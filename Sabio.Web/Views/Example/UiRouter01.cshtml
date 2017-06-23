@@ -1,0 +1,213 @@
+﻿
+@{
+    ViewBag.Title = "UI-Router";
+    Layout = "~/Views/Shared/_LayoutAlternate.cshtml";
+}
+
+<h2>Angular UI-Router, part 1</h2>
+
+<div>
+    <div>
+        <a class="btn btn-primary" ui-sref="hello" ui-sref-active="active">Hello</a>
+        <a class="btn btn-primary" ui-sref="about" ui-sref-active="active">About</a>
+
+        <ui-view></ui-view>
+    </div>
+</div>
+
+@section pageInitScripts{
+
+    <script src="~/Scripts/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push('ui.router');
+    </script>
+}
+
+@section scripts {
+    <script src="/Scripts/sabio.services.blogTag.js"></script>
+
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                 .config(RouteConfig);
+
+            RouteConfig.$inject = ["$stateProvider", "$urlRouterProvider"];
+
+            function RouteConfig($stateProvider, $urlRouterProvider) {
+                var helloState = {
+                    name: 'index',
+                    url: '/index',
+                    template: '<h4>Hello from  UI-Router</h4>'
+                };
+                var aboutState = {
+                    name: 'about',
+                    url: '/about',
+                    template: '<h4>About UI-Router</h4>'
+                }
+
+                $stateProvider.state(helloState);
+                $stateProvider.state(aboutState);
+                $urlRouterProvider.otherwise("/index");
+            }
+        })();
+
+
+
+        //(function () {
+        //    "use strict";
+        //    angular.module(APPNAME)
+        //    .controller('exController', ExController);
+
+        //    ExController.$inject = ['$scope', '$window', '$baseController', 'blogTagService'];
+
+        //    function ExController($scope, $window, $baseController, blogTagService) {
+        //        // Administrative stuff
+        //        var vm = this;
+        //        vm.$scope = $scope;
+        //        // Simulate inheritance to add
+        //        // $document, $log, $route, $routeParams, $systemEventService, $alertService, $sabio services
+        //        // to our controller.
+        //        $baseController.merge(vm, $baseController);
+        //        vm.blogTagService = blogTagService;
+        //        vm.$window = $window;
+
+        //        // ViewModel
+        //        vm.goHome = _goHome;
+        //        vm.items = [];
+        //        vm.item = null;  // copy of item being edited
+        //        vm.itemIndex = -1; // index of item being edited
+        //        vm.select = _select;
+        //        vm.save = _save;
+        //        vm.cancel = _cancel;
+        //        vm.add = _add;
+        //        vm.delete = _delete;
+
+        //        // "The fold"
+
+        //        _render();
+
+        //        function _render() {
+        //            vm.blogTagService.getAll(_getAllSuccess, _getAllError);
+        //        }
+
+        //        function _goHome() {
+        //            vm.$window.location.href = '/';
+        //        }
+
+        //        function _getAllSuccess(data) {
+        //            vm.$scope.$apply(function () {
+        //                vm.items = data.items;
+        //            });
+        //            vm.$alertService.success("Retrieved all");
+        //        }
+
+        //        function _getAllError(jqXHR) {
+        //            vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+        //        }
+
+        //        function _select(foo) {
+        //            // Keep track of the position in vm.items of
+        //            // the item we will be editing
+        //            vm.itemIndex = vm.items.indexOf(foo);
+        //            // get a fresh copy of the object to be edited from the database.
+        //            vm.blogTagService.getById(foo.id, _getByIdSuccess, _getByIdError)
+        //        }
+
+        //        function _getByIdSuccess(data) {
+        //            if (data.item) {
+        //                vm.$scope.$apply(function () {
+        //                    vm.item = data.item;
+        //                });
+        //            }
+        //            vm.$alertService.success("Retrieved item for editing from database");
+        //        }
+
+        //        function _getByIdError(jqXHR) {
+        //            vm.$alertService.error(jqXHR.responseText, "GetById failed");
+        //        }
+
+        //        // create a new empty item
+        //        function _add() {
+        //            // Changing item from null to empty object indicates any
+        //            // ui components for editing should be shown
+        //            vm.item = {};
+        //            vm.itemIndex = -1;
+        //        }
+
+        //        function _cancel() {
+        //            _endEdit();
+        //        }
+
+        //        function _endEdit() {
+        //            vm.item = null;
+        //            vm.itemIndex = -1;
+        //        }
+
+        //        function _save() {
+        //            if (vm.item.id) {
+        //                vm.blogTagService.putJson(vm.item.id, vm.item, _putSuccess, _putError);
+        //            }
+        //            else {
+        //                vm.blogTagService.postJson(vm.item, _postSuccess, _postError);
+        //            }
+        //        }
+
+        //        function _putSuccess(data) {
+        //            vm.$scope.$apply(function () {
+        //                // for update, replace with new version
+        //                vm.items[vm.itemIndex] = vm.item;
+        //                _endEdit();
+        //                vm.$alertService.success("Update successful");
+        //            });
+        //        }
+
+        //        function _putError(jqXHR) {
+        //            vm.$alertService.error(jqXHR.responseText, "Update failed");
+        //        }
+
+        //        function _postSuccess(data) {
+        //            if (data.item) {
+        //                vm.$scope.$apply(function () {
+        //                    // To sync the UI, get id from data and push vm.item onto vm.items array
+        //                    vm.item.id = data.item;
+        //                    vm.items.push(vm.item);
+        //                    _endEdit();
+        //                    vm.$alertService.success("Insert successful");
+        //                });
+        //            }
+        //        }
+
+        //        function _postError(jqXHR) {
+        //            vm.$alertService.error(jqXHR.responseText, "Insert failed");
+        //        }
+
+        //        function _delete() {
+        //            if (vm.item.id) {
+        //                vm.blogTagService.delete(vm.item.id, _deleteSuccess, _deleteError);
+        //            }
+        //        }
+
+        //        function _deleteSuccess(data) {
+        //            vm.$scope.$apply(function () {
+        //                // To update UI, replace with new version
+        //                vm.items.splice(vm.itemIndex, 1);
+        //                _endEdit();
+        //                vm.$alertService.success("Delete successful");
+        //            });
+        //        }
+
+        //        function _deleteError(jqXHR) {
+        //            vm.$alertService.error(jqXHR.responseText, "Delete failed");
+        //        }
+        //    }
+
+        //})();
+
+    </script>
+}
+
+
+
+

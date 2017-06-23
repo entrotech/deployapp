@@ -1,0 +1,192 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+<!-- begin breadcrumb -->
+<ol class="breadcrumb pull-right">
+    <li><a href="/">Home</a></li>
+    <li><a href="/serviceBranches">Service Branches</a></li>
+    <li class="active">Service Branch</li>
+</ol>
+<!-- end breadcrumb -->
+<!-- begin page-header -->
+<h1 class="page-header">Service Branches <small></small></h1>
+<!-- end page-header -->
+<!-- begin form content -->
+<div class="row">
+    <!-- begin col-6 -->
+    <div class="col-md-8">
+        <!-- begin panel -->
+        <div class="panel panel-inverse" data-sortable-id="form-stuff-1">
+            <div class="panel-heading">
+                <div class="panel-heading-btn">
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                </div>
+                <h4 class="panel-title">Input Types</h4>
+            </div>
+            <div class="panel-body">
+          
+                <form id="serviceBranchForm" name="serviceBranchForm" data-parsley-validate="true">
+                    <div class="form-group">
+                        <label for="name">Service Branch: </label>
+                        <input type="text" class="form-control" name="name" data-parsley-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="code">Service Branch Code: </label>
+                        <input class="form-control" id="code" name="code" data-parsley-required="true">
+                    </div>
+                    <div class="form-group">
+                        <label for="displayOrder">Display Order: </label>
+                        <select class="form-control" name="displayOrder" data-parsley-required="true">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="inactive">Inactive: </label>
+                        <select class="form-control" id="inactive" name="inactive" data-parsley-required="true">
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-primary submit" id="submit">Add</button>
+                    <button type="button" class="btn btn-default cancel">Cancel</button>
+                    <button type="button" class="btn btn-danger delete">Delete</button>
+                </form> 
+
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end form content -->
+@section styles{
+}
+
+@section scripts{
+
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/sabio.services.servicebranch.js"></script>
+
+
+    <script>
+
+        sabio.page.id = @Model.Item;
+
+        sabio.page.startUp = function () {
+
+            $(".submit").on("click", sabio.page.handlers.submitBtn);
+           
+            $(".cancel").on("click",function(){
+                window.location = "/ServiceBranches/";
+            });
+
+            if(sabio.page.id){
+                sabio.services.servicebranch.getById(sabio.page.id,sabio.page.onGetSuccess,sabio.page.onGetError);
+                $("#submit").removeClass("btn-primary").addClass("btn-warning").text("Update Service Branch");
+
+            }
+        }
+
+        sabio.page.initializeValidation = function () {
+            jQuery.validator.setDefaults({
+                debug: true
+            });
+        }
+
+        $("#serviceBranchForm").validate({
+            rules: {
+                name: {
+                    required: true
+                },
+                code: {
+                    required: true
+                },
+                inactive: {
+                    required: true
+                },
+                displayOrder: {
+                    required: true,
+                    number: true,
+
+                }
+            },
+
+            messages: {
+                Name: {
+                    required: "This field is required."
+                },
+                Code: {
+                    required: "This field is required."
+                },
+                inactive: {
+                    required: "This field is required."
+                },
+                displayOrder: {
+                    required: "This field is required.",
+
+                }
+            }
+        });
+
+        sabio.page.handlers.submitBtn = function (event) {
+
+            if ($("#serviceBranchForm").valid()) {
+                var data = $("#serviceBranchForm").serialize();
+                console.log(data);
+                if (sabio.page.id) {
+
+                    sabio.services.servicebranch.put(sabio.page.id,data,sabio.page.onPutSuccess, sabio.page.onPutError);
+
+                }
+                else {
+                    sabio.services.servicebranch.post(data,sabio.page.onPostSuccess, sabio.page.onPostError);
+
+                }
+            }
+        }
+
+        sabio.page.onPostSuccess = function (data) {
+
+            $("#submit").removeClass("btn-primary").addClass("btn-warning").text("Update Service Branch");
+            $(".alert").removeClass("hidden").text("ServiceBranch posted!");
+            toastr.success('Service Branch Added');
+            sabio.page.id = data.item;
+        }
+
+        sabio.page.onPostError = function () {
+          
+            toastr.error('Post Error Occured');
+        }
+
+        sabio.page.onPutSuccess = function (data) {
+            $(".alert").removeClass("hidden").text("ServiceBranch Updated!");
+            toastr.info('Update Successful');
+        }
+        sabio.page.onPutError = function () {
+            $(".alert").removeClass("hidden alert-success").addClass("alert-danger").text("ServiceBranch Update Error!");
+            
+            toastr.info('Update Successful');
+        }
+        sabio.page.onGetSuccess = function(data){
+            $("input[name='name']").val(data.item.name);
+            $("input[name='code']").val(data.item.code);
+            $("input[name='displayOrder']").val(data.item.displayOrder);
+            $("input[name='inactive']").val(data.item.inactive );
+        }
+
+        sabio.page.onGetError = function(){
+            //  console.log("Id doesnt exist");
+            toastr.warning("Opps! it doesnt exist in our database");
+        }
+
+       
+    </script>
+}

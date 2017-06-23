@@ -1,0 +1,260 @@
+﻿@{
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .announcement-img {
+            width: 415px;
+            height: 232px;
+        }
+
+        a:focus, a:hover {
+            text-decoration: none;
+        }
+    </style>
+}
+
+<div ng-controller="announcementController as main">
+    <div class="page-header">
+        <div class="container">
+            <h2 class="text-center lead">Announcements</h2>
+        </div>
+    </div>
+    <!-- begin #content -->
+    <div id="content" class="content">
+        <!-- begin container -->
+        <div class="container">
+            <!-- begin row -->
+            <div class="row row-space-20">
+                <!-- begin col-9 -->
+                <div class="row date-sort">
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            <span class="filter-date small">
+                                <i class="fa fa-filter"></i> <b>Sort:</b> <a ng-click="main.sortReverse = !main.sortReverse" href="#">
+                                    Date
+                                    <span ng-show="!main.sortReverse" class="fa fa-caret-down"></span>
+                                    <span ng-show="main.sortReverse" class="fa fa-caret-up"></span>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <!-- begin post-list -->
+                    <div class="post-list post-grid post-grid-2">
+                        <div class="post-li" dir-paginate="item in main.items.announcements
+                            | filter: main.searchString
+                            | filter: {announcementCategory: {name: main.filter}}
+                            | orderBy: main.items.dateCreated: main.sortReverse
+                            | itemsPerPage:4">
+                            <!-- begin post-content -->
+                            <div class="post-content">
+                                <!-- begin post-image -->
+                                <div class="post-image">
+                                    <a ng-click="main.viewAnnouncement(item)" href="#">
+                                        <img class="announcement-img" ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{item.photoKey}}" />
+                                    </a>
+                                </div>
+                                <!-- end post-image -->
+                                <!-- begin post-info -->
+                                <div class="post-info">
+                                    <h4 class="post-title">
+                                        <a ng-click="main.viewAnnouncement(item)" href="#">
+                                            {{item.title}}
+                                        </a>
+                                    </h4>
+                                    <div class="post-by">
+                                        Posted By
+                                        <a href="#">
+                                            {{item.announcements.personFirstName}} {{item.personLastName}}
+                                        </a>
+                                        <span class="divider">|</span>
+                                        <span class="dateCreated">{{item.dateCreated | date : "MMMM d, y"}}</span>
+                                        <span class="divider">|</span>
+                                        <span>{{item.announcementCategory.name}}</span>
+                                    </div>
+                                    <div class="post-desc">
+                                        {{item.body | limitTo: 500}}
+                                        <span ng-if="item.body.length > 490">
+                                            <a ng-click="main.viewAnnouncement(item)" href="#">[...]</a>
+                                        </span>
+                                    </div>
+                                    <div class="read-btn-container">
+                                        <a ng-click="main.viewAnnouncement(item)" href="#">
+                                            View Post <i class="fa fa-angle-double-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <!-- end post-info -->
+                            </div>
+                            <!-- end post-content -->
+                        </div>
+                    </div>
+                    <!-- end #content -->
+                </div>
+                <!-- end col-9 -->
+                <!-- begin col-3 -->
+                <div class="col-md-3">
+                    <!-- begin section-container -->
+                    <div class="section-container ">
+                        <div class="input-group sidebar-search">
+                            <input type="text" class="form-control searchBar"
+                                   placeholder="Enter keywords..." ng-model="main.searchString" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-inverse" type="button">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- end section-container -->
+                    <!-- begin section-container -->
+                    <div class="section-container">
+                        <h4 class="section-title"><span>Categories</span></h4>
+                        <ul class="sidebar-list a">
+                            <li class="bCategory">
+                                <a ng-click="main.filterByGeneral()" href="#">
+                                    General ({{main.items.categoriesWithTotals[0].categoryTotal}})
+                                </a>
+                                <a ng-click="main.filterBySquad()" href="#">
+                                    Squad ({{main.items.categoriesWithTotals[1].categoryTotal}})
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="sidebar-list a">
+                            <li class="bCategory">
+                                <a ng-click="main.resetFilter()" href="#">
+                                    All ({{main.totalAnnouncements}})
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- end section-container -->
+                    <!-- begin section-container -->
+                    <div class="section-container">
+                        <h4 class="section-title"><span>Recent</span></h4>
+                        <ul ng-repeat="item in main.items.announcements
+                            | limitTo: 4" class="sidebar-recent-post">
+                            <li class="recent-post-list">
+                                <div class="info">
+                                    <h4 class="title">
+                                        <a ng-click="main.viewAnnouncement(item)" href="#">
+                                            {{item.title}}
+                                        </a>
+                                    </h4>
+                                    <div class="date">
+                                        {{item.dateCreated | date : "MMMM d, y"}}
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="recent-post-padding"></li>
+                        </ul>
+                    </div>
+                    <!-- end section-container -->
+                </div>
+                <!-- end col-3 -->
+            </div>
+            <!-- end row -->
+            <div class="row text-center">
+                <dir-pagination-controls max-size="5"
+                                         direction-links="true"
+                                         boundary-links="true">
+                </dir-pagination-controls>
+            </div>
+        </div>
+        <!-- end container -->
+    </div>
+</div>
+
+@section pageInitScripts{
+    <script src="~/Scripts/dirPagination.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("angularUtils.directives.dirPagination")
+    </script>
+}
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.announcement.js"></script>
+    <script src="~/Scripts/app/services/announcement.js"></script>
+    <script>
+        (function () {
+            angular.module(APPNAME)
+                .controller("announcementController", AnnouncementController);
+
+            AnnouncementController.$inject = ["$scope", "$window", "$baseController", "announcementService"];
+
+            function AnnouncementController($scope, $window, $baseController, announcementService) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.announcementService = announcementService;
+                vm.$window = $window;
+
+                // viewmodel
+                vm.sortReverse = false;
+                vm.totalAnnouncements = 0;
+                vm.filter = "";
+                vm.searchString = "";
+                vm.items = [];
+                vm.viewAnnouncement = _viewAnnouncement;
+                vm.filterByMentorship = _filterByMentorship;
+                vm.filterBySquad = _filterBySquad;
+                vm.filterByGeneral = _filterByGeneral;
+                vm.resetFilter = _resetFilter;
+
+                _render();
+
+                function _render() {
+                    vm.announcementService.getAllWithCategories(_getAllSuccess, _getAllError);
+                }
+
+                function _getAllSuccess(data) {
+                    if (data.item.announcements.length >= 1) {
+                        vm.$scope.$apply(function () {
+                            vm.items = data.item;
+                            console.log(vm.items);
+                            _totalAnnouncements();
+                        });
+                    }
+                    else {
+                        vm.$alertService.success("No announcements exist!");
+                    }
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load announcements!");
+                }
+
+                function _totalAnnouncements() {
+                    var catTotal = 0;
+                    for (var i = 0; i < vm.items.categoriesWithTotals.length; i++) {
+                        catTotal += vm.items.categoriesWithTotals[i].categoryTotal;
+                    }
+                    vm.totalAnnouncements = catTotal;
+                }
+
+                function _viewAnnouncement(item) {
+                    vm.$window.location.href = "/announcements/" + item.id;
+                }
+
+                function _filterByMentorship() {
+                    vm.filter = "Mentorship";
+                }
+
+                function _filterBySquad() {
+                    vm.filter = "Squad";
+                }
+
+                function _filterByGeneral() {
+                    vm.filter = "General";
+                }
+
+                function _resetFilter() {
+                    vm.filter = "";
+                }
+            }
+        })();
+    </script>
+}

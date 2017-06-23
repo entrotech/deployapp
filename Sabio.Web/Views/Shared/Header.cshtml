@@ -1,0 +1,88 @@
+﻿
+<div id="header" class="header navbar navbar-inverse navbar-fixed-top">
+    <!-- begin container -->
+    <div class="container">
+        <!-- begin navbar-header -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#header-navbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+                <div><img src="/Content/Images/DeployLogo.png" width="100"></div>
+                @*<div class="brand-logo"><img src="https://files.slack.com/files-pri/T08EKJ58F-F51HG2US1/pasted_image_at_2017_04_19_09_35_am.png"></div>*@
+                <span class="brand-text">
+                    <span class="text-theme"></span>
+                </span>
+            </a>
+        </div>
+        <!-- end navbar-header -->
+        <!-- begin navbar-collapse -->
+        <div class="collapse navbar-collapse" id="header-navbar">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/squads">MENTORSHIP</a></li>
+                <li class="dropdown">
+                    <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                        JOBS<b class="caret m-l-5"></b>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                        <li class="arrow"></li>
+                        <li><a href="/jobpostings">Job Search</a></li>
+                        <li><a href="/companies">Companies</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                        PROJECTS<b class="caret m-l-5"></b>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                        <li class="arrow"></li>
+                        @*<li><a href="/projects">Projects</a></li>*@
+                        <li><a href="/proposals/create">Submit Proposals</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                        EVENTS<b class="caret m-l-5"></b>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                        <li class="arrow"></li>
+                        <li><a href="/globalevents">Upcoming Events</a></li>
+                        <li><a href="/resources/index">Resources</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                        ABOUT US<b class="caret m-l-5"></b>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                        <li class="arrow"></li>
+                        <li><a href="/blogs">Blogs</a></li>
+                        <li><a href="/announcements">Announcements</a></li>
+                        <li><a href="/testimonials">Testimonials</a></li>
+                        <li><a href="/faqs">FAQ</a></li>
+                        <li class="contact-us"><a href="/#/#contact">Contact Us</a></li>
+                    </ul>
+                </li>
+                <li class="hidden-xs"><a>|</a></li>
+                <li data-ng-hide="{{lVm.model.isLoggedIn}}"><a href="/users/login" id="login" style="font-weight:bold; color:ActiveCaption"><span>LOG IN</span></a></li>
+                <li id="userDropDown" class="active dropdown" data-ng-show="{{lVm.model.isLoggedIn}}">
+                    <a href="javascript:;" class="dropdown-toggle visible" data-toggle="dropdown" id="username" ng-bind="lVm.model.fullName">
+                        <b class="caret m-l-5"></b>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                        <li class="arrow"></li>
+                        <li data-ng-show="{{lVm.isAdmin}}"><a href="/aspnetuserroles">Admin Home</a></li>
+                        <li><a href="/users/home">My Home Page</a></li>
+                        <li><a href="/person/0/edit">My Profile</a></li>
+                        <li><a href="/calendar">Calendar</a></li>
+                        <li><a href="" data-ng-click="lVm.logout()">Log Out</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <!-- end navbar-collapse -->
+    </div>
+    <!-- end container -->
+</div>

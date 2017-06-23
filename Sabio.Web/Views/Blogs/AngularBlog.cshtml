@@ -1,0 +1,699 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+@section Styles{
+
+
+    <style>
+        .indent {
+            margin-left: 40px;
+        }
+
+        .photo2 {
+            border: 3px solid #AAAAAA;
+            padding: 5px;
+        }
+
+        .comment-avatar-img {
+            width: 100px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #AAAAAA;
+            overflow: hidden;
+        }
+
+            .comment-avatar-img:hover {
+                -webkit-opacity: 0.7;
+                -moz-opacity: 0.7;
+                transition: 0.7s ease;
+                -webkit-transition: 0.7s ease;
+                -moz-transition: 0.7s ease;
+                transform: scale(1.2, 1.2);
+            }
+            .ng-cloak {
+            display: none !important;
+        }
+        textarea{
+            width:100%
+        }
+    </style>
+}
+<!-- begin #content -->
+<!-- begin #page-title -->
+<div id="page-title" class="page-title has-bg">
+    <div class="bg-cover"><img src="/content/images/blog/cover.jpg" alt="" /></div>
+    <div class="container">
+        <h1>Official Deploy Blog</h1>
+        @*<p>Blog Page Title Goes Here</p>*@
+        @*<div ng-switch on="vm.blogList">
+            <span ng-switch-when="true">Recent Blog Posts</span>
+            <span ng-switch-when="false">Single Blog Post </span>
+        </div>*@
+    </div>
+</div>
+<!-- end #page-title -->
+<div id="content" class="content" data-ng-controller='blogController as exVm'>
+    <!-- begin container -->
+    <div class="container">
+        <!-- begin row -->
+        <div class="row row-space-30">
+            <!-- begin col-9 -->
+            <div class="col-md-9" id="blogPost">
+
+                <!-- begin post-list -->
+                <div class="post-list post-grid post-grid-2" ng-show="exVm.blogList" ng-cloak>
+                   
+
+                    <div class="post-li pull-left"  ng-repeat='item in exVm.filteredItems'>
+                        <!-- begin post-content -->
+                        <div class="post-content">
+                            <!-- begin post-image -->
+                            <div class="post-image">
+                                <a ng-click="exVm.select(item)"><img class="img-responsive" ng-src='https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{item.photos[0].blogPhotoKey}}'></a>
+                            </div>
+                            <!-- end post-image -->
+                            <!-- begin post-info -->
+                            <div class="post-info">
+                                <h4 class="post-title">
+                                    <a href="#">{{item.title}}</a>
+                                </h4>
+                                <div class="post-by">
+                                    Posted By <a>{{item.firstName}} {{item.lastName}}</a> <span class="divider">|</span><span class="dateCreated">{{item.dateCreated | date:'MMMM d, y'}}</span>
+                                </div>
+                                <div class="post-desc" ng-bind-html='exVm.sanitize(item.body)'>
+                                    {{item.body }}
+                                </div>
+                                <div class="btn read-btn-container">
+                                    <a ng-click="exVm.select(item)" class="btn btn-primary btn-sm read-btn ">Read More <i class="fa fa-angle-double-right"></i></a>
+                                </div>
+                            </div>
+                            <!-- end post-info -->
+                        </div>
+                        <!-- end post-content -->
+
+                    </div>
+
+                </div>
+                <!-- end #content -->
+                <!-- begin post-detail -->
+                <div ng-hide="exVm.blogList" >
+                    <div class="post-detail section-container">
+
+                        <h4 class="post-title">
+                            <a href="#">
+                                {{exVm.item.title}}
+
+                            </a>
+                        </h4>
+                        <div class="post-by">
+                            Posted By <a href="#" class="author">{{exVm.item.firstName}} {{exVm.item.lastName}}</a>
+                            <span class="divider">|</span> <span class="dateCreated"> {{exVm.item.dateCreated | date:'MMMM d, y'}}</span>
+                               <span class="divider">|</span>
+                        </div>
+                        <!-- begin post-image -->
+                        <div class="post-image">
+                            <img ng-src='https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{exVm.item.photos[0].blogPhotoKey}}' width="820">
+
+                        </div>
+                        <!-- end post-image -->
+                        <!-- begin post-desc -->
+                        <div class="post" ng-bind-html='exVm.sanitize(exVm.item.body)'>
+                            {{exVm.item.body}}
+                        </div>
+                        <!-- end post-desc -->
+                        <!-- begin post-image -->
+                        <div class="post-image">
+                            <img ng-show="exVm.item.photos.length > 1" ng-src='https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{exVm.item.photos[1].blogPhotoKey}}' width="820">
+
+                        </div>
+                        <!-- end post-image -->
+                        <!-- begin post-desc -->
+                        @*<div class="post-desc2" ng-bind-html='exVm.sanitize(exVm.item.body)'>
+                            {{exVm.item.body}}
+                        </div>*@
+                        <!-- end post-desc -->
+                        <!--Image Cropper Start-->
+                        <div>
+
+                        </div>
+                        <!--Image Cropper Ends Here-->
+                    </div>
+                    <!-- end post-detail -->
+                    <!-- begin section-container -->
+                    <div class="section-container">
+                        <h4 class="section-title"><span>All Comments </span></h4>
+                        <!-- begin comment-list -->
+                        <div>
+                            <ul class="comment-list" ng-repeat="item in exVm.comments" ng-include="'commentSection.html'"></ul>
+                        </div>
+                        <!-- end comment-list -->
+                    </div>
+                    <!-- end section-container -->
+                    <!-- begin section-container -->
+                    <div class="section-container" id="cmntSection">
+                        <h4 class="section-title m-b-20"><span>Add a Comment</span></h4>
+
+                        <form ng-hide="showFormR" class="form-horizontal" name="commentForm" novalidate ng-submit="exVm.submitComment()">
+
+
+                            <div class="form-group">
+                                <label class="control-label f-s-12 col-md-2">Comment <span class="text-danger">*</span></label>
+                                <div class="col-md-10">
+                                    <textarea class="form-control" rows="10" id="comment" name="comment" ng-model="exVm.comment.comment"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-10 col-md-offset-2">
+                                    <button type="submit" class="btn btn-inverse btn-lg" id="submit">Submit Comment</button>
+                                    <h4>You need to login to Post Comment <span> <a href="../users/login">Login Here</a></span></h4>
+
+                                </div>
+                            </div>
+                        </form>
+
+
+                    </div>
+                    <!-- end section-container -->
+                </div>
+            </div>
+            <!-- end col-9 -->
+            <!-- begin col-3 -->
+            <div class="col-md-3">
+                <!-- begin section-container -->
+                <div class="section-container" ng-show="exVm.blogList">
+                    <div class="input-group sidebar-search">
+                        <input type="text" class="form-control searchBar"  placeholder="Search Our Stories..." />
+                        <span class="input-group-btn">
+                            <button class="btn btn-inverse searchButton" type="button" ng-click="exVm.search()"><i class="fa fa-search"></i></button>
+                        </span>
+                    </div>
+                </div>
+                <!-- end section-container -->
+                <!-- begin section-container -->
+                @*<div class="section-container">
+                        <h4 class="section-title"><span>Categories</span></h4>
+                        <ul class="sidebar-list" ng-repeat="category in exVm.categories">
+                            <li><a ng-click="exVm.selectByCategory(category)">{{category}}</a></li>
+
+                        </ul>
+                    </div>*@
+                <div class="section-container">
+                    <h4 class="section-title"><span>Create Blog</span></h4>
+                    <ul class="sidebar-list">
+                        <li><a href="../blogs/create" class="btn btn-success">Post Your Own Blog</a></li>
+                        @*<li><a href="../blogs/create">Edit Your Blog Post</a></li>*@
+
+                    </ul>
+                </div>
+                <!-- end section-container -->
+                <!-- begin section-container -->
+                <div class="section-container">
+                    <h4 class="section-title"><span>Recent Post</span></h4>
+                    <ul class="sidebar-recent-post" data-ng-repeat="item in exVm.recentBlogs | limitTo:10">
+                        <li>
+                            <div class="info">
+                                <h4 class="title"><a ng-click="exVm.select(item)">{{item.title}}</a></h4>
+                                <div class="date">{{item.dateCreated | date :  "MMMM d, y"}}</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- end section-container -->
+                <!-- begin section-container -->
+                <div class="section-container">
+                    <h4 class="section-title"><span>Follow Us</span></h4>
+                    <ul class="sidebar-social-list">
+                        <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                        <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                        <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                        <li><a href="#"><i class="fa fa-instagram"></i></a></li>
+                    </ul>
+                </div>
+                <!-- end section-container -->
+            </div>
+            <!-- end col-3 -->
+        </div>
+
+
+        <!-- end row -->
+        <div class="row">
+            <div class="col-md-9 text-center">
+                <ul uib-pagination ng-model="exVm.currentPage" total-items="exVm.totalItems" boundary-link="true" ng-change="exVm.pageChanged() " items-per-page="exVm.itemsPerPage"></ul>
+            </div>
+        </div>
+        
+
+    </div>
+</div>
+<!-- end container -->
+
+<script type="text/ng-template" id="commentSection.html">
+    <li>
+        <div class="comment-avatar">
+            <img class="comment-avatar-img" src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{item.photoKey}}" />
+        </div>
+        <!-- end comment-avatar -->
+        <!-- begin comment-container -->
+        <div class="comment-container">
+            <div class="comment-author">
+                {{item.firstName}} {{item.lastName}}
+                <span class="comment-date">
+                    on <span class="underline">{{item.dateCreated | date:'MMM dd, y'}}</span> 
+                </span>
+            </div>
+            <div class="comment-content">
+                {{item.comment}}
+            </div>
+            <div class="comment-btn pull-left">
+                <a ng-hide="showFormR" ng-click="showFormR='true';exVm.selectComment(item)"><i class="fa fa-reply"></i> Reply</a>
+            </div>
+            <div class="myReplyForm">
+                <form class="form" ng-show="showFormR" name="commentForm" novalidate ng-submit="exVm.submitComment()">
+                    <div class="col-md-12">
+                       
+                        <textarea class="form-control" name="comment" rows="5" ng-model="exVm.comment.comment"></textarea>
+                    </div>
+                    <div class="col-md-offset-8">
+                        <button type="submit" class="btn btn-inverse" id="submit">Submit </button>
+                        <button type="submit" ng-click="showFormR=!showFormR" class="btn btn-inverse" id="cancel">Cancel </button>
+                    </div>
+
+                    <div class="form-group">
+                        
+                    </div>
+                </form>
+            </div>
+              
+           
+            @*<div class="comment-rating">
+                    Like or Dislike:
+                    <a href="#" class="m-l-10 text-inverse"><i class="fa fa-thumbs-up text-success"></i> 5</a>
+                    <a href="#" class="m-l-10 text-inverse"><i class="fa fa-thumbs-down text-danger"></i> 0</a>
+                </div>*@
+        </div>
+        <!-- end comment-container -->
+        <ul class="comment-list indent" ng-if="item.replies">
+            <li ng-repeat="item in item.replies" ng-include="'commentSection.html'"></li>
+        </ul>
+    </li>
+</script>
+
+
+@section pageInitScripts{
+    <script src="~/Assets/Admin/plugins/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ng/angular-ckeditor.min.js"></script>
+
+
+}
+
+@section scripts {
+    <script src="/Scripts/sabio.services.blog.js"></script>
+    <script src="/Scripts/sabio.services.blogComment.js"></script>
+    <script src="/Scripts/sabio.services.blogTag.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-sanitize.js"></script>
+    <script src="~/Scripts/sabio.services.file.js"></script>
+    <script src="https://rawgit.com/dwmkerr/angular-modal-service/master/dst/angular-modal-service.js"></script>
+
+    <script src="~/Assets/blog/js/Image_cropper.js"></script>
+
+
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('blogService', BlogService);
+            BlogService.$inject = ['$baseService', '$sabio', ];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function BlogService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.blog;
+
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+
+        })();
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('commentService', CommentService);
+            CommentService.$inject = ['$baseService', '$sabio'];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function CommentService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.blogComment;
+
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+
+        })();
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('fileService', FileService);
+            FileService.$inject = ['$baseService', '$sabio'];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function FileService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.file;
+
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+
+        })();
+
+
+        (function () {
+            angular.module(APPNAME)
+            .controller('blogController', BlogController)
+
+            BlogController.$inject = ['$scope', '$window', '$baseController', 'blogService', '$sce', 'commentService', 'fileService', '$uibModal'];
+
+            function BlogController($scope, $window, $baseController, blogService, $sce, commentService, fileService, $uibModal) {
+                // Administrative stuff
+                var vm = this;
+
+                vm.$scope = $scope;
+                vm.$uibModal = $uibModal;
+                vm.openModal = _openModal;
+                $baseController.merge(vm, $baseController);
+                vm.blogService = blogService;
+                vm.fileService = fileService;
+                vm.commentService = commentService;
+                vm.$window = $window;
+                vm.submitComment = _submitComment;
+              
+               
+
+
+                // ViewModel
+
+                vm.items = [];
+                vm.blogList = true;
+                vm.item = null;  // copy of item being edited
+                vm.itemIndex = -1; // index of item being edited
+                vm.select = _select;
+                vm.selectComment = _selectComment;
+                //vm.save = _save();
+                vm.comments = [];
+                vm.comment = null;
+                vm.modalSelected = null;
+                vm.selectedItems = []
+                vm.showFormR = false;
+                var blogId;
+                var commentId;
+
+
+                //vm.submitForm = _submitForm;
+                vm.recentBlogs = [];
+                vm.selectByCategory = _selectByCategory;
+                vm.categories = ['General', 'Experience Sharing', 'Other'];
+                vm.filteredItems = [];
+                vm.currentPage = 1;
+                vm.itemsPerPage = 6;
+                vm.totalItems = vm.items.length;
+                vm.pageChanged = _pageChanged;
+                vm.search = _search;
+                vm.sanitize = _sanitize;
+                vm.currentBlogId = 0;
+                
+
+                _render();
+                //_getComments();
+
+               
+                function _submitComment(comment) {
+                    //var data = {
+                    //    id: blogId,
+                    //    parentId: commentId,
+                    //    comment: vm.comment
+                    //}
+                    vm.comment.blogId = blogId;
+                    if (commentId) {
+                        vm.comment.parentId = commentId;
+                    }
+                   
+                   // vm.comments.push(vm.comment);
+                    vm.commentService.postJson(vm.comment, _onCommentPostSuccess, _onPostCommentError);
+                    vm.comment = {};
+                   // vm.commentForm.$setUntouched();
+                   // vm.commentForm.$setPristine();
+
+                }
+                function _onCommentPostSuccess(data) {
+                    //vm.comments = [];
+                    vm.commentService.getByIdJson(blogId, _getCommentSuccess, _getByIdError);
+                    commentId = 0;
+                 vm.$alertService.success("Comment Post Success");
+                }
+               
+                function _onPostCommentError(err) {
+                    console.log(err.responseText);
+                    alert("Please Login to Post Comment");
+                }
+
+                function _render() {
+
+                    vm.blogService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _endEdit() {
+                    vm.item = null;
+                    vm.itemIndex = -1;
+                }
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+                function _search() {
+                    var searchStr = $(".searchBar").val();
+
+                    vm.blogService.search(searchStr,_getAllSuccess, _getAllError);
+                };
+
+            
+
+                function _getCommentSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.comments = data.items;
+
+                    });
+
+                    vm.$alertService.success("Comment Success");
+
+
+                }
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+                }
+                function _pageChanged() {
+                    var begin = ((vm.currentPage - 1) * vm.itemsPerPage);
+                    var end = begin + vm.itemsPerPage;
+                    vm.filteredItems = vm.items.slice(begin, end);
+                }
+                function _selectComment(foo) {
+                    vm.itemIndex = vm.items.indexOf(foo);
+                    commentId = foo.id;
+                 
+                    vm.modalItems = foo; 
+                   // _openModal(foo);
+                }
+                //==========Modal Function==========
+                function _openModal(foo) {
+                    var modalInstance = vm.$uibModal.open({
+                        animation: true,
+                        templateUrl: 'modalContent.html', // targets template
+                        controller: 'modalController as mc', // controller for modal
+                        size: 'lg',
+                        resolve: {
+                            item: function () {
+                                return foo;
+                            }
+                        }
+                    });
+
+                    modalInstance.result.then(function () {
+
+                    }, function () {
+                        console.log('Modal dismissed at: ' + new Date());
+                    });
+                }
+                //function _submitForm(isValid) {
+                //    if (isValid) {
+                //        console.log("data is valid! go save it");
+                //        _save();
+                //    }
+                //    else {
+                //        console.log("form data invalid ");
+
+                //    }
+
+                //  }
+
+                //function _save() {
+                //    var data = {
+                //        "Name": vm.Name,
+                //        "Email": vm.Email,
+                //        "Comment": vm.comment,
+                //        "BlogId": vm.currentBlogId
+                //    }
+                //    vm.commentService.postJson(data, _postCommentSuccess, _postError);
+                //}
+
+
+                function _postError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Post Failed");
+                }
+
+                function _onSearchSuccess(data) {
+                    vm.items = [];
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                        pagechanged();
+
+                    });
+
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                        vm.recentBlogs = data.items;
+                        vm.totalItems = vm.items.length;
+                        vm.filteredItems = vm.items.slice(0, vm.itemsPerPage);
+                    });
+                    //vm.$alertService.success("Retrieved all" + vm.totalItems);
+                }
+
+
+                function _getAllError(jqXHR) {
+                    console.log(jqXHR.responseText, "GetAll failed");
+                }
+
+                function _select(foo) {
+                    vm.blogList = false;
+                    vm.itemIndex = vm.items.indexOf(foo);
+                   // vm.item = vm.items[vm.itemIndex];
+                    vm.currentBlogId = foo.id;
+                    blogId = foo.id;
+                    // get a fresh copy of the object to be edited from the database.
+                    vm.blogService.getById(foo.id, _getByIdSuccess, _getByIdError);
+                    _getComments();
+                }
+
+                function _getComments() {
+
+                    vm.commentService.getByIdJson(blogId, _getCommentSuccess, _getByIdError);
+                }
+
+                function _selectByCategory(foo) {
+                    vm.itemIndex = vm.items.indexOf(foo);
+                    vm.blogService.search("", foo, 1, 4, _getSearchSuccess, _getSearchError);
+                }
+                function _getByIdSuccess(data) {
+                   
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                        });
+                        vm.currentBlogId = vm.item.blogId;
+                    }
+                   // vm.$alertService.success("Single Post Blog");
+
+                }
+                function _getSearchSuccess(data) {
+                    vm.blogList = true;
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                        vm.items.blogId = blogId;
+                    });
+
+                  //  vm.$alertService.success("Blog By Category");
+                }
+                function _getSearchError(jqXHR) {
+
+                    vm.$alertService.error(jqXHR.responseText, "GetById failed");
+                }
+
+                //function _getByIdError(jqXHR) {
+                //    vm.$alertService.error(jqXHR.responseText, "Blog Retrived failed");
+                //}
+
+
+            }
+        })();
+
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller('modalController', ModalController);
+
+            ModalController.$inject = ['$scope', '$baseController', '$uibModalInstance', 'commentService', 'item']
+
+            function ModalController($scope, $baseController, $uibModalInstance, commentService, item) {
+
+                var vm = this;
+                vm.ModalItems = item;
+                vm.comments = [];
+                vm.commentService = commentService;
+
+                $baseController.merge(vm, $baseController);
+                vm.$scope = $scope;
+                vm.$uibModalInstance = $uibModalInstance;
+
+                vm.ok = function () {
+                    var data = { parentId: vm.ModalItems.id, BlogId: vm.ModalItems.blogId, comment: vm.comment };
+                    vm.commentService.postJson(data, _onCommentPostSuccess, _onPostCommentError);
+                };
+                function _onCommentPostSuccess(data) {
+
+                    vm.commentService.getByIdJson(vm.ModalItems.blogId, _getCommentSuccess, _onPostCommentError);
+                   
+                    vm.$uibModalInstance.close();
+                    vm.$alertService.success("Comment Post Success");
+                }
+                function _getCommentSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.comments = data.items;
+                    });
+                }
+
+                function _onPostCommentError() {
+                    console.log("Comment Post Failed")
+                }
+
+                vm.cancel = function () {
+                    vm.$uibModalInstance.dismiss('cancel');
+                };
+            }
+        })();
+    </script>
+
+    <script type="text/ng-template" id="modalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Add Comment</h3>
+        </div>
+        <div class="modal-body">
+            <form class="form-horizontal" name="commentForm" id="commentForm" novalidate>
+
+                <div class="form-group">
+                    <label class="control-label f-s-12 col-md-2">Comment <span class="text-danger">*</span></label>
+                    <div class="col-md-10">
+
+                        <textarea class="form-control" rows="10" id="comment" name="comment" ng-model="mc.comment"></textarea>
+                        <h3>You need to login to Post Comment <span> <a href="../users/login">Login Here</a></span></h3>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="mc.ok()">Submit Comment</button>
+            <button class="btn btn-warning" ng-click="mc.cancel()">Cancel</button>
+        </div>
+    </script>
+}

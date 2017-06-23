@@ -1,0 +1,128 @@
+﻿@model Sabio.Web.Models.ViewModels.BaseViewModel
+
+@{
+
+//SabioRazor: line #1 demonstrates how a Layout file, like any View file
+//              has the capability to be stronly typed.
+
+//SabioRazor: this is a Razor code block. It starts at the "@{" and ends where the closing
+//"}" is found
+
+}
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <title>Deploy - Built By Vets</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <link href="/assets/parallax/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/parallax/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="/assets/parallax/css/animate.min.css" rel="stylesheet" />
+    <link href="/assets/parallax/css/style.css" rel="stylesheet" />
+    <link href="/assets/parallax/css/style-responsive.css" rel="stylesheet" />
+    <link href="/assets/parallax/css/theme/default.css" id="theme" rel="stylesheet" />
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <!-- ================== BEGIN BASE JS ================== -->
+    @*<script src="/assets/parallax/plugins/pace/pace.min.js"></script>*@
+    <link href="~/Content/angular-toastr.css" rel="stylesheet" />
+    <!-- ================== END BASE JS ================== -->
+    <link href="~/Content/deployHome.css" rel="stylesheet" />
+    @RenderSection("styles", required: false)
+</head>
+<body data-ng-app="SabioApp" data-spy="scroll" data-target="#header-navbar" data-offset="51" data-ng-controller="layoutController as lVm">
+    <!-- begin #page-container -->
+    <div id="page-container" class="fade">
+        <!-- begin #header -->
+        @Html.Partial("~/Views/Shared/Header.cshtml")
+        <!-- end #header -->
+        <!-- begin #content -->
+        <div id="content" class="content">
+            @RenderBody()
+        </div>
+        <!-- end #content -->
+        <!-- begin scroll to top btn -->
+        <a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+        <!-- end scroll to top btn -->
+    </div>
+    <!--Begin footer-->
+    <div id="footer" class="footer">
+        <div class="container">
+            <div class="footer-brand">
+                @*<img class="irc_mi" src="https://operationcode.org/assets/operationcode_logo-eead949a7ce5220011ea8ddeb9ec5b0a.svg" alt="Image result for operation code logo" onload="google.aft&&google.aft(this)" width="541" height="120" style="margin-top: 137px;">*@
+                @*<img src="https://files.slack.com/files-pri/T08EKJ58F-F51HG2US1/pasted_image_at_2017_04_19_09_35_am.png" width="400" height="120">*@
+                <img src="/Content/Images/DeployLogo.png" width="320" />
+            </div>
+            <p>
+                © Copyright Operation Code 2017 <br>
+                An admin &amp; front end theme with serious impact. Created by <a href="#">Sabio Team</a>
+            </p>
+            <p class="social-list">
+                <a href="#"><i class="fa fa-facebook fa-fw"></i></a>
+                <a href="#"><i class="fa fa-instagram fa-fw"></i></a>
+                <a href="#"><i class="fa fa-twitter fa-fw"></i></a>
+                <a href="#"><i class="fa fa-google-plus fa-fw"></i></a>
+                <a href="#"><i class="fa fa-dribbble fa-fw"></i></a>
+            </p>
+        </div>
+    </div>
+    <!--End footer-->
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script type="text/javascript">
+        var APPNAME = 'SabioApp';
+    </script>
+    <script src="~/Assets/Parallax/plugins/jquery/jquery-1.9.1.min.js"></script>
+    <script src="~/assets/parallax/plugins/jquery/jquery-1.9.1.min.js"></script>
+    <script src="~/assets/parallax/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+    <script src="~/assets/admin/plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+    <script src="~/assets/parallax/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="/assets/admin/crossbrowserjs/html5shiv.js"></script>
+        <script src="/assets/admin/crossbrowserjs/respond.min.js"></script>
+        <script src="/assets/admin/crossbrowserjs/excanvas.min.js"></script>
+    <![endif]-->
+    <script src="~/assets/admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="~/assets/parallax/plugins/jquery-cookie/jquery.cookie.js"></script>
+    <script src="~/Assets/Parallax/plugins/scrollMonitor/scrollMonitor.js"></script>
+    <!-- ================== END BASE JS ================== -->
+    <!-- ================== BEGIN PAGE LEVEL JS ================== -->
+    <script src="~/assets/parallax/js/apps.js"></script>
+    <script src="~/Scripts/toastr.js"></script>
+    <!-- ================== END PAGE LEVEL JS ================== -->
+    <script src="~/Scripts/sabio.js"></script>
+
+    @Scripts.Render("~/bower/angular")
+
+    <script src="~/Assets/Admin/plugins/moment/moment.min.js"></script>
+
+    @RenderSection("pageInitScripts", required: false)
+
+    <script src="~/Scripts/sabio.ng.app.js"></script>
+    <script src="~/Scripts/sabio.services.user.js"></script>
+    <script src="~/Scripts/sabio.services.timecardEntry.js"></script>
+    <!--
+        SabioRazor: notice that this script is not required and that it will be
+        rendered at the
+        very bottom of the rendered HTML file
+        -->
+    @Scripts.Render("~/sabio/core")
+    <script src="~/Scripts/app/controllers/LayoutController.js"></script>
+    <script src="~/Scripts/app/services/TimecardEntry.js"></script>
+
+    @RenderSection("scripts", required: false)
+
+    <script>
+        sabio.page.model = @Html.RawJson(Model);
+    </script>
+</body>
+
+
+
+</html>

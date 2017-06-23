@@ -1,0 +1,159 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+@section Styles{ 
+    <style>
+        #content {
+            margin-top: 80px;
+        }
+
+        .recent-post-container {
+            margin-top: 63px;
+        }
+
+        .recent-post-padding {
+            padding: 0px !important;
+        }
+
+        .post-desc {
+            height: 100% !important;
+        }
+    </style>
+}
+
+<div ng-controller="announcementController as main">
+    <!-- begin #content -->
+    <div id="content" class="content">
+        <!-- begin container -->
+        <div class="container">
+            <!-- begin row -->
+            <div class="row row-space-30">
+                <!-- begin col-9 -->
+                <div class="col-md-9">
+                    <!-- begin post-detail -->
+                    <div class="post-detail section-container">
+                        <h4 class="post-title">
+                            <a href="#">{{main.item.title}}</a>
+                        </h4>
+                        <div class="post-by">
+                            Posted By 
+                            <a href="#" class="author">
+                                {{main.item.personFirstName}} {{main.item.personLastName}}
+                            </a> 
+                            <span class="divider">|</span>
+                            <span class="dateCreated">
+                                {{main.item.dateCreated | date : "MMMM d, y"}}
+                            </span>
+                            <span class="divider">|</span>
+                            <span class="category">
+                                {{main.item.announcementCategory.name}}
+                            </span>
+                        </div>
+                        <!-- begin post-image -->
+                        @*<div class="post-image">
+                            <img ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{main.item.photoKey}}" />
+                        </div>*@
+                        <!-- end post-image -->
+                        <!-- begin post-desc -->
+                        <div class="post-desc">
+                            <p>
+                                {{main.item.body}}
+                            </p>
+                            <p>
+                                <a href="/announcements">« Back to Index</a>
+                            </p>
+                        </div>
+                        <!-- end post-desc -->                    
+                    </div>
+                    <!-- end post-detail -->                                    
+                </div>
+                <!-- end col-9 -->
+                <!-- begin col-3 -->
+                <div class="col-md-3">
+                    <!-- begin section-container -->
+                    <div class="section-container recent-post-container">
+                        <h4 class="section-title"><span>Recent</span></h4>
+                        <ul ng-repeat="item in main.items | limitTo: 4" class="sidebar-recent-post">
+                            <li>
+                                <div class="info">
+                                    <h4 class="title"><a href="#" ng-click="main.viewAnnouncement(item)">{{item.title}}</a></h4>
+                                    <div class="date">{{item.dateCreated | date : "MMMM d, y"}}</div>
+                                </div>
+                            </li>
+                            <li class="recent-post-padding">
+                            </li>                            
+                        </ul>
+                    </div>
+                    <!-- end section-container -->
+                </div>
+                <!-- end col-3 -->
+            </div>
+            <!-- end row -->
+        </div>
+        <!-- end container -->
+    </div>
+</div>
+@section Scripts{
+    <script src="~/Scripts/sabio.services.announcement.js"></script>
+    <script src="~/Scripts/app/services/announcement.js"></script>
+    <script>
+        sabio.page.announcementId = @Model.Item;
+
+        (function () {
+            angular.module(APPNAME)
+                .controller("announcementController", AnnouncementController);
+
+            AnnouncementController.$inject = ["$scope", "$window", "$baseController", "announcementService", "$sabio"];
+
+            function AnnouncementController($scope, $window, $baseController, announcementService, $sabio) {
+                var vm = this;
+                vm.$sabio = $sabio;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.announcementService = announcementService;
+                vm.$window = $window;
+
+                // viewmodel
+                vm.announcementId = $sabio.announcementId;
+                vm.items = [];
+                vm.item = [];
+                vm.viewAnnouncement = _viewAnnouncement;
+
+                _loadAnnouncement();
+
+                function _loadAnnouncement() {
+                    vm.announcementService.getById(vm.announcementId, _getByIdSuccess, _getByIdError);
+                }
+
+                function _getByIdSuccess(data) {
+                    vm.item = data.item;
+                    _loadRecentAnnouncements();
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load announcement!");
+                }
+
+                function _loadRecentAnnouncements() {
+                    vm.announcementService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                    });
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load recent announcements!");
+                }
+
+                function _viewAnnouncement(item) {
+                    vm.$window.location.href = "/announcements/" + item.id;
+                }
+            }
+        })();
+    </script>
+}

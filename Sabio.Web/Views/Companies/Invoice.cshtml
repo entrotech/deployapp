@@ -1,0 +1,595 @@
+﻿@model Sabio.Web.Models.ViewModels.BaseViewModel
+@{
+    ViewBag.Title = "Invoice";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section styles {
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <link href="~/Content/select2.css" rel="stylesheet" />
+    <link href="~/Content/angular-material.css" rel="stylesheet" />
+    <style>
+        .backcolor {
+            background-color: #f0f3f4;
+        }
+
+        .form {
+            border: 1px solid;
+        }
+
+        .color {
+            background-color: #fff;
+        }
+
+        .add {
+            margin-top: 10%;
+            margin-right: 10%;
+        }
+
+        .dte {
+            margin-top: -10px;
+            margin-left: 70px;
+        }
+
+        .m-b-10 {
+            margin-top: 10px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        /*.hide {
+            display:none;
+        }
+        .show {
+            display:block;
+        }*/
+    </style>
+}
+<div class="col-md-12 invoice-header" data-ng-controller="invoiceController as invm">
+    <div class="row-fluid">
+
+        <div class="row backcolor col-md-push-10">
+            @*invoice populate button*@
+
+            <span class="pull-right hidden-print">
+                <input type="checkbox"  aria-label="Toggle ngShow"><br />
+                <md-button class="btn btn-xs btn-success m-b-10 class1"  ng-click="invm.invoicePopulate()">
+                    <md-tooltip>Don't forget to Save at the bottom of the page!</md-tooltip>
+                    <i class="fa fa-download m-r-5"></i>Add items to Invoice
+                </md-button>
+                @*data-ng-init="featureClass=false" data-ng-click="featureClass=!featureClass" data-ng-class="{'active': featureClass}"*@
+                <md-button class="btn btn-xs btn-success m-b-10" ng-click="invm.pdf()"><md-tooltip>You are not as smart as you look!</md-tooltip><i class="fa fa-download m-r-5"></i>Export as PDF</md-button>
+                @*<a href="javascript:;" class="btn btn-sm btn-success m-b-10"><i class="fa fa-download m-r-5"></i> Export as PDF</a>*@
+                <a href="javascript:;" onclick="window.print()" md-button class="btn btn-xs btn-success m-b-10"><i class="fa fa-print m-r-5"></i> Print</a>
+            </span>
+
+            @*save button*@
+            @*Company Dropdown start*@
+            <div class="row col-md-push-10">
+                <div class="col-md-2">
+                    <md-input-container class="m-b-10 color">
+                        <md-select ng-model="invm.item.companyId"
+                                   md-on-close="clearSearchTerm()"
+                                   data-md-container-class="InvoiceController m-b-10" ng-change="invm.companyChange()">
+                            <md-select-header>
+                                <input ng-model="searchTerm"
+                                       type="search"
+                                       placeholder="Select company"
+                                       class="demo-header-searchbox md-text searchTerm m-b-10">
+                            </md-select-header>
+                            <md-optgroup label="Companies">
+                                <md-option ng-value="company.id" ng-repeat="company in invm.allCompanies | filter: searchTerm" class="m-b-10">
+                                    {{company.name}}
+                                </md-option>
+                                <div ng-bind="company.id" ng-model="invm.item.companyId">
+                                    <strong>{{company.name}}</strong>
+                                    <strong>{{company.address1}}</strong>
+                                    <strong>{{company.address2}}</strong>
+                                    <strong>{{company.companyCity}}{{company.companystateProvinceId}}{{company.postalCode}}</strong>
+                                    <strong>{{company.phoneNumber}}</strong>
+                                    <strong>{{company.companyEmail}}</strong>
+                                </div>
+                            </md-optgroup>
+                        </md-select>
+                    </md-input-container>
+                    @*Company dropdown end*@
+                </div>
+            </div>
+            @*Project dropdown start*@
+            <div class="col-md-2">
+                <md-input-container class="color m-b-10">
+                    <md-select ng-model="invm.item.projectsId"
+                               md-on-close="clearSearchStateProvince()"
+                               data-md-container-class="InvoiceController" ng-change="invm.projectChange()" class="">
+                        <md-select-header>
+                            <input ng-model="searchTerm"
+                                   type="search"
+                                   placeholder="Select project"
+                                   class="demo-header-searchbox md-text searchStateProvince">
+                        </md-select-header>
+                        <md-optgroup label="Select project">
+                            <md-option ng-value="project.id" ng-repeat="project in invm.projects | filter: searchprojects">{{project.projectName}}</md-option>
+                        </md-optgroup>
+                    </md-select>
+                </md-input-container>
+            </div>
+            @*Project dropdown stop*@
+
+            @*Timecard dropdown start*@
+            <div class="col-md-2">
+                <md-input-container class="m-b-10 color">
+                    <md-select ng-model="invm.item.timeCardId"
+                               data-md-container-class="InvoiceController" multiple ng-change="invm.timecardChange();">
+                        <md-select-header>
+                            <input ng-model="searchTerm"
+                                   placeholder="Select Timecards">
+                        </md-select-header>
+                        <md-optgroup label="Select Timecards">
+                            <md-option ng-value="timeCard" ng-repeat="timeCard in invm.timecards | filter: searchtimeCards" ng-model="earningsOnProj">{{timeCard.id}}{{" "}}{{timeCard.lastName}}{{" "}}{{timeCard.earningsOnProj}}</md-option>
+                        </md-optgroup>
+
+            </div>
+            @*Timecard dropdown stop*@
+
+        </div>
+    </div>
+
+    <!-- end page-header -->
+    <!-- begin invoice -->
+    <div id="exportthis">
+        <div class="invoice form">
+            <div class="invoice-company">
+                <span><strong>{{invm.companiesById[invm.item.companyId].name}}</strong></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <small>From:</small>
+                    <address class="m-t-5 m-b-5">
+                        <strong>Operation Code</strong><br />
+                        1220 SW Morrison<br />
+                        Portland, Oregon 97205<br />
+                        Phone: (503) 477-9229<br />
+                    </address>
+                </div>
+                <div class="col-md-3">
+                    <small>To:</small>
+                    <address class="m-t-5 m-b-5">
+                        <strong>{{invm.companiesById[invm.item.companyId].name}}</strong>
+                        <br />
+                        {{invm.companiesById[invm.item.companyId].address1}}
+                        <br />
+                        {{invm.companiesById[invm.item.companyId].city}}{{" "}}
+                        {{invm.companiesById[invm.item.companyId].stateProvince.name}}{{" "}}{{invm.companiesById[invm.item.companyId].postalCode}}
+                        <br />
+                        {{invm.companiesById[invm.item.companyId].companyPhoneNumber}}
+
+                    </address>
+                </div>
+                <div class="col-md-2">
+                    <div class="invoice-detail">
+                        Invoice Number:{{invm.item.companyId}}{{"-"}}{{invm.item.id}}<br />
+
+                        <md-input-container class="m-b-10 color">
+                            <md-select ng-model="invm.item.statusId"
+                                       data-md-container-class="InvoiceController">
+                                <md-select-header>
+                                    <md-option ng-value="1">Pending</md-option>
+                                    <md-option ng-value="2">Approved</md-option>
+                                    <md-option value="3">Invoiced</md-option>
+                                    <md-option value="4">Hold</md-option>
+                                </md-select-header>
+                                <md-optgroup label="Totals">
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </div>
+                @*datepicker start*@
+                <div class="col-md-3 dte">
+                    <strong>
+                        <md-datepicker ng-model="invm.item.invoiceDate" ng-value="invoiceDate" md-placeholder="Enter date" md-open-on-focus></md-datepicker>
+                    </strong>
+                </div>
+                @*datepicker stop*@
+
+
+            </div>
+        </div>
+        <div class="invoice-content">
+            <div class="table-responsive">
+                <table class="table table-invoice">
+                    <thead>
+                        <tr>
+                            <th>TASK DESCRIPTION</th>
+                            <th>AMOUNT</th>
+                            <th></th>
+                            <th>LINE TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>{{invm.item.timeCardTotals | currency}}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <md-input-container ng-show="class1">
+                                <label>Task Description:</label>
+                                <input ng-model="invm.item.description1" ng-show="class1">
+                            </md-input-container>
+                        </td>
+                        <td>
+                            <md-input-container ng-show="class1">
+                                <label>Amount:</label>
+                                <input ng-model="invm.hours1">
+                            </md-input-container>
+                        </td>
+                        <td>
+                            <md-input-container>
+                                @*<label>Hourly Rate:</label>
+                                    <input ng-model="invm.hourlyRate1">*@
+                            </md-input-container>
+                        </td>
+                        <td>{{invm.item.lineTotal1 | currency}}</td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <md-input-container ng-show="class1">
+                                <label>Task Description:</label>
+                                <input ng-model="invm.item.description2">
+                            </md-input-container>
+                        </td>
+                        <td>
+                            <md-input-container ng-show="class1">
+                                <label>Amount:</label>
+                                <input ng-model="invm.hours2" />
+                            </md-input-container>
+                        </td>
+                        <td>
+                            <md-input-container ng-show="class1">
+                                @*<label>Hourly Rate:</label>
+                                    <input ng-model="invm.hourlyRate2">*@
+                            </md-input-container>
+                        </td>
+                        <td ng-hide>{{invm.item.lineTotal2 | currency}}</td>
+
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="invoice-price">
+
+            <div class="invoice-price-left">
+                <div class="invoice-price-row">
+                    <button type="button" class="btn btn-small btn-success" ng-click="invm.saveInvoice()">Save Invoice</button>
+                </div>
+            </div>
+            <div class="invoice-price-right">
+                <small>TOTAL</small>{{invm.hours1 * 1 + invm.hours2 * 1 + invm.item.timeCardTotals | currency}}
+            </div>
+        </div>
+    </div>
+    <div class="invoice-note">
+        * Make all cheques payable to Dave<br />
+        * Payment is optional<br />
+        * If you have any questions concerning this invoice, contact  [Name, Phone Number, Email]
+    </div>
+
+
+    <div class="invoice-footer text-muted">
+        <p class="text-center m-b-5">
+            THANK YOU
+    </div>
+</div>
+
+@section pageInitScripts{
+    <script src="~/Scripts/angular-aria.js"></script>
+    <script src="~/Scripts/angular-material.min.js"></script>
+    <script src="~/Scripts/sabio/sabio.material.js"></script>
+
+}
+@section scripts {
+
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/sabio.services.company.js"></script>
+    <script src="~/Scripts/sabio.services.invoice.js"></script>
+    <script src="~/Scripts/sabio.services.project.js"></script>
+    <script src="~/Scripts/sabio.services.timecardEntry.js"></script>
+    <script src="~/Scripts/angular-material.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/html2canvas.js"></script>
+    <script src="~/Scripts/pdfmake.min.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    <script src="~/Scripts/sabio.ui.toastr.js"></script>
+
+
+    <script>
+
+        (function () {
+            "use strict"
+            angular.module(APPNAME)
+                .factory('invoiceService', InvoiceService);
+
+            InvoiceService.$inject = ['$baseService', '$sabio'];
+
+            function InvoiceService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.invoice;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+            .factory('companyService', CompanyService);
+
+            CompanyService.$inject = ['$baseService', '$sabio'];
+
+            function CompanyService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.company;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            "use strict"
+
+            angular.module(APPNAME)
+                .factory('projectService', ProjectService);
+
+            ProjectService.$inject = ['$baseService', '$sabio'];
+
+            function ProjectService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.project;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            "use strict"
+            angular.module(APPNAME)
+                .factory('timecardService', TimecardService);
+
+            TimecardService.$inject = ['$baseService', '$sabio'];
+
+            function TimecardService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.timecardEntry;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+
+            angular.module(APPNAME)
+                .controller('invoiceController', InvoiceController);
+
+            InvoiceController.$inject = ['$scope', '$window', '$baseController', '$sabio', 'invoiceService', 'companyService', 'projectService', 'timecardService', '$q', '$timeout', '$element'];
+
+            function InvoiceController($scope, $window, $baseController, $sabio, invoiceService, companyService, projectService, timecardService, $q, $timeout, $element) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$window = $window;
+                $baseController.merge(vm, $baseController);
+                //service
+                vm.invoiceService = invoiceService;
+                vm.companyService = companyService;
+                vm.projectService = projectService;
+                vm.timecardService = timecardService;
+                vm.companyChange = _companyChange;
+                vm.projectChange = _projectChange;
+                vm.timecardChange = _timecardChange;
+                vm.allCompanies = [];
+                vm.allTimecards = null;
+                vm.allInvoices = null;
+                vm.hours2 = '';
+                vm.hours1 = '';
+                vm.pdf = _pdf;
+                vm.toggle = _toggle;
+                vm.statusId = 2;
+
+                //vm.add = _add;
+                vm.remove = _remove;
+
+                vm.description = "";
+                vm.rate = "";
+                vm.statusId = 2;
+
+
+                vm.getCompaniesSuccess = _getCompaniesSuccess;
+                //vm.pdf = pdf;
+
+                //item
+                vm.projects = [];
+                vm.timecards = [];
+                vm.items = [];
+                vm.output = [];
+                vm.item = {};
+                vm.selectedItems = [];
+                vm.itemIndex = -1;
+                vm.render = _render;
+                vm.invoicePopulate = _invoicePopulate;
+                vm.saveInvoice = _saveInvoice;
+                //functions called
+                vm.date = $scope.date = new Date();
+
+                //toggle function//
+                function _toggle() {
+                    $(".class").removeclass('hidden');
+                    }
+                
+                //pdf function start
+                function _pdf() {
+                    html2canvas(document.getElementById('exportthis'), {
+                        onrendered: function (canvas) {
+                            var data = canvas.toDataURL();
+                            var docDefinition = {
+                                content: [{
+                                    image: data,
+                                    width: 500,
+                                }]
+                            };
+                            pdfMake.createPdf(docDefinition).download("invoice.pdf");
+                        }
+                    });
+                }
+                //pdf function end
+
+
+                vm.$scope.$watch(
+                    function () {
+                        //console.log('watch1 ' + vm.hourlyRate1 + ", " + vm.hours1);
+                        return vm.hours1
+                    },
+                    function (newValue) {
+                        //console.log('watch2 ' + newValue)
+                        vm.item.lineTotal1 = newValue
+                    }
+                );
+                vm.$scope.$watch(
+                    function () {
+                        return vm.hours2
+                    },
+                    function (newValue) {
+                        vm.item.lineTotal2 = newValue
+
+                    }
+                    );
+
+                _render();
+
+                function _invoicePopulate() {
+                    console.log(vm.item);
+                    vm.invoiceService.postJson(vm.item, _postSuccess, _postError);
+                    vm.toggle();
+                }
+
+                function _endEdit() {
+                    vm.editForm = null;
+                    vm.itemIndex = -1;
+                }
+
+                function _postSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            // To update UI, get id from data
+                            var sum = 0;
+                            vm.item.id = data.item;
+                            for (var i = 0; i < vm.item.timeCardId.length; i++) {
+                                sum += vm.item.timeCardId[i].earningsOnProj;
+                            }
+                            vm.item.timeCardTotals = sum;
+                            vm.items.push(vm.item);
+                            _endEdit();
+                            vm.$alertService.warning("You are not done yet!");
+
+                        });
+                    }
+                }
+
+
+                function _postError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Insert");
+                }
+
+                function _saveInvoice() {
+                    console.log(vm.item);
+                    vm.invoiceService.putJson(vm.item.id, vm.item, _putSuccess, _putError);
+                }
+
+                function _putSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items[vm.itemIndex] = vm.item;
+                        _endEdit();
+                        vm.$alertService.success("Invoice saved to Database")
+                    });
+                }
+
+                function _putError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Update failed");
+                }
+
+                function _render() {
+                    vm.companyService.selectAll(_getCompaniesSuccess, _getCompaniesError);
+                    console.log('stop');
+                }
+
+                function _companyChange(data) {
+                    console.log('change', data);
+                    vm.invoiceService.selectProjectByCompanyId(vm.item.companyId, _getProjectSuccess, _getProjectError);
+                }
+
+                function _getProjectSuccess(data) {
+                    console.log('projectsuccess', data);
+                    vm.projects = data.items;
+                    var projectsById = {};
+                    for (var i = 0; i < data.items.length; i++) {
+                        var project = data.items[i];
+                        projectsById[project.id] = project;
+                    }
+                    vm.projectsById = projectsById;
+                }
+
+                function _getProjectError(data) {
+                    console.log("fail", data);
+                    toastr.error("Failed to get projects");
+                }
+                function _projectChange(data) {
+                    console.log('project', data);
+                    vm.invoiceService.getTimecardByProjectId(vm.item.projectsId, _getInvoiceSuccess, _getInvoiceError);
+
+                }
+                function _getInvoiceSuccess(data) {
+                    console.log('invoice', data);
+                    vm.timecards = data.items;
+                }
+
+                function _getInvoiceError(data) {
+                    console.log('fail', data);
+                    toastr.error("Failed to get invoices");
+                }
+
+                function _getCompaniesSuccess(data) {
+                    console.log("companies", data.items);
+                    vm.$scope.$apply(function () {
+                        vm.allCompanies = data.items;
+                        //this removes companies from Array and place them into an object is easier to deal with//
+                        var companiesById = {};
+                        for (var i = 0; i < data.items.length; i++) {
+                            var company = data.items[i];
+                            companiesById[company.id] = company;
+                        }
+                        vm.companiesById = companiesById;
+                    })
+                }
+
+                function _getCompaniesError(data) {
+                    toastr.error("Failed to get Companies");
+                }
+
+                function _getTimecardSuccess(data) {
+                    console.log("timecard", data.items);
+                    vm.allTimecards = data.items;
+                }
+                function _getTimecardError(data) {
+                    toastr.error("Failed to get timecards");
+                }
+
+                function _timecardChange(data) {
+                    console.log("timecardChange", data);
+
+                }
+                function _remove(index) {
+                    invoice.items.splice(index, 1);
+                }
+
+            }
+        })();
+    </script>
+}

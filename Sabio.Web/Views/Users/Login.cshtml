@@ -1,0 +1,340 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+    <meta name="google-signin-client_id" content="933707548833-6bpvd89rla41tqo3gmdkql0n15hmoo15.apps.googleusercontent.com">
+    <meta charset="utf-8" />
+    <title>Deploy | Login Page</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    <link href="/assets/admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
+    <link href="/assets/admin/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/animate.css" rel="stylesheet" />
+    <link href="/assets/admin/css/style.css" rel="stylesheet" />
+    <link href="/assets/admin/css/style-responsive.css" rel="stylesheet" />
+    <link href="/assets/admin/css/theme/default.css" rel="stylesheet" id="theme" />
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+
+    <!-- ================== END BASE CSS STYLE ================== -->
+    @*<link href="~/Content/deployAdmin.css" rel="stylesheet" />*@
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="/assets/admin/plugins/pace/pace.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!-- ================== END BASE JS ================== -->
+    <style>
+        @@media (max-width: 767px) {
+            .login.login-v2 {
+                position: relative;
+                left: 0;
+            }
+        }
+
+        body {
+            margin: 0 auto !important;
+        }
+
+        .login-content {
+            margin: 0 auto;
+        }
+
+        .login-cover-bg img {
+            width: 100%;
+        }
+
+        @@media only screen and (max-width: 680px) {
+            .login-content {
+                margin: 0 auto !important;
+                padding: 0;
+                width: auto;
+            }
+
+            .brand {
+                text-align: center !important;
+                text-size-adjust: auto !important;
+            }
+
+            .login-header {
+                text-size-adjust: auto !important;
+            }
+
+            .login-cover-image img {
+                top: 0;
+                left: 0;
+                height: auto !important;
+                width: 320px;
+                /*max-height:100%*/
+            }
+
+            .login-cover {
+                max-width: 100%;
+                height: 200px;
+            }
+
+            body {
+                margin: 0 auto !important;
+            }
+        }
+        /*Ipad*/
+        @@media (max-width: 1030px) {
+
+            .login-cover-image {
+                width: 100%;
+                height: 1024px !important;
+            }
+
+                .login-cover-image img {
+                    max-width: 100%;
+                    top: 0;
+                    left: 0;
+                    height: 1024px !important;
+                }
+        }
+        /*Ipad Pro*/
+        @@media (max-width: 1370px) {
+
+            .login-cover-image {
+                width: 100%;
+                height: 1380px !important;
+            }
+
+                .login-cover-image img {
+                    max-width: 100%;
+                    top: 0;
+                    left: 0;
+                    height: 1380px !important;
+                }
+        }
+    </style>
+</head>
+<body class="pace-top">
+    <!-- begin #page-loader -->
+    <div id="page-loader" class="fade in"><span class="spinner"></span></div>
+    <!-- end #page-loader -->
+
+    <div class="login-cover">
+        <div class="login-cover-image"><img src="~/assets/admin/img/login-bg/bg-2.jpg" data-id="login-cover-image" alt="" /></div>
+        <div class="login-cover-bg"></div>
+    </div>
+    <!-- begin #page-container -->
+    <div id="page-container" class="fade">
+        <!-- begin login -->
+        <div class="login login-v2" data-pageload-addclass="animated fadeIn">
+            <!-- begin brand -->
+            <div class="login-header">
+                <div class="brand text-center">
+                    @*<span class="logo"></span>*@ DEPLOY
+                    <small>
+                        A Web Development Community for Veterans
+                    </small>
+                </div>
+            </div>
+            <!-- end brand -->
+            <div id="loginDiv" class="login-content">
+                <form class="margin-bottom-0" id="formLogin">
+
+                    <div class="form-group m-b-20">
+                        <input type="text" name="Email" class="form-control input-lg" placeholder="Email Address" required />
+                    </div>
+                    <div class="form-group m-b-20">
+                        <input type="password" name="Password" class="form-control input-lg" placeholder="Password" required />
+                    </div>
+                    @*<div class="g-signin2" data-onsuccess="onSignIn"></div>*@ 
+                    <div class="checkbox m-b-20">
+                        <label>
+                            <input type="checkbox" /> Remember Me
+                        </label>
+                    </div>
+                    <div class="login-buttons">
+                        <button type="button" class="btn btn-success btn-block btn-lg" id="login">Sign me in</button>
+                    </div>
+                    <div class="m-t-20 text-center">
+                        Not a member yet? Click <a href="/users/register/">here</a> to register.
+                    </div>
+                    <div class="m-t-20 text-center">
+                        <a id="forgotLink" href="#">Forgot Your Password?</a>
+                    </div>
+                </form>
+            </div>
+            <div id="emailDiv" class="login-content hide">
+                <form class="margin-bottom-0" id="emailForm">
+                    <div class="form-group m-b-20">
+                        <p>Email me a link to reset my password at: </p>
+                    </div>
+                    <div class="form-group m-b-20">
+                        <input type="text" name="Email" class="form-control input-lg" placeholder="Email Address" required />
+                    </div>
+                    <div class="login-buttons">
+                        <button type="button" class="btn btn-success center-block" id="send">Send</button>
+                    </div>
+                    <div class="m-t-20 text-center">
+                        Not a member yet? Click <a href="/users/register/">here</a> to register.
+                    </div>
+                </form>
+            </div>
+            <div id="msgConfirm" class="login-content hide">
+                <p>An email has been sent to the email address you provided. Please follow the instructions in the email to reset your password.</p>
+            </div>
+            <div id="msgFailed" class="login-content hide">
+                <p>This email does not have an account with us. Please try a different email or register <a href="/users/register/">here.</a></p>
+            </div>
+        </div>
+        <!-- end login -->
+    </div>
+    <!-- end page container -->
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="/assets/admin/plugins/jquery/jquery-1.9.1.min.js"></script>
+    <script src="/assets/admin/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+    <script src="/assets/admin/plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+    <script src="/assets/admin/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="/assets/admin/crossbrowserjs/html5shiv.js"></script>
+        <script src="/assets/admin/crossbrowserjs/respond.min.js"></script>
+        <script src="/assets/admin/crossbrowserjs/excanvas.min.js"></script>
+    <![endif]-->
+    <script src="/assets/admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="/assets/admin/plugins/jquery-cookie/jquery.cookie.js"></script>
+    <!-- ================== END BASE JS ================== -->
+    <!-- ================== BEGIN PAGE LEVEL JS ================== -->
+    <script src="/assets/admin/js/login-v2.demo.min.js"></script>
+    <script src="/assets/admin/js/apps.min.js"></script>
+    <!-- ================== END PAGE LEVEL JS ================== -->
+    <script src="~/Scripts/sabio.js"></script>
+    <script src="~/Scripts/toastr.js"></script>
+    <script src="~/Scripts/sabio.ui.toastr.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.16.0/jquery.validate.js"></script>
+    <script src="~/Scripts/sabio.services.user.js"></script>
+
+    <script>
+        //startup
+        sabio.page.startUp = function () {
+            $("#login").on("click", sabio.page.handlers.loginUser);
+            $("#forgotLink").on("click", sabio.page.handlers.forgotPassword);
+            $("#send").on("click", sabio.page.handlers.sendResetEmail);
+            sabio.page.initializeValidation();
+            
+        }
+
+        //google User
+        function onSignIn(googleUser) {
+            var id_token = googleUser.getAuthResponse().id_token;
+           console.log("Google Token Id", id_token);
+          //var email =  id_token.getPayload().getEmail();
+            }
+        //FORM SUBMIT VALIDATE
+        sabio.page.handlers.loginUser = function () {
+            if ($("#formLogin").valid()) {
+                var url = "/api/users/login/";
+                var data = $("#formLogin").serialize();
+                sabio.services.user.postLogin(data, sabio.page.loginRequestSuccess, sabio.page.loginRequestFailed);
+            }
+        }
+        //AJAX SUCCESS
+        sabio.page.loginRequestSuccess = function (data, status, xhr) {
+            $("#formLogin")[0].reset();
+            var queryString = window.location.search;
+            if (queryString) {
+                queryString = queryString.split("=")[1];
+                queryString = queryString.replace(/%2F/g, "/");
+                window.location = queryString;
+            } else {
+                window.location = "/users/home";
+            }
+
+        };
+        //AJAX ERROR
+        sabio.page.loginRequestFailed = function (xhr, textStatus, errorThrown) {
+            var response = xhr.responseText;
+            swal({
+                title: response,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Ok',
+                confirmButtonClass: 'btn btn-error',
+                buttonsStyling: true,
+                allowOutsideClick: true,
+            })
+        }
+        sabio.page.initializeValidation = function () {
+            jQuery.validator.setDefaults({
+                debug: true
+            })
+        };
+
+        $("#formLogin").validate({
+            highlight: function (element) {
+                $(element).addClass("form-validate");
+            },
+            unhighlight: function (element) {
+                $(element).removeClass("form-validate");
+            },
+            errorPlacement: function (label, element) {
+                element.parent().append(label);
+            },
+            errorClass: "error-msg",
+            errorElement: "span",
+            rules: {
+                "Email": {
+                    required: true,
+                },
+                "Password": {
+                    required: true,
+                }
+            }
+        })
+        //forgot password functions below
+        //validate form
+        sabio.page.handlers.forgotPassword = function () {
+            $("#loginDiv").hide();
+            $("#emailDiv").toggleClass("hide");
+        }
+        $("#emailForm").validate({
+            highlight: function (element) {
+                $(element).addClass("form-validate");
+            },
+            unhighlight: function (element) {
+                $(element).removeClass("form-validate");
+            },
+            errorClass: "error-msg",
+            errorElement: "span",
+            rules: {
+                email: {
+                    required: true,
+                    email: true
+                }
+            }
+        });
+        //send reset password email to user (if user has acct, send. if not, suggest go to registration)
+        sabio.page.handlers.sendResetEmail = function () {
+            console.log("send btn clicked");
+            if ($("#emailForm").valid()) {
+                var data = $("#emailForm").serialize();
+                sabio.services.user.postResetEmail(data, sabio.page.handlers.userValid, sabio.page.handlers.userInvalid);
+            }
+        }
+        sabio.page.handlers.userValid = function () {
+            console.log("user exist");
+            $("#emailDiv").hide();
+            $("#msgConfirm").toggleClass("hide");
+        }
+        sabio.page.handlers.userInvalid = function () {
+            console.log("user does not have account with us");
+            $("#emailDiv").hide();
+            $("#msgFailed").toggleClass("hide");
+        }
+    </script>
+</body>
+</html>

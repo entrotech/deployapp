@@ -1,0 +1,692 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+@section styles{
+    @* SquadTag style *@
+    <link href="~/Content/select2.css" rel="stylesheet" />
+    <link href="~/Content/select.css" rel="stylesheet" />
+    <style>
+        #squadTagContainer {
+            padding-left: 12%;
+            width: 80%;
+        }
+
+        .photo {
+            width: 100px;
+            height: 100px;
+            /*border-radius: 50%;*/
+            border-radius: 200px;
+            border-color: aliceblue;
+            margin-bottom: 10px;
+            margin-left: 20px;
+        }
+        .item-list{
+            height: 200px;
+            width: 170px;
+            border: 2px solid #f2f2f2;
+            border-radius: 15px;
+            padding: 10px 10px 10px 10px;
+            margin: 5px;
+            border-width: 4px;
+            background-color: #f2f2f2;
+        }
+
+        .member {
+            width: 100px;
+            height: 100px;
+        }
+
+        .leader {
+            border-style: solid;
+            border-color: #43AF6A;
+            border-width: 5px;
+        }
+
+        .content {
+            padding-top: 40px;
+        }
+
+        .page-header > h1 {
+            font-size: 36px;
+            font-family: 'Open Sans', "Helvetica Neue",Helvetica,Arial,sans-serif;
+            color: #707478;
+            font-weight: 500;
+        }
+
+        .memberName{
+            text-align:center;
+        }
+    </style>
+}
+
+
+<div class="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="/">Home</a></li>
+            <li><a href="/Squads">Squads</a></li>
+            <li class="active">Create Squad</li>
+        </ol>
+        <h1 class="page-header text-center">Create Squad</h1>
+    </div>
+
+    <div class="container">
+        <div ng-controller="sqController as sqVm" class="row">
+            @*=================Squad Form===============*@
+            <div class="col-md-6">
+                <div class="panel panel-default" @*ng-show="sqVm.item"*@>
+                    <div class="panel-heading">
+                        <span class="h4">Create / Edit Squad</span>
+                        <button type="button" class="btn btn-primary btn-xs pull-right" data-ng-click="sqVm.add()">Create New Squad</button>
+                    </div>
+                    <div class="panel-body" style="margin-left: 15px; margin-right: 15px;">
+                        <form name="editForm" class="form-horizontal" ng-submit="sqVm.submitForm(editForm.$valid)" novalidate>
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" class="form-control" ng-model="sqVm.item.name" name="name" ng-minlength="3" ng-maxlength="50" ng-class="{'form-validate' : editForm.name.$invalid && submitted }" required />
+                                <p ng-show="editForm.name.$invalid && submitted" class="error-msg">This Field is required.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="ckEditor">Mission</label>
+                                <textarea class="ckeditor" ng-model="sqVm.item.mission" id="ckeditor" name="ckeditor" ng-minlength="5" data-ng-bind-html="sqVm.sanitize(sqVm.item.mission)" ng-class="{'form-validate' : editForm.mission.$invalid && submitted }" ng-required="string" ng-maxlength="250"></textarea>
+                                <p ng-show="editForm.mission.$invalid && submitted" class="error-msg">This field is required.</p>
+                                <p ng-show="sqVm.missingMission" class="error-msg">This field is required.</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Notes</label>
+                                <input type="text" class="form-control" ng-model="sqVm.item.notes" name="notes" ng-maxlength="250" ng-class="{'form-validate' : editForm.notes.$invalid && submitted }" required />
+                                <p ng-show="editForm.notes.$invalid && submitted" class="error-msg">Your name is required.</p>
+                                <p ng-show="editForm.notes.$error.minlength" class="error-msg">notes is too short</p>
+                                <p ng-show="editForm.notes.$error.maxlength" class="error-msg">notes is too long.</p>
+                            </div>
+                            @*---------------------- BEGIN SQUADTAG SELECT TO --------------------*@
+                            <fieldset>                                
+                                <div class="col-sm-9"><label>Squad Tags</label></div>
+                                <div class="dropdown-pull-left col-sm-3" id="squadTagContainer">
+                                    <ui-select multiple="multiple" id="squadTags" theme="bootstrap" ng-model="sqVm.item.squadTag">
+                                        <ui-select-match placeholder="Squad Tag">{{$item.keyword}}</ui-select-match>
+                                        <ui-select-choices repeat="squadtag in sqVm.squadTags">{{squadtag.keyword}}</ui-select-choices>
+                                    </ui-select>
+                                </div>
+                            </fieldset>
+                            <br />
+                            @* ---------------------END SQUADTAG SELECT TO ---------------------- *@
+                            <button type="button" class="btn btn-primary btn-sm" ng-click="submitted=true; sqVm.submitForm(editForm.$valid)">Save</button>
+                            <button type="button" class="btn btn-default btn-sm" ng-click="sqVm.cancel()">Cancel</button>
+                            <button type="button" class="btn btn-warning btn-sm" ng-click="sqVm.delete()">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            @*=================Squad Members List===============*@
+            <div class="col-md-6">
+                <div class="panel panel-default" @*ng-show="sqVm.item.squadMember"*@>
+                    <div class="panel panel-heading">
+                        <span class="h4">Squad Members</span>
+                        <button type="button" class="btn btn-primary btn-xs pull-right" data-ng-click="sqVm.openModal()">Add New Member</button>
+                    </div>
+                    <div class="panel-body">
+                        <form>
+                            <div class="row">
+                                <div data-ng-repeat="member in sqVm.item.squadMember" class="col-md-4 center">
+                                    <div class="item-list">
+                                        <img ng-class="{ 'leader': member.isLeader === true}" class="photo" ng-src="{{member.person.profilePicture}}" />
+                                        <div class="h4 memberName" ng-click="sqVm.selectMember(member)">
+                                            <a><strong>{{member.person.firstName +' '+ member.person.lastName}}</strong></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @*=================Squad Member Form===============*@
+            <div class="col-md-6">
+                <div class="panel panel-default" ng-show="sqVm.member">
+                    <div class="panel-heading">
+                        <span class="h4">Create / Edit Squad Member</span>
+                    </div>
+                    <div class="panel-body" style="margin-left: 15px; margin-right: 15px;">
+                        <form name="editMemberForm" class="form-horizontal" ng-submit="sqVm.submitMemberForm(editMemberForm.$valid)" novalidate>
+                            <div class="form-group">
+                                <div class="col-md-4">
+
+                                    <img ng-class="{ 'leader': sqVm.member.isLeader === true}" class="photo pull-left" ng-src="{{sqVm.member.person.profilePicture}}" />
+                                </div>
+                                <div class="col-md-8">
+                                    <h4><strong>{{sqVm.member.person.firstName + ' '+ sqVm.member.person.lastName}}</strong></h4>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" ng-model="sqVm.member.isLeader">
+                                            <strong>Leader</strong>
+                                        </label>
+                                    </div>
+                                    <p>Email: {{sqVm.member.person.email}}</p>
+                                    <p>Phone: {{sqVm.member.person.phoneNumber}}</p>
+                                    <label for="repeatSelect"> Status: </label>
+                                    <select ng-options="status.id as status.name for status in sqVm.statuses" ng-model="sqVm.member.memberStatusId">
+                                        <option></option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <p><strong>Comments</strong></p>
+                                    <textarea class="form-control" ng-model="sqVm.member.leaderComment" type="text" rows="5" {{sqVm.member.leaderComment}}></textarea>
+                                </div>
+
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-sm" ng-click="submitted=true; sqVm.saveMember(editMemberForm.$valid)">Save</button>
+                            <button type="button" class="btn btn-default btn-sm" ng-click="sqVm.cancelMember()">Cancel</button>
+                            <button type="button" class="btn btn-warning btn-sm" ng-click="sqVm.deleteMember()">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+@section pageInitScripts{
+    <script src="~/Scripts/sabio/select2.full.js"></script>
+    <script src="~/Scripts/select.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("ui.select");
+    </script>
+    <script src="~/Assets/Admin/plugins/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ng/angular-ckeditor.min.js"></script>
+}
+
+@section scripts{
+    <script src="~/Scripts/sabio.services.squad.js"></script>
+    <script src="~/Scripts/sabio.services.squadMember.js"></script>
+    <script src="~/Scripts/sabio.service.squadtag.js"></script>
+    <script>
+        sabio.page.squadId = @Model.Item;
+    </script>
+    <script>
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory("squadService", SquadService);
+
+            SquadService.$inject = ['$baseService', '$sabio'];
+
+            function SquadService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.squad;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+
+            angular.module(APPNAME).directive('myOnKeyDownCall', function () { //directive for the auto-personSearch.
+                return function (scope, element, attrs) {
+                    element.bind("keyup", function (event) {
+                        var val = element.val();
+                        if (val.length > 2) {
+                            scope.callRestService(val);
+                        }
+                    });
+                };
+            });
+        })();
+        // BEGIN JOB TAG Module
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('squadTagService', SquadTagService);
+
+            SquadTagService.$inject = ['$baseService', '$sabio'];
+
+            function SquadTagService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.squadtag;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+        // END JOB TAG Module
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller('modalController', ModalController);
+
+            ModalController.$inject = ['$scope', '$baseService', '$baseController', '$uibModalInstance', 'squad', 'squadService']
+
+            function ModalController(
+                $scope
+                , baseService
+                , $baseController
+                , $uibModalInstance
+                , squad
+                , squadService) {
+
+                var vm = this;
+
+                $baseController.merge(vm, $baseController);
+                vm.item = {};
+                vm.squad = squad;
+                vm.$scope = $scope;
+                vm.$uibModalInstance = $uibModalInstance;
+                vm.people = [];
+                vm.selectPerson = _selectPerson;
+                vm.personIndex = -1;
+                vm.person = null;
+                vm.selectPerson = _selectPerson;
+                vm.selected = [];
+                vm.squadSquadMember = {};
+                if (vm.squad.squadMember) {
+                    vm.squadMemberPersonIds = vm.squad.squadMember.map(function personIds(squadMember) {
+                        return squadMember.person.id;
+                    });
+                }
+                console.log(vm.squadMemberPersonIds);
+
+                vm.ok = function () {
+                    vm.squadSquadMember = { squadId: vm.squad.id, personId: vm.selected.person.id, memberStatusId: 1 };
+                    squadService.postPerson(vm.squadSquadMember, _postMemberSuccess, _postMemberError);
+                };
+
+                function _postMemberSuccess(data) {
+                    vm.squadSquadMember.id = data.item;
+                    vm.squadSquadMember.person = vm.selected.person;
+                    vm.$uibModalInstance.close(vm.squadSquadMember);
+                    //vm.$alertService.success("Retrieved item for editing from database");
+                };
+
+                function _postMemberError() {
+                    vm.$alertService.error(jqXHR.respondText, "Post Person Failed");
+                }
+
+                vm.cancel = function () {
+                    vm.$uibModalInstance.dismiss('cancel');
+                };
+
+                vm.$scope.callRestService = function (foo) { //this takes the search string input and sends the ajax call to retrieve results.
+                    squadService.searchPersonResults(foo, _getPersonSuccess, _getPersonError);
+                    //vm.$alertService.success("Retrieved item for editing from database");
+                }
+
+                function _getPersonSuccess(data) {
+                    console.log(data.items);
+                    if (data.items) {
+                        vm.$scope.$apply(function () {
+                            if (vm.squadMemberPersonIds) {
+                                vm.people = data.items.filter(function (person) {
+                                    return vm.squadMemberPersonIds.indexOf(person.id) === -1
+                                })
+                            } else {
+                                vm.people = data.items
+                            }
+                        });
+                    }
+                    //vm.$alertService.success("Retrieved item for editing from database");
+                }
+
+                function _getPersonError(jqXHR) {
+                    vm.$alertService.error(jqXHR.respondText, "GetPerson Failed");
+                }
+
+                function _selectPerson(person) {
+                    console.log(person);
+                    vm.person = person;
+                }
+            }
+        })();
+
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory("squadMemberService", SquadMemberService);
+
+            SquadMemberService.$inject = ['$baseService', '$sabio'];
+
+            function SquadMemberService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.squadMember;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        //----------Squad Create/Edit------------------
+
+        (function () {
+
+            angular
+            .module(APPNAME)
+            .controller('sqController', SqController);
+
+            SqController.$inject = ['$scope', '$window', '$baseController', 'squadService', 'squadMemberService', '$uibModal', 'squadTagService', '$sce', '$sabio'];
+
+            function SqController($scope, $window, $baseController, squadService, squadMemberService, $uibModal, squadTagService, $sce, $sabio) {
+                var vm = this;
+                vm.$scope = $scope;
+                $scope.selected = [];
+                $baseController.merge(vm, $baseController);
+                vm.squadService = squadService;
+                vm.squadMemberService = squadMemberService;
+                vm.$window = $window;
+                vm.$uibModal = $uibModal;
+                vm.squadTagService = squadTagService;
+                vm.squadTags = [];
+                vm.goHome = _goHome;
+                vm.squadId = $sabio.squadId;
+                vm.items = [];
+                vm.item = null;
+                vm.itemIndex = -1; //keeps track on which squad where on
+                vm.memberIndex = -1; // keeps track of member
+                vm.member = null;
+                vm.memberStatusId = null;
+                vm.memberSelect = null;
+                vm.membrerStatusIdIndex = -1;
+                vm.select = _select;
+                vm.save = _save;
+                vm.cancel = _cancel;
+                vm.add = _add;
+                vm.submitForm = _submitForm;
+                vm.addMember = _addMember;
+                vm.selectMember = _selectMember;
+                vm.saveMember = _saveMember;
+                vm.deleteMember = _deleteMember;
+                vm.submitMemberForm = _submitMemberForm;
+                vm.cancelMember = _cancelMember;
+                vm.people = [];
+                vm.openModal = _openModal;
+                vm.modalSelected = null;
+                vm.modalItems = [];
+                vm.results = [];
+                vm.sanitize = _sanitize;
+                _getSquadTags()
+
+                //=========Squad Functions Begin=============
+
+                _render();
+
+                function _render() {
+                    memberStatusGetAll();
+                    if (vm.squadId) {
+                        vm.squadService.getByIdJson(vm.squadId, _getByIdSuccess, _getByIdError);
+                    }
+                }
+
+                function _goHome() {
+                    vm.$window.location.href = '/';
+                }
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                    });
+                    //vm.$alertService.success("Retrieved All")
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.respondText, "GetAll Failed");
+                }
+
+                function _select(foo) {
+                    CKEDITOR.instances.ckeditor.setData("");
+                    vm.itemIndex = vm.items.indexOf(foo);
+                    console.log(foo.name);
+                    vm.squadId = foo.id;
+                    vm.squadService.getByIdJson(foo.id, _getByIdSuccess, _getByIdError)
+                }
+
+                function _getByIdSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                            CKEDITOR.instances.ckeditor.insertHtml(data.item.mission);
+                        });
+                        console.log(data);
+                    }
+                    //vm.$alertService.success("Retrieved item for editing from database");
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Load failed");
+                }
+
+                function _add() {
+                    CKEDITOR.instances.ckeditor.setData("");
+                    vm.item = { inactive: false };
+                    vm.itemIndex = -1;
+                    window.location.href = "/Squads/Manage";
+                }
+
+                function _cancel() {
+                    _endEdit();
+                }
+
+                function _endEdit() {
+                    vm.item = null;
+                    vm.itemIndex = -1;
+                }
+
+                function _save() {
+                    console.log("test");
+                    if (vm.item.squadTag) {
+                        vm.item.squadTagIds = vm.item.squadTag.map(function (tag) {
+                            return tag.id;
+                        });
+                    }
+                    console.log(vm.item.id);
+                    vm.item.mission = CKEDITOR.instances.ckeditor.getData();
+                    if (!vm.item.mission) { //validation for ckEditor
+                        vm.missingMission = true;
+                        return;
+                    }
+                    if (vm.item.id) {
+                        vm.squadService.updateJson(vm.item.id, vm.item, _putSuccess, _putError);
+                    } else {
+                        vm.squadService.postJson(vm.item, _postSuccess, _postError);
+                    }
+                }
+
+                function _putSuccess(data) {
+                    vm.$alertService.success("Update Successful");
+
+                }
+
+                function _putError(jqXHR) {
+                    vm.$alertService.error(jqXHR.respondText, "Update Failed");
+                }
+
+                function _postSuccess(data) {
+                    window.location.href = "/Squads/" + data.item + "/Manage";
+                }
+
+                function _postError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Upload Failure");
+                }
+
+                function _delete() {
+                    if (vm.item.id) {
+                        vm.squadService.delete(vm.item.id, _deleteSuccess, _deleteError);
+                    }
+                }
+
+                function _deleteSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items.splice(vm.itemIndex, 1);
+                        _endEdit();
+                        vm.$alertService.success("Delete Successful");
+                    });
+                }
+
+                function _deleteError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Delete failed");
+                }
+
+                function _submitForm(isValid) {
+                    if (isValid) {
+                        console.log("form valid");
+                        _save();
+                    }
+                }
+
+                //============SquadMember Functions==========
+
+                function _addMember() { //click to open search box maybe?
+                    vm.item = { inactive: false };
+                    vm.itemIndex = -1;
+                }
+
+                function _selectMember(member) { //select Person and post to squadMemberForm
+                    vm.memberIndex = vm.item.squadMember.indexOf(member);
+                    console.log(member);
+                    vm.member = member;//points to member to be edited
+                    vm.member.memberStatusId = vm.member.status.id;
+                }
+
+                function _saveMember(squadSquadMember) {
+                    memberId = vm.member.id;
+                    statusId = vm.member.memberStatusId;
+                    memberComment = vm.member.leaderComment;
+                    isLeader = vm.member.isLeader;
+                    var statusObject = vm.statuses.filter(x => x.id === statusId);
+                    vm.member.status = statusObject[0];
+                    member = { squadId: vm.member.squadId, personId: vm.member.person.id, id: memberId, leaderComment: memberComment, memberStatusId: statusId, isLeader: isLeader };
+                    vm.$alertService.success("Status Updated");
+                    vm.squadMemberService.putJson(memberId, member, _statusUpdateSuccess, _statusUpdateError);
+                    return member;
+                }
+
+                function _statusUpdateSuccess() {
+                    var index = vm.item.squadMember.indexOf(vm.member);
+                    vm.item.squadMember.splice(index, 1, vm.member);
+                    _endEditMember();
+                }
+
+                function _statusUpdateError(jqXHR) {
+                    vm.$alertService.error(jqXHR.respondText, "Statuses Failed");
+                }
+
+                function _submitMemberForm(isValid) {
+                    if (isValid) {
+                        console.log("form valid");
+                        _save();
+                    }
+                }
+
+                function _deleteMember(member) {
+                    member = vm.member;
+                    if (member.id) {
+                        vm.squadMemberService.delete(member.id, _deleteMemberSuccess, _deleteError);
+                    }
+                }
+
+                function _deleteMemberSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.item.squadMember.splice(vm.memberIndex, 1);
+                        _endEditMember();
+                        vm.$alertService.success("Delete Successful");
+                    });
+                }
+
+                function _cancelMember() {
+                    _endEditMember();
+                }
+
+                function _endEditMember() {
+                    vm.member = null;
+                    vm.memberIndex = -1;
+                }
+
+                //==========Modal Function==========
+
+                function _openModal() {
+                    if (!vm.squadId) {
+                        return;
+                    }
+                    var modalInstance = vm.$uibModal.open({
+                        animation: true,
+                        templateUrl: 'modalContent.html', // targets template
+                        controller: 'modalController as mc', // controller for modal
+                        size: 'md',
+                        resolve: {
+                            squad: function () {
+                                return vm.item;
+                            }
+                        }
+                    });
+                    console.log(vm.item);
+                    modalInstance.result.then(function (squadSquadMember) {
+                        console.log(squadSquadMember);
+                        vm.item.squadMember.push(squadSquadMember);
+                        console.log(vm.item.squadMember);
+                    }, function () {
+                        console.log('Modal dismissed at: ' + new Date());
+                    });
+                }
+                //=============Squad Tag Functions===============
+                function _getSquadTags() {
+                    vm.squadTagService.getAll(_squadTagsSuccess, _squadTagsError);
+                }
+
+                function _squadTagsSuccess(data) {
+                    vm.squadTags = data.items;
+                }
+
+                function _squadTagsError(data) {
+                    vm.$alertService.error("Job Tag upload denied");
+
+                }
+
+                //=============Member Status=============
+
+                function memberStatusGetAll() {
+                    vm.squadMemberService.getAllStatus(_statusReceived, _statusError);
+                }
+
+                function _statusReceived(data) {
+                    vm.$scope.$apply(function () {
+                        vm.statuses = data.items;
+                    });
+                }
+
+                function _statusError(jqXHR) {
+                    vm.$alertService.error(jqXHR.respondText, "GetAll Statuses Failed");
+                }
+
+            }
+        })();
+
+    </script>
+
+    <script type="text/ng-template" id="modalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Search For New Members</h3>
+        </div>
+        <div class="modal-body">
+            <form>
+                <input class="form-control" type="text" my-on-key-down-call="mc.callRestService()">
+            </form>
+            <div>
+                <div ng-repeat="person in mc.people">
+                    <h4><a ng-click="mc.selected.person = person">{{ person.firstName + ' '+person.lastName }}</a></h4>
+                </div>
+            </div>
+            Selected: <div>
+                <img ng-if="mc.selected.person.photoKey" class="photo" ng-src="{{mc.selected.person.profilePicture}}" />
+                <h4>{{ mc.selected.person.firstName + ' ' + mc.selected.person.lastName}}</h4>
+                <h6>{{mc.selected.person.email}}</h6>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="mc.ok()">OK</button>
+            <button class="btn btn-warning" ng-click="mc.cancel()">Cancel</button>
+        </div>
+    </script>
+
+}

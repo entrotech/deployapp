@@ -1,0 +1,115 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+@section styles{
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+<link href="~/Content/toastr.css" rel="stylesheet" />
+
+}
+<!-- begin #content -->
+@*<div id="content" class="content"></div>*@
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li><a href="/faqs">Index</a></li>
+        <li><a href="/faqs/create">Create</a></li>
+        <li class="active">Manage</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">
+        Frequently Asked Questions
+        <small>Below is a List of Common Questions About Operation Code.</small>
+    </h1>
+   
+<ul class="result-list"></ul>
+
+@section Scripts{
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.16.0/jquery.validate.js"></script>
+    <script src="~/Scripts/sabio.services.faq.js"></script>
+    <script type="text/javascript">
+
+        sabio.page.startUp = function () {
+            sabio.services.faq.getAll(sabio.page.dataReceived, sabio.page.requestFailed);
+            $(".result-list").on("click", ".edit", sabio.page.handlers.switchToEdit)
+            $(".result-list").on("click", ".delete", sabio.page.handlers.deleteFaq)
+        }
+
+        sabio.page.handlers.switchToEdit = function () {
+            activeId = $(this).closest(".faqList").find(".faqId").text();
+            window.location = "/Faqs/" + activeId + "/edit";
+        }
+
+        sabio.page.handlers.deleteFaq = function () {
+            var id = $(this).closest(".faqList").find(".faqId").text();
+            sabio.page.deleteFaq(id);
+        }
+        sabio.page.deleteFaq = function (id) {
+            sabio.ui.sweetalert.delete(id, sabio.services.faq.delete, sabio.page.successDelete, sabio.page.deleteFailed)
+        }
+
+        sabio.page.successDelete = function (data, status, xhr) {
+            document.location = "/faqs/"
+        }
+        sabio.page.deleteFailed = function (xhr, status, errorThrown) {
+            console.log(xhr + ":" + status + ":" + errorThrown);
+        }
+
+        sabio.page.loadTemplate = function () {
+            return $($("#template").html());
+        }
+
+        sabio.page.dataReceived = function (data, status, xhr) {
+            if (!data.items) {
+                return;
+            }
+            for (var i = 0; i < data.items.length; i++) {
+                var template = sabio.page.loadTemplate();
+                console.log(data.items[i]);
+                $("span.faqId", template).text(data.items[i].id);
+                $("span.userIdCreated", template).text(data.items[i].userIdCreated);
+                $(".question", template).text(data.items[i].question);
+                $(".desc", template).text(data.items[i].answer);
+                $("span.faqCategoryId", template).text(data.items[i].faqCategory.name);
+                $(".result-list").append(template);
+            }
+            sabio.page.requestFailed = function (jqxhr, status) {
+                console.log(jqxhr.responseText);
+            }
+        }
+    </script>
+
+    <script type="text/html" id="template">
+        <div class="panel panel-inverse">
+            <div class="panel-heading faqList">
+                <div class="panel-heading-btn">
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload" data-original-title="" title="" data-init="true"><i class="fa fa-repeat"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove" data-original-title="" title="" data-init="true"><i class="fa fa-times"></i></a>
+                </div>
+                <h4 class="panel-title">Frequently Asked Question</h4>
+            </div>
+            <div class="panel-body">
+                <div class="faqList">
+                    <div class="div">
+                        <p><span class="faqId hidden"></span></p>
+                        <p> <span class="userIdCreated hidden">1</span></p>
+                        <p>Category: <span class="faqCategoryId">3 </span></p>
+                        <h4 class="title question"><a href="javascript:;">When was Operation Code Founded?</a></h4>
+                        <p class="desc">
+                            Nunc et ornare ligula. Aenean commodo lectus turpis, eu laoreet risus lobortis quis. Suspendisse vehicula mollis magna vel aliquet. Donec ac tempor neque, convallis euismod mauris. Integer dictum dictum ipsum quis viverra.
+                        </p>
+                        <div class="result-info">
+                            <input type="button" class="edit btn pull-left btn-sm btn-primary" value="Edit" />
+                            <input type="button" class="delete  pull-left btn btn-sm btn-danger"
+                                   value="Delete" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>       
+    </script>
+}

@@ -1,0 +1,238 @@
+﻿@model Sabio.Web.Models.ViewModels.BaseViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<div ng-controller="contactController as crVM">
+
+    <!-- begin page-header -->
+    <h1 class="page-header">Contact Us Requests <small>Manage questions, comments, qualms here...</small></h1>
+    <!-- end page-header -->
+    @* **PAGINATION** *@
+
+    @* **SEARCH** *@
+
+
+
+    <div class="row">
+        <div class="col-md-8 m-b-20">
+            <!-- begin section-container -->
+            <div class="input-group sidebar-search">
+                <input type="text" class="form-control" ng-model="crVM.searchString" placeholder="Search Contact Requests" />
+                <span class="input-group-btn">
+                    <button ng-click="crVM.search()" class="btn btn-inverse" type="button"><i class="fa fa-search"></i></button>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-8 ui-sortable">
+            <div ng-repeat="item in crVM.contactRequests">
+                <div class="panel panel-inverse">
+                    <div class="panel-heading">
+                        <div class="panel-heading-btn">
+                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload" data-original-title="" title="" data-init="true"><i class="fa fa-repeat"></i></a>
+                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove" data-original-title="" title="" data-init="true"><i class="fa fa-times"></i></a>
+                        </div>
+                        <h4 class="panel-title">{{ item.name }}</h4>
+                    </div>
+                    <div class="panel-body">
+
+                        <div>
+                            <div>
+
+                                <a ng-click="crVM.select(item)"><big><strong>{{item.name}}</strong></big></a>
+                                <br />
+                                <big>{{item.email}}</big>
+                                <br />
+                                <br />
+                                <big>{{item.message}}</big>
+                                <br />
+                                <br />
+                                <big>{{item.notes}}</big>
+
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+
+                        @*DROPDOWN*@
+                        <div class="form-group col-md-4">
+                            <label for="contactRequestStatusId">Contact Request Status</label>
+                            <select ng-options="status.id as status.name for status in crVM.contactRequestStatuses" class="form-control" name="contactRequestStatusId" ng-model="item.contactRequestStatusId"></select>
+                        </div>
+
+                        @*END DROPDOWN*@
+
+                        <button type="button" class="btn btn-success btn-sm pull-right" ng-click="crVM.save(item)">Save Updates</button>
+
+                        <div class="col-md-6 form-col fadeInRight contentAnimated finishAnimated" data-animation="true" data-animation-type="fadeInRight">
+                            <form class="form-horizontal ng-pristine ng-valid" id="emailForm">
+
+                                <div class="form-group">
+                                    <label class="control-label col-md-3">Enter Notes </label>
+                                    <div class="col-md-9">
+                                        <textarea ng-model="item.notes" class="form-control" rows="5" name="notes"></textarea>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 text-center">
+            <ul uib-pagination ng-model="crVM.currentPage" total-items="crVM.totalItems" boundary-link="true" ng-change="crVM.pageChanged() " items-per-page="crVM.itemsPerPage"></ul>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script src="~/Scripts/sabio.services.contactRequest.js"></script>
+
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                 .factory('contactRequestService', ContactRequestService);
+
+            ContactRequestService.$inject = ['$baseService', '$sabio'];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function ContactRequestService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.contactRequest;
+                // Simlates inheritance, giving access to $window and $location services and the getNotifier function
+                // to our new service.
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+
+        })();
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+            .controller('contactController', ContactController);
+
+            ContactController.$inject = ['$scope', '$baseController', 'contactRequestService', '$window']; //adding a dependency. '$scope' is provided by angular
+
+            // Constructor
+            function ContactController($scope, $baseController, contactRequestService, $window) {
+
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.contactRequestService = contactRequestService;
+                vm.$window = $window;
+
+                // ViewModel
+                vm.items = [];
+                vm.item = null;  // copy of item being edited
+                vm.itemIndex = -1; // index of item being edited
+                vm.totalItems = 10;
+                //vm.send = _send;
+                vm.select = _select;
+                vm.currentPage = 1;
+                vm.itemsPerPage = 3; //items per page
+                //vm.pageChanged = _pageChanged;
+                vm.save = _save;
+                vm.onSearchSuccess = _onSearchSuccess;
+                vm.onSearchError = _onSearchError;
+                vm.onUpdateReceived = _onUpdateReceived;
+                vm.onUpdateError = _onUpdateError;
+                vm.contactRequestStatuses = [{ id: 1, name: "New" }, { id: 2, name: "Pending" }, { id: 3, name: "Resolved" }, { id: 4, name: "Deferred" }]
+
+
+                // "THE FOLD"
+
+                _render();
+
+                function _render() {
+                    vm.contactRequestService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _getAllSuccess(data) {
+                    if (data.items) {
+                        vm.$scope.$apply(
+                            function () {
+                                vm.contactRequests = data.items;
+                            }
+                            );
+                    }
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Get All failed");
+                }
+
+                function _select(foo) {
+                    // Keep track of the position in vm.items of
+                    // the item we will be editing
+                    vm.itemIndex = vm.items.indexOf(foo);
+                    // get a fresh copy of the object to be edited from the database.
+                    vm.ContactRequestService.getById(foo.id, _getByIdSuccess, _onError)
+                }
+
+                function _getByIdSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                        });
+                    }
+                    vm.$alertService.success("Retrieved item for editing from database");
+                }
+
+                function _save(item) {
+                    //vm.item = {};
+                    vm.itemIndex = -1;
+                    vm.contactRequestService.update(item.id, item, _onUpdateReceived, _onUpdateError);
+
+                    //vm.$alertService.success("Retrieved item for editing from database");
+                }
+
+                function _onUpdateReceived() {
+                    vm.$alertService.success("Retrieved item for editing from database");
+                }
+
+                function _onUpdateError(error) {
+                    vm.$alertService.error(error);
+                }
+
+                // SEARCH
+                function _search() {
+                    vm.contactRequestService.search(vm.searchString, vm.itemsPerPage, vm.currentPage, _onSearchSuccess, _onSearchError)
+                }
+
+                function _onSearchSuccess(data) {
+                    vm.items = [];
+
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                        _pageChanged();
+                    });
+
+                }
+
+                function _onSearchError(jqXHR) {
+
+                    vm.$alertService.error(jqXHR.responseText, "Search failed");
+                }
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                };
+
+
+            }
+
+        })();
+
+    </script>
+
+}
+

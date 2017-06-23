@@ -1,0 +1,684 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section styles {
+    <link href="~/Assets/Admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+
+    <style>
+        .page-line {
+            border-bottom: 1px solid #e2e7eb;
+            margin: 10px 0px;
+        }
+
+        .center-align {
+            text-align: center;
+        }
+
+        .photo-thumb-sm {
+            width: 30px;
+            height: 30px;
+            border-radius: 100%;
+        }
+
+        .photo-thumb-md {
+            width: 100px;
+            height: 100px;
+            border-radius: 100%;
+        }
+
+        tr:hover td {
+            cursor: pointer;
+            background-color: #e1e1e1 !important;
+        }
+
+        .info-card {
+            border: 1px solid #e2e7eb;
+        }
+
+        .card-margin {
+            margin-top: 8px;
+        }
+
+        .card-btn-margin {
+            margin: 10px 0px 0px 5px;
+        }
+
+        .remove-margin {
+            margin: 0px !important;
+        }
+    </style>
+}
+
+
+<div id="content" data-ng-controller="exController as exVm">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li><a href="javascript:;">Home</a></li>
+        <li class="active">Dashboard</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Project Dashboard<small> Edit Team, Assign Tasks, etc.</small></h1>
+
+    <!-- end page-header -->
+    <!-- begin row -->
+    <div class="row">
+        <!-- begin profile-container -->
+
+        <div class="profile-container">
+            <!-- begin col-md-6 -->
+            <div class="col-md-6">
+                <div class="panel" data-sortable-id="ui-widget-1">
+                    <div class="panel-body">
+                        <h2 class="title">{{exVm.item.projectName}}</h2>
+                        <h3>Budget: <span id="budget">{{exVm.item.budget | currency}}</span></h3>
+                        <h4>Spent To-Date: <span id="to-date">{{exVm.item.amountToDate | currency}}</span></h4>
+                        <button type="button" class="btn btn-default" data-ng-click="exVm.createBoard()">Create Trello Board</button>
+                        <button type="button" class="btn btn-default" data-ng-click="exVm.addTeam()">Add team to Trello board</button>
+                        <label>Team members must be registered on Trello with the same Email used to register on Op Code</label>
+                    </div>
+                </div>
+            </div>
+            <!-- begin col-md-6 -->
+            <div class="col-md-6">
+                <div class="panel" data-sortable-id="ui-widget-2">
+                    <div class="panel-body">
+                        <p>Tentative Deadline: <span id="deadline">{{exVm.item.deadline | date: "fullDate"}}</span></p>
+                        <p>Overall Progress (Determined by Budget):</p>
+                        <div class="progress progress-striped active">
+                            <div class="progress-bar" style="width:{{exVm.percentage}}">{{exVm.percentage}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end col-md-6 -->
+            <!-- start page line -->
+            <div class="col-md-12">
+                <div class="panel" data-sortable-id="ui-widget-4">
+                    <h3 class="title">Description</h3>
+                    <div class="panel-body">
+                        <div id="description" ng-bind-html="exVm.sanitize(exVm.item.description)"></div>
+                        <button class="btn btn-warning pull-right" data-ng-click="exVm.goToEdit()">Edit</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 page-line"></div>
+            <!-- end page line -->
+            <!-- begin col-md-8 -->
+            <div class="col-md-12">
+                <div class="panel"><h3 class="title">Team Management</h3></div>
+            </div>
+            <div class="col-md-8">
+                <div class="panel" data-sortable-id="ui-widget-3">
+                    <div class="panel-body ">
+                        <p class="pull-right"><input type="checkbox" ng-model="exVm.hideInactive" class="checkbox-inline remove-margin" checked/> Hide Denied/Inactive</p>
+                        <div class="team-list">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="center-align">Profile Picture</th>
+                                        <th class="center-align">Full Name</th>
+                                        <th class="center-align">Role</th>
+                                        <th class="center-align">Email</th>
+                                        <th class="center-align">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="staff in exVm.item.staff" ng-click="exVm.selectMember(staff)" ng-hide="exVm.hideInactive && (staff.projectPersonStatus == 'Denied' || staff.projectPersonStatus == 'Inactive')">
+                                        <td style="text-align:center;"><img class="photo-thumb-sm" ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{staff.person.photoKey}}" /></td>
+                                        <td><a>{{staff.person.fullName}}</a></td>
+                                        <td>{{staff.isLeader ? 'Project Lead' : 'Team Member'}}</td>
+                                        <td>{{staff.person.email}}</td>
+                                        <td>{{staff.projectPersonStatus}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button class="btn btn-default" data-ng-click="exVm.openModal()">Add Team Member</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end col-md-8-->
+            <!-- begin col-md-4 (INFO CARD) -->
+            <div class="col-md-4">
+                <div class="panel info-card" data-sortable-id="ui-widget-5" ng-show="exVm.staff">
+                    <div class="panel-body">
+                        <div class="col-md-6">
+                            <img class="photo-thumb-md" ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{exVm.staff.person.photoKey}}" />
+                        </div>
+                        <div class="col-md-6">
+                            <h3>{{exVm.staff.person.fullName}}</h3>
+                        </div>
+                        <div class="col-md-12 card-margin">
+                            <p>Email: {{exVm.staff.person.email}}</p>
+                            <input type="checkbox" ng-model="exVm.staff.isLeader" />
+                            <strong>Project Leader</strong>
+                        </div>
+                        <div class="col-md-12 card-margin">
+                            <label>
+                                Member Status:
+                                <select ng-model="exVm.staff.statusId" ng-options="status.id as status.status for status in exVm.statuses"></select>
+                            </label>
+                            <label>
+                                Hourly Rate:
+                                <input type="text" ng-model="exVm.staff.hourlyRate" />
+                            </label>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-success pull-right card-btn-margin" ng-click="exVm.updateMember()">Update</button>
+                            <button type="button" class="btn btn-default pull-right card-btn-margin" ng-click="exVm.cancelMemberUpdate()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end col-md-4 (INFO CARD) -->
+        </div>
+        <timecard timecard="tVm.item" projectId="@Model.Id"></timecard>
+    </div>
+
+    <!-- end profie-container -->
+    <!-- end row -->
+</div>
+
+@section pageInitScripts {
+    <script src="~/Assets/Admin/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-eonasdan-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/Scripts/angular-eonasdan-datetimepicker.js"></script>
+    <script src="~/Scripts/sabio/sabio.module.ae-datetimepicker.js"></script>
+}
+
+
+@section scripts {
+    @*Ian Armstrong's Trello Auth Key for testing; To be replaced by OpCodes*@
+    @{string key = "e80a9933c3ae90cce5448460161351bf";}
+    <script src=@String.Format("https://api.trello.com/1/client.js?key=" + key)></script>
+
+    <!-- Begin Linked Scripts -->
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/sabio.services.project.js"></script>
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/app/services/project.js"></script>
+    <script src="~/Scripts/app/services/person.js"></script>
+
+    <!--Timecard Component Scripts-->
+    <script src="~/Scripts/app/services/TimecardEntry.js"></script>
+    <script src="~/Scripts/sabio.services.timecardEntry.js"></script>
+    <script src="~/Scripts/app/Timecard/TimecardController.js"></script>
+    <script src="~/Scripts/app/Timecard/TimecardComponent.js"></script>
+
+    <script type="text/javascript">
+
+        (function (){
+            "use strict";
+            angular.module(APPNAME)
+                .directive('onKeyDown', function () {
+                    return function (scope, element, attrs) {
+                        element.bind("keyup", function(event) {
+                            var val = element.val();
+                            if (val.length > 2) {
+                                scope.callSearch(val);
+                            }
+                        });
+                    };
+                });
+        })();
+
+        // ------------ BEGIN MODAL CONTROLLER --------------- //
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .controller('modalController', ModalController);
+
+            ModalController.$inject = ['$scope', '$baseService', '$baseController', '$uibModalInstance', 'projectsService', 'personService', '$log', 'project']
+
+            function ModalController($scope, $baseService, $baseController, $uibModalInstance, projectsService, personService, $log, project)
+            {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.projectsService = projectsService;
+                vm.personService = personService;
+                vm.$uibModalInstance = $uibModalInstance;
+
+                // View Model
+
+                vm.people = [];
+
+                vm.selected = {};
+                vm.cancel = _cancel;
+                vm.ok = _ok;
+                vm.project = project;
+                vm.projectPerson = {};
+
+                _render();
+
+                function _render() {
+                    if(vm.project.staff) {
+                        vm.projectPersonIds = vm.project.staff.map(function personIds(staff){
+                            return staff.personId;
+                        });
+                    }
+                    console.log(vm.projectPersonIds);
+                    return vm.projectPersonIds;
+                }
+
+                function _cancel() {
+                    vm.$uibModalInstance.dismiss('cancel');
+                }
+
+                function _ok() {
+                    console.log("Button Pressed!!")
+                    vm.projectPerson = {projectId: vm.project.id, personId: vm.selected.person.id, statusId: 4, hourlyRate:30}
+
+                    vm.projectsService.postPerson(vm.projectPerson, _postPersonSuccess, _postPersonError)
+                    vm.$uibModalInstance.close(vm.projectPerson);
+                }
+
+                function _postPersonSuccess(data) {
+                    vm.projectPerson.projectId = vm.project.id;
+                    vm.projectPerson.person = vm.selected.person;
+                }
+
+                function _postPersonError(jqXHR) {
+                    console.log("Something went wrong.");
+                    console.log(jqXHR);
+                }
+
+                vm.$scope.callSearch = function (searchString) {
+                    projectsService.personSearch(searchString, _getPersonSuccess, _getPersonError);
+                }
+
+                function _getPersonSuccess(data) {
+                    $log.info(data.items);
+                    vm.$scope.$apply(function (){
+                        if(vm.projectPersonIds) {
+                            vm.people = data.items.filter(function (person) {
+                                return vm.projectPersonIds.indexOf(person.id) == -1
+                            })
+                        } else {
+                            vm.people = data.items;
+                        }
+                    });
+
+                }
+
+                function _getPersonError(){
+                    $log.error("Didn't work. Try again.")
+                }
+
+            }
+        })();
+
+        // ------------ END MODAL CONTROLLER --------------- //
+
+        // -----------  BEGIN MAIN CONTROLLER ------------- //
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .controller('exController', ExController);
+
+            ExController.$inject = ['$scope', '$window', '$baseController', 'projectsService', 'personService', '$sce', '$uibModal', '$log'];
+
+            function ExController($scope, $window, $baseController, projectsService, personService, $sce, $uibModal, $log) {
+
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.projectsService = projectsService;       
+                vm.personService = personService;
+                vm.$window = $window;
+                vm.$uibModal = $uibModal;
+
+
+                vm.notify = vm.projectsService.getNotifier($scope);
+
+                // View Model
+                vm.item = {};
+                vm.items = [];
+                vm.id = @Model.Item;
+                vm.sanitize = _sanitize;
+                vm.openModal = _openModal;
+                vm.goToEdit = _goToEdit;
+                vm.test = _test;
+                vm.createBoard = _createBoard;
+                vm.addTeam = _addTeam;
+                vm.memberIndex = -1;
+                vm.staff = null;
+                vm.selectMember = _selectMember;
+                vm.cancelMemberUpdate = _cancelMemberUpdate;
+                vm.updateMember = _updateMember;
+                vm.hideInactive = true;
+                vm.percentage = 0;
+                
+
+                _render();
+
+                function _render() {
+                    getAllMemberStatus();
+                    if (vm.id) {
+                        vm.projectsService.getById(vm.id, _getSuccess, _getError);
+
+                    }
+                   
+
+                }
+
+                function _test() {
+                    console.log("record clicked.")
+                }
+
+                //------ GET BY ID (Load Project Info on Page) END ------- //
+
+                function _getSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.item = data.item;
+                        for (var i = 0; i < vm.item.staff.length; i++) {
+                            vm.item.staff[i].personId = vm.item.staff[i].person.id;
+                            vm.item.staff[i].projectId = vm.item.id;
+                        }
+
+                        //Progress bar 
+                        var budget = data.item.budget;
+                        var amountToDate = data.item.amountToDate;
+
+                        vm.percentage = _calculatePercentage(budget, amountToDate);
+                        
+
+                    });
+
+                    
+                    
+                }
+
+                function _getError(jqXHR) {
+                    $log.error("There was a problem.");
+                    $log.error(jqXHR)
+
+                }
+
+                function _sanitize (data) {
+                    return $sce.trustAsHtml(data);
+                }
+
+                function _goToEdit() {
+                    $window.location = "/projects/" + vm.id + "/edit/";
+
+
+                }
+
+                function _calculatePercentage(budget, amountToDate) {
+
+                    var percentage = Math.floor((amountToDate / budget) * 100) + "%";
+                    return percentage;
+
+                }
+
+                //------ GET BY ID (Load Project Info on Page) END ------- //
+
+               
+
+
+
+                // --------------- MODAL FUNCTIONS BEGIN ---------------- //
+
+                function _openModal () {
+                    var modalInstance = vm.$uibModal.open({
+                        animation: true,
+                        templateUrl: 'modalContent.html', // targets template
+                        controller: 'modalController as mc', // controller for modal
+                        size: 'sm',
+                        resolve: {
+                            project: function () {
+                                return vm.item;
+                            }
+                        }
+                    });
+
+                    modalInstance.result.then(function (projectPerson) {
+                        console.log(projectPerson);
+                        if(projectPerson){
+                            vm.projectsService.getById(vm.id, _getSuccessRefresh, _getErrorRefresh);
+
+                            function _getSuccessRefresh(data) {
+                                vm.$scope.$apply(function () {
+                                    vm.item = data.item;
+                                    for (var i = 0; i < vm.item.staff.length; i++) {
+                                        vm.item.staff[i].personId = vm.item.staff[i].person.id;
+                                        vm.item.staff[i].projectId = vm.item.id;
+
+                                    }
+
+                                });
+                                vm.$alertService.success("Member Added.")
+                            }
+
+                            function _getErrorRefresh(jqXHR) {
+                                console.log("Something happened.")
+                                console.log(jqXHR);
+                            }
+
+                        }
+                    }, function () {
+
+                        $log.info('Modal dismissed at: ' + new Date());
+                    });
+                };
+
+                // --------------- MODAL FUNCTIONS END ---------------- //
+
+                // ------------ TEAM MEMBER CARD FUCNTIONS -------------- //
+
+
+                function _selectMember(staff) {
+                    vm.memberIndex = vm.item.staff.indexOf(staff);
+                    console.log(staff);
+                    vm.staff = staff;
+
+                }
+
+                function _updateMember() {
+                    var personId = vm.staff.personId;
+                    var projectId = vm.staff.projectId;
+                    var hourlyRate = vm.staff.hourlyRate;
+                    var isLeader = vm.staff.isLeader;
+                    var statusId = vm.staff.statusId;
+
+                    var staff = {
+                        projectId: projectId
+                        , personId: personId
+                        , isLeader: isLeader
+                        , statusId: statusId
+                        , hourlyRate: hourlyRate
+                    }
+
+                    console.log(staff);
+
+                    vm.projectsService.putPerson(staff, _memberUpdateSuccess, _memberUpdateError);
+
+                }
+
+                function _memberUpdateSuccess() {
+                    
+                    vm.staff = null;
+                    vm.memberIndex = -1;
+
+                    vm.projectsService.getById(vm.id, _getSuccess, _getErrorRefresh);
+                    vm.$alertService.success("Member Updated.")
+                }
+
+
+                function _getErrorRefresh (){
+                    console.log("Something went wrong.")
+                }
+
+                function _memberUpdateError(jqXHR) {
+                    vm.$alertService.error(jqXHR.respondText, "Member Update Failed.")
+                }
+
+                function getAllMemberStatus() {
+                    vm.projectsService.getAllStatus(_getStatusSuccess, _getStatusError);
+                }
+
+                function _getStatusSuccess(data){
+                    vm.$scope.$apply(function () {
+                        vm.statuses = data.items;
+                    });
+                    console.log(vm.statuses);
+                }
+
+                function _getStatusError(jqXHR) {
+                    vm.$alertService.error(jqXHR.respondText, "Get All Failed.")
+                }
+
+                function _cancelMemberUpdate() {
+                    vm.staff = null;
+                    vm.memberIndex = -1;
+
+                }
+
+                // -------- TEAM CARD MEMBER FUNCTIONS END ------- //
+
+                //Trello functions Start      
+                function _authorizeTrello() {
+                    Trello.authorize({
+                        type: 'popup',
+                        name: 'Getting Started Application',
+                        scope: {
+                            read: 'true',
+                            write: 'true'
+                        },
+                        expiration: 'never',
+                        success: _authenticationSuccess,
+                        error: _authenticationFailure
+                    });
+                }
+
+                 function _authenticationSuccess() {
+                    console.log('Successful authentication');
+                };
+
+                 function _authenticationFailure() { console.log(data); };
+
+                 function _createBoard() {
+                     _authorizeTrello();
+
+                    var newBoard = {
+                        name: vm.item.projectName,
+                    };
+                    Trello.post('/boards', newBoard, _trelloBoardSuccess, _trelloBoardFailure);
+                 }
+
+                 function _trelloBoardSuccess(data) {
+                     vm.$alertService.success('Board created successfully');
+                     console.log(data);
+                     vm.item.trelloBoardId = data.id;
+                     vm.item.trelloBoardUrl = data.shortUrl;
+                     vm.projectsService.put(vm.item.id, vm.item, _trelloUpdateSuccess, _trelloUpdateError);
+                     $window.open(data.url, '_blank');
+                 }
+
+                 function _trelloUpdateSuccess(data) {
+                     console.log(data)
+                 }
+
+                 function _trelloUpdateError() {
+                     console.log(data)
+                 }
+
+                 function _trelloBoardFailure(data) {
+                     vm.$alertService.error("Creation Failed")
+                     console.log(data)
+                 }
+
+                 function _addTeam() {
+                     _authorizeTrello();
+
+                     for (var i = 0; i < vm.item.staff.length; i++) {
+                         var member = {
+                             email: vm.item.staff[i].person.email,
+                         };
+                         Trello.put('/boards/' + vm.item.trelloBoardId, member, _addTeamSuccess, _addTeamFailure);
+                     }
+                 }
+
+                 function _addTeamSuccess(data) {
+                     vm.$alertService.success("Team member Added")
+                     console.log(data);
+                 }
+
+                 function _addTeamFailure(data) {
+                     vm.$alertService.success("Failed to add " + JSON.stringify(data))
+                 }
+
+        //Trello functions End
+
+            }
+            // Outside controller function scope. Don't put anything here.
+        })();
+
+        // -----------  END MAIN CONTROLLER ------------- //
+
+        // ----------- UNIQUE FILTER -------------------- //
+        (function () {
+            angular.module(APPNAME)
+                .filter('unique', function () {
+
+                    return function (collection, keyname) {
+
+                        var output = [],
+                            keys = [];
+
+                        angular.forEach(collection, function (item) {
+                            var key = item[keyname];
+
+                            if (keys.indexOf(key) === -1) {
+                                keys.push(key);
+                                output.push(item);
+                            }
+                        });
+                        return output;
+                    };
+                });
+        })();
+
+
+    </script>
+
+    <!------- MODAL FORM TEMPLATE -------->
+
+    <script type="text/ng-template" id="modalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Team Member Search</h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <form>
+                <p>Enter a user email:</p>
+                <input type="text" on-key-down="mc.callSearch()" />
+            </form>
+            <div>
+                <div ng-repeat="person in mc.people">
+                    <a ng-click="mc.selected.person = person">{{ person.email }}</a>
+                </div>
+                <div>
+                    Selected: <b>{{mc.selected.person.email}}</b>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="mc.ok()">OK</button>
+            <button class="btn btn-warning" type="button" ng-click="mc.cancel()">Cancel</button>
+        </div>
+    </script>
+
+}
+
+

@@ -1,0 +1,462 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+@section styles{
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Assets/Admin/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <link href="~/Assets/Admin/plugins/bootstrap-eonasdan-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <style>
+        table {
+            border: 1px solid #ccc;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+            table tr {
+                border: 1px solid #ddd;
+                padding: 5px;
+            }
+
+            table th, table td {
+                padding: 10px;
+                text-align: center;
+            }
+
+            table th {
+                text-transform: uppercase;
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+
+        .table-condensed {
+            background-color: #fff;
+        }
+
+        @@media screen and (max-width: 600px) {
+
+            table {
+                border: 0;
+            }
+
+                table thead {
+                    display: none;
+                }
+
+                table tr {
+                    margin-bottom: 10px;
+                    display: block;
+                    border-bottom: 2px solid #ddd;
+                }
+
+                table td {
+                    display: block;
+                    text-align: center;
+                    font-size: 13px;
+                    border-bottom: 1px dotted #ccc;
+                }
+
+                    table td:last-child {
+                        border-bottom: 0;
+                    }
+
+                    table td:before {
+                        content: attr(data-label);
+                        float: left;
+                        text-transform: uppercase;
+                        font-weight: bold;
+                    }
+        }
+    </style>
+}
+<div id="content" class="content">
+    <div class="container">
+        <!-- begin breadcrumb -->
+        <ol class="breadcrumb pull-right">
+            <li><a href="/">Home</a></li>
+            <li class="active">Timecard Entry</li>
+        </ol>
+        <!-- end breadcrumb -->
+        <!-- begin page-header -->
+        <h1 class="page-header text-center" align="center">Timecard Entry</h1>
+        <!-- end page-header -->
+        <!-- begin form content -->
+        <div class="row" data-ng-controller='mainController as mVm'>
+            <div class="result-container col-md-offset-1 col-md-10" data-ng-if="!mVm.item">
+                <div class="col-md-5 pull-right">
+                    <label>Add a new entry</label>
+                    <button type="button" data-ng-click="mVm.add()">
+                        <i class="fa-plus-circle fa"></i>
+                    </button>
+                </div>
+                <div class="col-md-7">
+                    <div class="input-group">
+                        <div class="col-md-4">
+                            <label for="project">Sort by project:</label>
+                        </div>
+                        <div class="col-md-5">
+                            <select class="form-control" data-ng-model="project" data-ng-change="mVm.filter(project)" data-ng-options="project.projectId as project.projectName for project in mVm.items | unique:'projectName'">
+                                <option value="">All</option>
+                                <option>{{project.projectName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <ul uib-pagination ng-model="mVm.currentPage" total-items="mVm.totalItems" boundary-link="true" ng-change="mVm.pageChanged() " items-per-page="mVm.itemsPerPage"></ul>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
+                            <th>Hours worked</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in mVm.filteredItems">
+                            <td>{{item.projectName}}</td>
+                            <td>{{item.startDateTimeUtc | date:'dd MMM yyyy'}}</td>
+                            <td>{{item.endDateTimeUtc | date:'dd MMM yyyy'}}</td>
+                            <td>{{item.startDateTimeUtc | date:'hh:mm a'}}</td>
+                            <td>{{item.endDateTimeUtc | date:'hh:mm a'}}</td>
+                            <td>{{item.hoursWorked}}</td>
+                            <td>{{item.status}}</td>
+                            <td data-ng-show="item.timecardStatusId == 1">
+                                <button type="button" uib-tooltip="Edit Entry" data-ng-click="mVm.select(item)">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button type="button" uib-tooltip="Delete Entry" data-ng-click="mVm.delete(item)">
+                                    <i class="fa fa-trash-o"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-offset-2 col-md-8">
+                <!-- begin panel -->
+                <div class="panel panel-inverse" data-sortable-id="form-stuff-1" data-ng-if="mVm.item">
+                    <div class="panel-heading">
+                        <div class="panel-heading-btn">
+                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                        </div>
+                        <h4 class="panel-title">Timecard</h4>
+                    </div>
+                    <div class="panel-body">
+                        <form id="timecardEntryForm">
+                            <h4>Select Project Worked on</h4>
+                            <select class="form-control" data-ng-model="mVm.item.projectId" data-ng-options="item.projectId as item.projectName for item in mVm.items | unique:'projectName'"></select>
+                            <h4>Enter date and time started working</h4>
+                            <div class="form-group">
+                                <div class="input-group" datetimepicker
+                                     on-change="mVm.update(mVm.item.startDateTimeUtc, mVm.item.endDateTimeUtc)"
+                                     data-ng-model="mVm.item.startDateTimeUtc" options="mVm.optionsFrom">
+                                    <input class="form-control" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <h4>Enter date and time ended working</h4>
+                            <div class="form-group">
+                                <div class="input-group" datetimepicker
+                                     on-change="mVm.update(mVm.item.startDateTimeUtc, mVm.item.endDateTimeUtc)"
+                                     data-ng-model="mVm.item.endDateTimeUtc" options="mVm.optionsTo">
+                                    <input class="form-control" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary" data-ng-click="mVm.save()">Save</button>
+                            <button type="button" class="btn btn-default" data-ng-click="mVm.cancel()">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end form content -->
+    </div>
+
+</div>
+
+
+@section pageInitScripts{
+    <script src="~/Assets/Admin/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-eonasdan-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/Scripts/angular-eonasdan-datetimepicker.js"></script>
+    <script src="~/Scripts/sabio/sabio.module.ae-datetimepicker.js"></script>
+}
+
+@section scripts{
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script>
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('mainController', MainController);
+            MainController.$inject = ['$scope', '$window', '$baseController', 'timecardEntryService', '$sce'];
+
+            function MainController($scope, $window, $baseController, timecardEntryService, $sce) {
+                // Administrative stuff
+                var vm = this;
+                var sortReverse = false;
+                vm.$scope = $scope;
+                // Simulate inheritance to add
+                // $document, $log, $route, $routeParams, $systemEventService, $alertService, $sabio services
+                // to our controller.
+                $baseController.merge(vm, $baseController);
+                vm.timecardEntryService = timecardEntryService;
+                vm.$window = $window;
+
+                // ViewModel
+                vm.model = $scope.$parent.lVm.model;
+                vm.goHome = _goHome;
+                vm.items = [];
+                vm.item = null;  // copy of item being edited
+                vm.itemIndex = -1; // index of item being edited
+                vm.filteredItems = [];
+                vm.currentPage = 1;
+                vm.itemsPerPage = 10;
+                vm.totalItems = 50;
+                vm.select = _select;
+                vm.save = _save;
+                vm.cancel = _cancel;
+                vm.add = _add;
+                vm.delete = _delete;
+                vm.resetDropDown = _resetDropDown;
+                vm.pageChanged = _pageChanged;
+                vm.filter = _filter;
+                vm.sort = _sort;
+
+                //MinMax date settings for datepicker
+                vm.optionsFrom = { format: 'LLL', showClear: true };
+                vm.optionsTo = { format: 'LLL', showClear: true };
+                vm.update = function (startDateTimeUtc, endDateTimeUtc) {
+                    vm.optionsFrom.maxDate = endDateTimeUtc;
+                    vm.optionsTo.minDate = startDateTimeUtc;
+                };
+
+                // "The fold"
+
+                _render();
+
+                function _render() {
+                    vm.timecardEntryService.search("", "", vm.model.id, "", _getAllSuccess, _getAllError);
+                }
+
+                function _pageChanged() {
+                    var begin = ((vm.currentPage - 1) * vm.itemsPerPage);
+                    var end = begin + vm.itemsPerPage;
+                    vm.filteredItems = vm.items.slice(begin, end);
+                }
+
+                function _pageRefresh() {
+                    $window.location = ("/timecardentry/index")
+                }
+
+                function _resetDropDown() {
+                    vm.singleSelect = "";
+                }
+
+                function _goHome() {
+                    vm.$window.location.href = '/';
+                }
+
+                function _toLocalTime() {
+                    vm.item.startDateTimeLocal = vm.item.startDateTimeUtc.format()
+                    vm.item.endDateTimeLocal = vm.item.endDateTimeUtc.format()
+
+                    vm.item.startDateTimeUtc = vm.item.startDateTimeUtc.toISOString()
+                    vm.item.endDateTimeUtc = vm.item.endDateTimeUtc.toISOString()
+                }
+
+                function _hoursWorked(items) {
+                    for (var i = 0; i < items.length; i++) {
+                        a = moment(items[i].endDateTimeUtc).diff(moment(items[i].startDateTimeUtc))
+                        items[i].hoursWorked = moment.duration(a).asHours().toFixed(1)
+                    }
+                    return items
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        if (data.items) {
+                            var items = _hoursWorked(data.items)
+                            vm.totalItems = data.items.length;
+                            vm.items = items;
+                            vm.filteredItems = vm.items.slice(0, vm.itemsPerPage);
+                        }
+                    });
+                    vm.$alertService.success("Retrieved all");
+                }
+
+                function _filter(project) {
+                    if (project) {
+                        var projectId = project;
+                    }
+                    vm.timecardEntryService.search("", projectId, "", "", _getAllSuccess, _getAllError)
+                }
+
+                function _sort(prop) {
+                    vm.items.sort(_generateSortFn(prop, sortReverse));
+                    _pageChanged()
+                    sortReverse = !sortReverse;
+                }
+
+                function _generateSortFn(prop, reverse) {
+                    if (reverse) {
+                        return function (a, b) {
+                            if (a[prop] < b[prop]) return -1;
+                            if (a[prop] > b[prop]) return 1;
+                            return 0;
+                        };
+                    } else {
+                        return function (a, b) {
+                            if (a[prop] < b[prop]) return 1;
+                            if (a[prop] > b[prop]) return -1;
+                            return 0;
+                        };
+                    }
+
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+                }
+
+                function _select(data) {
+                    // Keep track of the position in vm.items of
+                    // the item we will be editing
+                    vm.itemIndex = vm.items.indexOf(data);
+                    // get a fresh copy of the object to be edited from the database.
+                    vm.timecardEntryService.search(data.id, "", "", "", _getByIdSuccess, _getByIdError)
+                }
+
+                function _getByIdSuccess(data) {
+                    if (data.items && data.items.length > 0) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.items[0];
+                        });
+                    }
+                    vm.$alertService.success("Retrieved item for editing from database");
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetById failed");
+                }
+
+                // create a new empty item
+                function _add() {
+                    vm.item = {};
+                    vm.itemIndex = -1;
+                }
+
+                function _cancel() {
+                    _endEdit();
+                }
+
+                function _endEdit() {
+                    vm.item = null;
+                    vm.itemIndex = -1;
+                }
+
+                //Save Functions
+                function _save() {
+                    _toLocalTime()
+                    vm.item.PersonId = vm.model.id;
+                    vm.item.timecardStatusId = 1;
+                    if (vm.item.id) {
+                        vm.timecardEntryService.put(vm.item.id, vm.item, _putSuccess, _putError);
+                    }
+                    else {
+                        vm.item.timecardStatusId = 1
+                        vm.timecardEntryService.post(vm.item, _postSuccess, _postError);
+                    }
+                }
+
+
+                function _putSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        // To update UI, replace with new version
+                        vm.items[vm.itemIndex] = vm.item;
+                        _pageRefresh();
+                        vm.$alertService.success("Update successful");
+                    });
+                }
+
+                function _putError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Update failed");
+                }
+
+                function _postSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.$alertService.success("Insert successful");
+                            _pageRefresh()
+                        });
+                    }
+                }
+
+                function _postError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Insert failed");
+                }
+
+                //Delete Functions
+                function _delete(item) {
+                    if (item.id) {
+                        sabio.ui.sweetalert.delete(item.id, vm.timecardEntryService.delete, _deleteSuccess, _deleteError)
+                    }
+                }
+
+                function _deleteSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        // To update UI, replace with new version
+                        vm.items.splice(vm.itemIndex, 1);
+                        _render();
+                        vm.$alertService.success("Delete successful");
+                    });
+                }
+
+                function _deleteError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Delete failed");
+                }
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .filter('unique', function () {
+
+                    return function (collection, keyname) {
+
+                        var output = [],
+                            keys = [];
+
+                        angular.forEach(collection, function (item) {
+                            var key = item[keyname];
+
+                            if (keys.indexOf(key) === -1) {
+                                keys.push(key);
+                                output.push(item);
+                            }
+                        });
+                        return output;
+                    };
+                });
+        })();
+    </script>
+}

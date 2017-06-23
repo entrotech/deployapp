@@ -1,0 +1,292 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+@section styles{
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    <link href="/assets/admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
+    <link href="/assets/admin/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/animate.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/style.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/style-responsive.css" rel="stylesheet" />
+    <link href="/assets/admin/css/theme/default.css" rel="stylesheet" id="theme" />
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <link href="~/Content/deployHome.css" rel="stylesheet" />
+    <link href="~/Content/deployAdmin.css" rel="stylesheet" />
+
+    <!-- ================== BEGIN BASE JS ================== -->
+    <!-- ================== END BASE JS ================== -->
+
+    <style>
+        .footer {
+            margin-top: 900px;
+            position: absolute;
+            left: -250px;
+            right: -350px;
+            width: 100.5%;
+            float: none;
+        }
+       .brand {
+           text-align:center !important;
+        }
+
+        .specialHeader {
+            display: none;
+        }
+
+        .login-cover-bg img {
+            height: 100%;
+            width: 100%;
+            opacity:.7;
+        }
+        /*Iphone*/
+        @@media (max-width: 767px) {
+            .login.login-v2 {
+                position: relative;
+                left: 0;
+            }
+
+            .login {
+                top: 0;
+            }
+
+            .small {
+                display: none;
+            }
+
+            /*.specialHeader {
+                text-align: center !important;
+                display: block !important;
+                color: white;
+                font-size: 17px;
+                font-weight: 500;
+                margin-bottom: 15px;
+                text-shadow: 1px 1px #e6eeff;
+            }*/
+
+            .footer {
+                display: none;
+            }
+
+            .brand {
+                display: none;
+            }
+
+            .login-cover-bg img {
+                height: 100%;
+                width: 100%;
+            }
+        }
+        /*Ipad*/
+        @@media (max-width: 1030px) {
+            .specialHeader {
+                text-align: center !important;
+                display: block !important;
+                color: white;
+                font-size: 17px;
+                font-weight: 500;
+                margin-bottom: 15px;
+                /*text-shadow: 1px 1px #e6eeff;*/
+            }
+
+            .footer {
+                display: none;
+            }
+
+            .brand {
+                display: none;
+            }
+
+            .login-cover-bg img {
+                height: 100%;
+                width: 100%;
+            }
+        }
+        /*Begin Navbar Styling*/
+        .navbar-inverse .navbar-header {
+            background: #222;
+        }
+
+        .navbar-inverse .navbar-collapse, .navbar-inverse .navbar-form {
+            border-color: #222;
+            background: #222;
+        }
+
+        .navbar.navbar-inverse {
+            background: #222;
+        }
+
+            .navbar.navbar-inverse .navbar-brand {
+                background-color: #222;
+            }
+
+        .navbar-nav > li > .dropdown-menu {
+            border-top: none;
+        }
+
+        .navbar-inverse .navbar-header {
+            border-bottom: none;
+        }
+                .login.login-v2 .login-header .brand {
+            text-shadow: 0px 1px 1px #453b3b;
+            font-weight: 400;
+        }
+
+            .login.login-v2 .login-header .brand small {
+                font-weight: 700!important;
+            }
+    </style>
+}
+
+<div class="login-cover-bg"><img src="~/assets/admin/img/login-bg/bg-2.jpg" width="5760" height="2480" alt="" /> </div>
+<!-- begin login -->
+<div class="login login-v2">
+    <!-- begin brand -->
+    <!-- end brand -->
+    <div id="loginDiv" class="login-content">
+        <form class="margin-bottom-0" id="formProposal">
+            <div class="login-header text-center">
+                <div class="brand">
+                    SUBMIT YOUR PROPOSAL
+                    <small class="small">
+                        CONTACT OUR EXPERTS TO DESIGN, DEVELOP AND DEPLOY
+                        YOUR DYNAMIC WEB APPLICATION
+                    </small>
+                </div>
+            </div>
+            @*<div class="specialHeader">
+                SUBMIT YOUR PROPOSAL
+            </div>*@
+            <div class="form-group m-b-10">
+                <input type="text" name="FirstName" class="form-control input-medium" placeholder="First Name" required />
+            </div>
+            <div class="form-group m-b-10">
+                <input type="text" name="LastName" class="form-control input-medium" placeholder="Last Name" required />
+            </div>
+            <div class="form-group m-b-10">
+                <input type="text" name="Company" class="form-control input-medium" placeholder="Company Name (Optional)" />
+            </div>
+            <div class="form-group m-b-10">
+                <input type="tel" name="PhoneNumber" class="form-control input-medium" placeholder="Phone Number" required />
+            </div>
+            <div class="form-group m-b-10">
+
+                    <input type="email" name="Email" class="form-control input-medium" placeholder="Email" required />
+                </div>
+                <div class="form-group m-b-10">
+                    <input type="number" min="2000" max="5000000" name="Budget" class="form-control input-medium" placeholder="Budget" required />
+                </div>
+                <div class="form-group m-b-10">
+                    <input type="text" name="Deadline" class="form-control input-medium" placeholder="Deadline (Optional)" />
+                </div>
+                <div class="form-group m-b-10">
+                    <input type="text" name="ProjectType" class="form-control input-medium" placeholder="Project Type (ie. Website, Mobile App: IOS/Android)" required />
+                </div>
+                <div class="form-group m-b-10">
+                    <textarea rows="4" name="Description" class="form-control input-lg txtbox" placeholder="Please Enter a Description of Your Project" required></textarea>
+                </div>
+                <div class="login-buttons">
+                    <button type="button" class="btn btn-success btn-block btn-lg submitProp" id="submitProp">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- end login -->
+
+@section scripts {
+
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.16.0/jquery.validate.js"></script>
+    <script src="~/Scripts/sabio.services.user.js"></script>
+
+    <script type="text/javascript">
+        sabio.page.id = @Model.Item;
+        sabio.page.startUp = function () {
+            $(".submitProp").on("click", sabio.page.handlers.sendProposal);
+            sabio.page.initializeValidation();
+        }
+        //FORM SUBMIT VALIDATE
+        sabio.page.handlers.sendProposal = function (e) {
+            e.stopPropagation();
+            if ($("#formProposal").valid()) {
+                console.log(data);
+                var url = "/api/proposals/";
+                var data = $("#formProposal").serialize();
+                var settings = {
+                    cache: false
+                       , dataType: "json"
+                       , data: data
+                       , success: sabio.page.proposalSuccess
+                       , error: sabio.page.onError
+                       , type: "POST"
+                };
+                $.ajax(url, settings);
+            }
+        }
+
+        //AJAX SUCCESS
+        sabio.page.proposalSuccess = function (data, status, xhr) {
+            console.log(status);
+            $("#formProposal")[0].reset();
+            window.location = "/";
+        };
+        //AJAX ERROR
+        sabio.page.onError = function (xhr, textStatus, errorThrown) {
+            var response = xhr.responseText;
+            swal({
+                title: response,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Ok',
+                confirmButtonClass: 'btn btn-error',
+                buttonsStyling: true,
+                allowOutsideClick: true,
+            })
+        }
+        sabio.page.initializeValidation = function () {
+            jQuery.validator.setDefaults({
+                debug: true
+            })
+
+            $("#formProposal").validate({
+                highlight: function (element) {
+                    $(element).addClass("form-validate");
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass("form-validate");
+                },
+                errorPlacement: function (label, element) {
+                    element.parent().append(label);
+                },
+                errorClass: "error-msg",
+                errorElement: "span",
+                rules: {
+                    "Description": {
+                        required: true,
+                    },
+                    "ProjectType": {
+                        required: true,
+                    },
+                    "FirstName": {
+                        required: true,
+                    },
+                    "PhoneNumber": {
+                        required: true,
+                    },
+                    "Email": {
+                        required: true,
+                    }
+                }
+            })
+        };
+    </script>
+}

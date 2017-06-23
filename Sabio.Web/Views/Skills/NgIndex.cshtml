@@ -1,0 +1,223 @@
+﻿@{
+    ViewBag.Title = "AngularIndex";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<h1 class="page-header">Manage Skills</h1>
+<div ng-controller='skillController as dVm' class="row">
+
+
+    @Html.Partial("~/Views/Shared/AdminDirectories.cshtml")
+</div>
+
+
+
+
+@section pageInitScripts{
+
+}
+
+
+@section scripts{
+    <script src="~/Scripts/sabio.services.skill.js"></script>
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('skillService', SkillService);
+
+            SkillService.$inject = ['$baseService', '$sabio'];
+
+            function SkillService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.skill;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('skillController', SkillController);
+
+            SkillController.$inject = ['$scope', '$window', '$baseController', 'skillService'];
+
+            function SkillController($scope, $window, $baseController, skillService) {
+
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.skillService = skillService;
+                vm.$window = $window;
+
+                // ViewModel
+                vm.submitForm = _submitForm;
+                vm.items = [];
+                vm.filteredItems = [];//empty array
+                vm.currentPage = 1;
+                vm.itemsPerPage = 10; //items per page
+                vm.totalItems = 50;
+                vm.item = null;  // copy of item being edited
+                vm.itemIndex = -1; // index of item being edited
+                vm.select = _select;
+                vm.save = _save;
+                vm.cancel = _cancel;
+                vm.add = _add;
+                vm.delete = _delete;
+                vm.pageChanged = _pageChanged;
+                vm.search = _search;
+                vm.submitted = false;
+                vm.type = "Skills"
+                vm.searchedItems = null;
+
+                _render();
+
+                function _render() {
+                    vm.skillService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                //Pagination
+                function _pageChanged() {
+                    var begin = ((vm.currentPage - 1) * vm.itemsPerPage);
+                    var end = begin + vm.itemsPerPage;
+                    if (vm.searchedItems) {
+                        vm.totalItems = vm.searchedItems.length;
+                        vm.filteredItems = vm.searchedItems.slice(begin, end);
+                    } else {
+                        vm.totalItems = vm.items.length;
+                        vm.filteredItems = vm.items.slice(begin, end);
+                    }
+                }
+
+                //search
+                function _search(searchText) {
+                    vm.searchedItems = [];
+                    for (var i = 0; i < vm.items.length; i++) {
+                        if (vm.items[i].name.search(new RegExp(searchText, "i")) != -1) {
+                            vm.searchedItems.push(vm.items[i])
+                        }
+                    }
+                    vm.currentPage = 1;
+                    _pageChanged();
+                }
+
+                function _submitForm(isValid) {
+
+                    if (isValid) {
+                        console.log("data is valid!");
+                        _save();
+                    } else {
+                        console.log("form submitted with invalid data")
+                    }
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                        vm.totalItems = data.items.length;
+                        _pageChanged();
+                    });
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Select all failed");
+                }
+
+                function _select(one) {
+                    vm.itemIndex = vm.items.indexOf(one);
+                    vm.item = one;
+                }
+
+                function _getByIdSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                        });
+                    }
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetById failed");
+                }
+
+                // create a new empty item
+                function _add() {
+                    // Changing item from null to empty object indicates any
+                    // ui components for editing should be shown
+                    vm.item = {};
+                    vm.itemIndex = -1;
+                }
+
+                function _cancel() {
+                    _endEdit();
+                }
+
+                function _endEdit() {
+                    vm.item = null;
+                    vm.itemIndex = -1;
+                    vm.submitted = false;
+                }
+
+                function _save() {
+                    if (vm.item.id) {
+                        vm.skillService.put(vm.item.id, vm.item, _putSuccess, _putError);
+                    }
+                    else {
+                        vm.skillService.post(vm.item, _postSuccess, _postError);
+                    }
+                }
+
+                function _putSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        // To update UI, replace with new version
+                        vm.items[vm.itemIndex] = vm.item;
+                        _endEdit();
+                        _render();
+                    });
+                }
+
+                function _putError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Update failed");
+                }
+
+                function _postSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            // To update UI, get id from data
+                            vm.item.id = data.item;
+                            vm.items.push(vm.item);
+                            _endEdit();
+                            _render();
+                        });
+                    }
+                }
+
+                function _postError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Insert failed");
+                }
+
+                function _delete() {
+                    if (vm.item.id) {
+                        vm.skillService.delete(vm.item.id, _deleteSuccess, _deleteError);
+                    }
+                }
+
+                function _deleteSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        // To update UI, replace with new version
+                        vm.items.splice(vm.itemIndex, 1);
+                        _endEdit();
+                        _render();
+                    });
+                }
+
+                function _deleteError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Delete Failed");
+                }
+            }
+
+        })();
+
+    </script>
+}

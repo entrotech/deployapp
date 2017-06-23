@@ -1,0 +1,202 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+@section styles{
+    <style>
+        .project-header {
+            padding: 0px;
+            border-bottom: 1px solid #b8b8b8;
+        }
+
+        .project-item {
+            padding-bottom: 2px;
+        }
+
+        .project-list {
+            clear: both;
+            border-bottom: 1px solid #b8b8b8;
+        }
+    </style>
+}
+<div id="content" class="content" data-ng-controller='mainController as mVm'>
+    <!-- begin #content -->
+    <div class="container">
+        <!-- begin breadcrumb -->
+        <ol class="breadcrumb pull-right">
+            <li><a href="/home/">Home</a></li>
+            <li><a href="javascript:;">Projects</a></li>
+        </ol>
+        <!-- end breadcrumb -->
+        <!-- begin row -->
+        <div class="row">
+            <div @*class="col-md-offset-2 col-md-8"*@>
+                <div class="project-header container-fluid">
+                    <h1 class="text-left">Projects</h1>
+                </div>
+                <ul uib-pagination ng-model="mVm.currentPage" total-items="mVm.totalItems" boundary-link="true" ng-change="mVm.pageChanged() " items-per-page="mVm.itemsPerPage"></ul>
+                <div data-ng-repeat="item in mVm.filteredItems" class="project-list">
+                    <div class="project-item">
+                        <span class="badge badge-success pull-right" data-ng-if="item.projectPersonStatus">{{item.projectPersonStatus}}</span>
+                        <h3>{{item.projectName}}</h3>
+                        <div data-ng-bind-html="mVm.sanitize(item.description)">
+                        </div>
+                        <p>Budget: {{item.budget | currency}}</p>
+                        <p>Deadline: {{item.deadline}}</p>
+                        <p>Date Posted: {{item.dateCreated}}</p>
+                        <button type="button" class="btn btn-info m-b-10" data-ng-click="mVm.apply(item)" data-ng-hide="item.projectPersonStatus">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end #content -->
+</div>
+@section scripts {
+
+
+    <script src="~/Scripts/sabio.services.project.js"></script>
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('projectsService', ProjectsService);
+
+            ProjectsService.$inject = ['$baseService', '$sabio'];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function ProjectsService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.project;
+                // Simlates inheritance, giving access to $window and $location services and the getNotifier function
+                // to our new service.
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            'use strict';
+            angular.module(APPNAME)
+                .controller('mainController', MainController);
+
+            MainController.$inject = ['$scope', '$window', '$baseController', 'projectsService', '$sce'];
+
+            function MainController($scope, $window, $baseController, projectsService, $sce) {
+                // Administrative stuff
+                var vm = this;
+                vm.$scope = $scope;
+                // Simulate inheritance to add
+                // $document, $log, $route, $routeParams, $systemEventService, $alertService, $sabio services
+                // to our controller.
+                $baseController.merge(vm, $baseController);
+                vm.projectsService = projectsService;
+                vm.$window = $window;
+
+                // ViewModel
+                vm.goHome = _goHome;
+                vm.items = [];
+                vm.item = null;  // copy of item being edited
+                vm.project = null;
+                vm.sanitize = _sanitize;
+                vm.apply = _apply;
+                vm.model = $scope.$parent.lVm.model;
+                vm.filteredItems = [];
+                vm.currentPage = 1;
+                vm.itemsPerPage = 10;
+                vm.totalItems = vm.items.length;
+                vm.pageChanged = _pageChanged;
+                // "The fold"
+
+                _render();
+
+                function _render() {
+                    vm.projectsService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _pageRefresh() {
+                    $window.location = ("/projects/index")
+                }
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+
+                function _goHome() {
+                    vm.$window.location.href = '/';
+                }
+
+                function _pageChanged() {
+                    var begin = ((vm.currentPage - 1) * vm.itemsPerPage);
+                    var end = begin + vm.itemsPerPage;
+                    vm.filteredItems = vm.items.slice(begin, end);
+                }
+
+                function _toLocal(items) {
+                    for (var i = 0; i < items.length; i++) {
+                        items[i].deadline = moment(items[i].deadline).format("DD MMM YYYY")
+                        items[i].dateCreated = moment(items[i].dateCreated).format("DD MMM YYYY")
+                    }
+                    return items
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        if (data.items) {
+                            data.items = _toLocal(data.items);
+                            for (var i = 0; i < data.items.length; i++) {
+                                if (data.items[i].staff) {
+                                    for (var j = 0; j < data.items[i].staff.length; j++) {
+                                        if (data.items[i].staff[j].person.id == vm.model.id) {
+                                            data.items[i].projectPersonStatus = data.items[i].staff[j].projectPersonStatus;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        vm.totalItems = data.items.length;
+                        vm.items = data.items.filter(function (item) {
+                            return item.projectStatusId == 2;
+                        })
+                        vm.totalItems = vm.items.length;
+                        vm.filteredItems = vm.items.slice(0, vm.itemsPerPage);
+                    });
+                    vm.$alertService.success("Retrieved all");
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+                }
+
+                function _apply(post) {
+                    var apply = {
+                        personId: vm.model.id,
+                        projectId: post.id,
+                        statusId: 1,
+                        hourlyRate: 0
+                    }
+                    var url = "/api/projectperson/";
+                    var settings = {
+                        cache: false
+                        , success: _applySuccess
+                        , error: _applyError
+                        , contentType: "application/json; charset=UTF-8"
+                        , dataType: "json"
+                        , data: JSON.stringify(apply)
+                        , type: "POST"
+                    };
+                    $.ajax(url, settings);
+                }
+
+                function _applySuccess(data) {
+                    _pageRefresh()
+                    vm.$alertService.success("Successfully Applied");
+                }
+
+                function _applyError(data) {
+                    vm.$alertService.error(jqXHR.responseText, "Apply Failed");
+                }
+            }
+        })();
+    </script>
+}

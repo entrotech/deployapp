@@ -1,0 +1,282 @@
+﻿@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section Styles {
+    <style>
+        #map {
+            height: 550px;
+            width: 100%;
+            margin-bottom: .5%;
+        }
+
+        .rounded {
+            margin-top: 3%;
+            border-radius: 10px;
+        }
+
+        .kilo {
+            color: #777;
+        }
+    </style>
+}
+
+<!-- begin breadcrumb -->
+<ol class="breadcrumb pull-right">
+    <li><a href="/">Home</a></li>
+    <li><a href="/globalevents/map">Map</a></li>
+    <li><a href="/globalevents/create">Create Event</a></li>
+    <li class="active">Events</li>
+</ol>
+<!-- end breadcrumb -->
+<h1 class="page-header"><small>Events</small></h1>
+<!-- begin form content -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Within <span class="caret"></span></button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                    <li id="radius-25"><a href="">25 Miles <small class="kilo">| 40 KM</small></a></li>
+                    <li id="radius-50"><a href="">50 Miles <small class="kilo">| 80 KM</small></a></li>
+                    <li id="radius-100"><a href="">100 Miles <small class="kilo">| 161 KM</small></a></li>
+                    <li role="separator" class="divider"></li>
+                    <li id="all-events"><a href="">All Events</a></li>
+                </ul>
+            </div><!-- /btn-group -->
+            <input type="text" id="search-content" class="form-control" placeholder="Enter keyword...">
+            <span class="input-group-btn">
+                <button id="search-btn" class="btn btn-inverse" type="button">Go!</button>
+            </span>
+        </div><!-- /input-group -->
+    </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="rounded" id="map">
+
+        </div>
+    </div>
+</div>
+<!-- end form content -->
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.globalEvent.js"></script>
+    <script type="text/javascript">
+        sabio.page.startUp = function () {
+            $("#radius-25").on("click", sabio.page.handlers.on25Click);
+            $("#radius-50").on("click", sabio.page.handlers.on50Click);
+            $("#radius-100").on("click", sabio.page.handlers.on100Click);
+            $("#all-events").on("click", sabio.page.handlers.onAllEventsClick);
+            $("#search-btn").on("click", sabio.page.handlers.onSearchClick);
+        };
+
+        // google maps initialize //
+
+        sabio.page.handlers.initMap = function () {
+            sabio.page.markers = [];
+
+            sabio.page.map = new google.maps.Map($("#map")[0], {
+                center: { lat: 33.9885, lng: -118.3869007 },
+                zoom: 6
+            });
+
+            sabio.page.infoWindow = new google.maps.InfoWindow({
+                content: "Your location"
+            });
+
+            //if (navigator.geolocation) {
+            //    navigator.geolocation.getCurrentPosition(function (position) {
+            //        var currentPosition = {
+            //            lat: position.coords.latitude,
+            //            lng: position.coords.longitude
+            //        };
+
+            //        sabio.page.userLat = currentPosition.lat;
+            //        sabio.page.userLng = currentPosition.lng;
+
+            //        var marker = new google.maps.Marker({
+            //            position: currentPosition,
+            //            map: sabio.page.map,
+            //            title: "Your location",
+            //        });
+
+            //        sabio.page.infoWindow.open(sabio.page.map, marker);
+            //        sabio.page.map.setCenter(currentPosition);
+            //    }, function () {
+            //        sabio.page.handlers.handleLocationError(true, sabio.page.infoWindow, sabio.page.map.getCenter());
+            //    });
+            //} else {
+            //    sabio.page.handlers.handleLocationError(false, sabio.page.infoWindow, sabio.page.map.getCenter());
+            //}
+        };
+
+        // page functions //
+
+        sabio.page.eventRadius = function (radius) {
+            sabio.services.globalevent.setEventRadius(
+                sabio.page.userLat,
+                sabio.page.userLng,
+                radius,
+                sabio.page.handlers.populateMapSuccess,
+                sabio.page.handlers.eventRadiusError
+            );
+        };
+
+        // handlers //
+
+        sabio.page.handlers.handleLocationError = function (browserHasGeolocation, infoWindow, pos) {
+            infoWindow.setPosition(pos);
+
+            infoWindow.setContent(
+                browserHasGeolocation ?
+                "Error: The Geolocation service failed." :
+                "Error: Your browser doesn't support geolocation."
+            );
+
+            infoWindow.open(sabio.page.map);
+        };
+
+        sabio.page.handlers.on25Click = function (event) {
+            event.preventDefault();
+            sabio.page.maxDistance = 25;
+            sabio.page.eventRadius(sabio.page.maxDistance);
+        };
+
+        sabio.page.handlers.on50Click = function (event) {
+            event.preventDefault();
+            sabio.page.maxDistance = 50;
+            sabio.page.eventRadius(sabio.page.maxDistance);
+        };
+
+        sabio.page.handlers.on100Click = function (event) {
+            event.preventDefault();
+            sabio.page.maxDistance = 100;
+            sabio.page.eventRadius(sabio.page.maxDistance);
+        };
+
+        sabio.page.handlers.onAllEventsClick = function () {
+            event.preventDefault();
+
+            sabio.services.globalEvent.getAll(
+                sabio.page.handlers.populateMapSuccess,
+                sabio.page.handlers.getAllError
+            );
+        };
+
+        sabio.page.handlers.onSearchClick = function () {
+            var searchStr = $("#search-content").val();
+
+            sabio.services.globalEvent.search(
+                searchStr,
+                sabio.page.handlers.populateMapSuccess,
+                sabio.page.handlers.eventRadiusError
+            );
+        };
+
+        sabio.page.handlers.populateInfoWindow = function (marker, infowindow) {
+            // on click makes sure the infowindow is not already opened on this marker
+            if (infowindow.marker != marker) {
+                infowindow.marker = marker;
+                infowindow.setContent("<h5>" + marker.title + "</h5>" +
+                    "<h5>" + marker.address + "</h5>" +
+                    "<h5>" + marker.city + "</h5>" +
+                    "<h5>" + marker.state + "</h5>" +
+                    "<h5>" + marker.zip + "</h5>" +
+                    "<h5>" + marker.dateStart + "</h5>" +
+                    "<h5>" + marker.time + "</h5>" +
+                    "<p>" + marker.desc + "</p>" +
+                    "<a href=/globalevents/" + marker.eventId + "/edit>" + "Edit" + "</a>"
+                );
+
+                infowindow.open(map, marker);
+                // makes sure the marker property is cleared if the infowindow is closed
+                infowindow.addListener("closeclick", function () {
+                    infowindow.setMarker = null;
+                });
+            }
+        };
+
+        // ajax success/error handlers //
+
+        sabio.page.handlers.eventRadiusError = function (jqXHR, textStatus, errorThrown) {
+            toastr.error("Failed to load events.");
+            console.log(errorThrown);
+        };
+
+        sabio.page.handlers.populateMapSuccess = function (data, status, xhr) {
+            if (!data.items) {
+                toastr.error("No events found!");
+                return;
+            }
+
+            //var userLocation = new google.maps.LatLng(sabio.page.userLat, sabio.page.userLng);
+            var bounds = new google.maps.LatLngBounds();
+            var largeInfowindow = new google.maps.InfoWindow();
+
+            // resets markers after search criteria changes
+            for (var i = sabio.page.markers.length - 1; i >= 0; i--) {
+                sabio.page.markers[i].setMap(null);
+                sabio.page.markers.pop();
+            }
+
+            for (var i = 0; i < data.items.length; i++) {
+                var lat = data.items[i].latitude;
+                var lng = data.items[i].longitude;
+                var latLng = new google.maps.LatLng(lat, lng);
+                var date = data.items[i].dateStart;
+                var formattedDate = date.slice(0, 10);
+                var time = data.items[i].startTime;
+                var formattedTime = time.slice(0, 5);
+
+                var marker = new google.maps.Marker({
+                    map: sabio.page.map,
+                    position: latLng,
+                    title: data.items[i].name,
+                    desc: data.items[i].description,
+                    dateStart: formattedDate,
+                    time: formattedTime,
+                    address: data.items[i].address,
+                    city: data.items[i].city,
+                    state: data.items[i].state,
+                    zip: data.items[i].zipCode,
+                    animation: google.maps.Animation.DROP,
+                    eventId: data.items[i].id
+                });
+
+                sabio.page.markers.push(marker);
+
+                bounds.extend(sabio.page.markers[i].position);
+
+                marker.addListener("click", function () {
+                    sabio.page.handlers.populateInfoWindow(this, largeInfowindow);
+                });
+            }
+            // sets initial zoom value
+            google.maps.event.addListener(sabio.page.map, "zoom_changed", function () {
+                zoomChangeBoundsListener =
+                    google.maps.event.addListener(sabio.page.map, "bounds_changed", function (event) {
+                        if (this.getZoom() > 15 && this.initialZoom == true) {
+                            // change max/min zoom here
+                            this.setZoom(9);
+                            this.initialZoom = false;
+                        }
+                        google.maps.event.removeListener(zoomChangeBoundsListener);
+                    });
+            });
+
+            sabio.page.map.initialZoom = true;
+            sabio.page.map.fitBounds(bounds);
+            //sabio.page.map.setCenter(userLocation);
+        };
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI&callback=sabio.page.handlers.initMap">
+    </script>
+}
+
+
+
+
+

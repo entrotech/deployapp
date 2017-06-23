@@ -1,0 +1,147 @@
+﻿@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section Styles {
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-bottom: .5%;
+        }
+
+        .rounded {
+            margin-top: 3%;
+            border-radius: 10px;
+        }
+    </style>
+}
+
+<!-- begin breadcrumb -->
+<ol class="breadcrumb pull-right">
+    <li><a href="/">Home</a></li>
+    <li><a href="/globalevents">Events</a></li>
+    <li class="active">Map</li>
+</ol>
+<!-- end breadcrumb -->
+<h1 class="page-header"><small>Event Map</small></h1>
+<!-- begin form content -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="rounded" id="map">
+
+        </div>
+    </div>
+</div>
+<!-- end form content -->
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.globalEvent.js"></script>
+    <script type="text/javascript">
+        (function () {
+            setTimeout("window.location='/globalevents/index/admin'", 2500);
+        })();
+
+        sabio.page.startUp = function () {
+            sabio.services.globalEvent.getAll(
+                sabio.page.handlers.getAllSuccess,
+                sabio.page.handlers.getAllError
+            );
+        };
+
+        // start up functions
+        sabio.page.handlers.getAllSuccess = function (data, status, xhr) {
+            var largeInfowindow = new google.maps.InfoWindow();
+            var bounds = new google.maps.LatLngBounds();
+
+            for (var i = 0; i < data.items.length; i++) {
+                var lat = data.items[i].latitude;
+                var lng = data.items[i].longitude;
+                var latLng = new google.maps.LatLng(lat, lng);
+                var date = data.items[i].dateStart;
+                var formattedDate = date.slice(0, 10);
+                var time = data.items[i].startTime;
+                var formattedTime = time.slice(0, 5);
+
+                var marker = new google.maps.Marker({
+                    map: sabio.page.map,
+                    position: latLng,
+                    title: data.items[i].name,
+                    desc: data.items[i].description,
+                    dateStart: formattedDate,
+                    time: formattedTime,
+                    address: data.items[i].address,
+                    city: data.items[i].city,
+                    state: data.items[i].state,
+                    zip: data.items[i].zipCode,
+                    animation: google.maps.Animation.DROP,
+                    eventId: data.items[i].id
+                });
+
+                sabio.page.markers.push(marker);
+
+                marker.addListener("click", function () {
+                    sabio.page.handlers.populateInfoWindow(this, largeInfowindow);
+                });
+
+                bounds.extend(sabio.page.markers[i].position);
+            }
+            if (sabio.page.markers.length > 1) {
+                sabio.page.map.fitBounds(bounds);
+            }
+            else {
+                sabio.page.map.setCenter(latLng);
+            }
+        };
+
+        sabio.page.handlers.getAllError = function (jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+        };
+
+        // google maps start up function
+        sabio.page.handlers.initMap = function () {
+            sabio.page.markers = [];
+
+            sabio.page.map = new google.maps.Map($("#map")[0], {
+                center: { lat: 33.9885, lng: -118.3869007 },
+                zoom: 8
+            });
+
+            google.maps.event.addDomListener(sabio.page.map, "idle", function () {
+                center = sabio.page.map.getCenter();
+            });
+
+            $(window).resize(function () {
+                sabio.page.map.setCenter(center);
+            });
+        };
+
+        // event handlers
+        sabio.page.handlers.populateInfoWindow = function (marker, infowindow) {
+            // on click make sure the infowindow is not already opened on this marker
+            if (infowindow.marker != marker) {
+                infowindow.marker = marker;
+                infowindow.setContent("<h5>" + marker.title + "</h5>" +
+                    "<h5>" + marker.address + "</h5>" +
+                    "<h5>" + marker.city + "</h5>" +
+                    "<h5>" + marker.state + "</h5>" +
+                    "<h5>" + marker.zip + "</h5>" +
+                    "<h5>" + marker.dateStart + "</h5>" +
+                    "<h5>" + marker.time + "</h5>" +
+                    "<p>" + marker.desc + "</p>" +
+                    "<a href=/globalevents/" + marker.eventId + "/edit>" + "Edit" + "</a>"
+                );
+                infowindow.open(map, marker);
+                // makes sure the marker property is cleared if the infowindow is closed
+                infowindow.addListener("closeclick", function () {
+                    infowindow.setMarker = null;
+                });
+            }
+        };
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI&callback=sabio.page.handlers.initMap">
+    </script>
+}
+

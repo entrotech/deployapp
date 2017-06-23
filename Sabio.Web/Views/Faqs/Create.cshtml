@@ -1,0 +1,184 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+@section styles {
+}
+
+<!-- begin breadcrumb -->
+<ol class="breadcrumb pull-right">
+    <li><a href="/faqs">Index</a></li>
+    <li><a href="/faqs/index/admin">Manage</a></li>    
+    <li class="active">Create</li>
+
+</ol>
+<!-- end breadcrumb -->
+<!-- begin page-header -->
+<h1 class="page-header">Frequently Asked Questions <small>Create new FAQ</small></h1>
+<!-- end page-header -->
+<!-- begin form content -->
+<div class="row">
+    <!-- begin col-6 -->
+    <div class="col-md-8">
+        <!-- begin panel -->
+        <div class="panel panel-inverse" data-sortable-id="form-stuff-1">
+            <div class="panel-heading">
+                <div class="panel-heading-btn">
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                </div>
+                <h4 class="panel-title">Create</h4>
+            </div>
+            <div class="panel-body">
+                <form id="formFaq">
+                    <div class="form-group idInput hidden">
+                        <label for="id">FAQ ID</label>
+                        <input type="number" class="form-control" id="id" name="Id" />
+                    </div>
+                    <div class="form-group">                       
+                        <input type="hidden" class="form-control" id="userIdCreated" name="userIdCreated" value="" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Question">Question</label>
+                        <textarea class="form-control" rows="2" input type="text" id="question" name="Question"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="Answer">Answer</label>
+                        <textarea class="form-control" rows="4" input type="text" id="answer" name="Answer"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="Category">FAQ Category</label>
+                            <select class="form-control" id="faqCategoryId" name="faqCategoryId">
+
+                            <option value="1">General</option>
+                            <option value="2">Employment</option>
+                            <option value="3">Deploy</option>
+                            <option value="4">Donations</option>
+                            <option value="5">Squad</option>
+                            <option value="6">Mentorship</option>
+                        </select>
+                        </div>
+                            <button class="btn btn-primary" type="button" id="submitBtn">Create</button>                  
+                            <button class="btn btn-primary pull-right hidden" type="button" id="updateBtn">Save Changes</button>
+                            <button class="btn btn-warning pull-left" type="button" id="redirectBtn">Back To Index</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.16.0/jquery.validate.js"></script>
+    <script src="~/Scripts/sabio.services.faq.js"></script>
+
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script type="text/javascript">
+        sabio.page.activeId= @Model.Item;
+        sabio.page.startUp = function () {
+            $("#submitBtn").on("click", sabio.page.handlers.submitFaq);
+            $("#redirectBtn").on("click", sabio.page.handlers.switchToIndex);
+            sabio.page.getActiveId();
+            sabio.page.initializeValidation();
+        };
+
+        sabio.page.getActiveId= function () {
+
+            if (sabio.page.activeId) {
+
+                $("#submitBtn").text("Save Changes");
+
+                var id = sabio.page.activeId;
+
+                sabio.services.faq.getById(id, sabio.page.handlers.getValuesSuccess, sabio.page.handlers.getValuesError);
+            }
+        }
+        sabio.page.handlers.getValuesSuccess = function (data, status, jqxhr) {
+            $("#userIdCreated").val(data.item.userIdCreated);
+            $("#question").val(data.item.question);
+            $("#answer").val(data.item.answer);
+            $("#faqCategoryId").val(data.item.faqCategoryId);
+            $("#id").val(data.item.id)
+        }
+
+        sabio.page.handlers.getValuesError = function () {
+            toastr.error("FAQ Load Error");
+        }
+
+        sabio.page.handlers.switchToIndex = function () {
+            window.location = "/Faqs/Index/admin";
+        }
+
+        sabio.page.submitFaqSuccess = function (data, status, jqxhr) {      
+            toastr.success("FAQ Successfully Created!");            
+            console.log(data + status);
+        }
+
+        sabio.page.submitFaqError = function (status, errorThrown) {
+            toastr.error("Submit Error!");
+            console.log(errorThrown);
+        }
+        sabio.page.handlers.submitFaq = function () {
+
+            if (sabio.page.activeId ==0 && ($("#formFaq").valid()))
+            {
+                var data = $("#formFaq").serialize();
+                console.log(data);
+                sabio.services.faq.post(data, sabio.page.submitFaqSuccess, sabio.page.submitFaqError);
+
+            }
+            else if (($("#formFaq").valid()))
+            {
+                var id = sabio.page.activeId;
+                var data = $("#formFaq").serialize();
+                sabio.services.faq.put(id, data, sabio.page.updateFaqSuccess, sabio.page.updateFaqError);
+            }
+        }
+
+        sabio.page.updateFaqSuccess = function (data, status, jqxhr) {
+            toastr.success("Update Successful!");
+            console.log(data + status);
+        }
+        sabio.page.updateFaqError = function () {
+            toastr.error("Update Error");
+        }
+
+        sabio.page.initializeValidation = function () {
+            jQuery.validator.setDefaults({
+                debug: true
+            });
+        }
+
+        $("#formFaq").validate({
+            highlight: function(element) {
+                $(element).addClass("form-validate");
+            },
+            unhighlight: function(element) {
+                $(element).removeClass("form-validate");
+            },
+            errorPlacement: function(label, element){
+                element.parent().append(label);
+            },
+            errorClass: "error-msg",
+            errorElement: "span",
+            rules: {
+                "faqCategoryId": {
+                    required: true,
+                    minlength: 1,
+                    maxlength: 6
+
+                },
+                "Question": {
+                    required: true,
+
+                },
+                "Answer": {
+                    required: true,
+
+                }           
+            }
+        });
+</script>
+
+}

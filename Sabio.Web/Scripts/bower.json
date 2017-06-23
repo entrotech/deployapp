@@ -1,0 +1,38 @@
+{
+  "name": "sabio-ng",
+  "authors": [
+    "Gregorio Rojas <gregorio@sabio.la>"
+  ],
+  "description": "Sabio Angular Application",
+  "main": "sabio.core.js",
+  "moduleType": [],
+  "keywords": [
+    "sabio"
+  ],
+  "license": "MIT",
+  "homepage": "sabio.la",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.5.11",
+    "bootstrap": "~3.3.6",
+    "angular-bootstrap": "~0.14.3",
+    "angular-route": "1.5.11",
+    "angular-animate": "1.5.11",
+    "angular-toastr": "^2.1.1",
+    "angular-ui-router": "^1.0.3",
+    "doc-ready": "^1.0.4"
+  },
+  "resolutions": {
+    "angular": "1.5.11",
+    "angular-animate": "1.5.11",
+    "angular-route": "1.5.11",
+    "angular-masonry": "0.16.0"
+  }
+}

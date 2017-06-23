@@ -1,0 +1,326 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+
+@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section Styles {
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+
+    <style>
+        #file {
+            margin-bottom: 10px;
+        }
+
+        .announcement-image {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+
+        .close {
+            margin-right: 450px;
+        }
+    </style>
+}
+
+<div ng-controller="announcementController as main">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li><a href="/announcements/index/admin">Manage</a></li>
+        <li ng-hide="main.announcementId" class="active">Create</li>
+        <li ng-show="main.announcementId" class="active">Edit</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Announcement <small>Create new announcements</small></h1>
+    <!-- end page-header -->
+    <!-- begin form content -->
+    <div class="row">
+        <!-- begin col-12 -->
+        <div class="col-md-8">
+            <!-- begin panel -->
+            <div class="panel panel-inverse" data-sortable-id="form-stuff-1">
+                <div class="panel-heading">
+                    <div class="panel-heading-btn">
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                    </div>
+                    <h4 class="panel-title" ng-show="main.announcementId">
+                        Edit
+                    </h4>
+                    <h4 class="panel-title" ng-show="!main.announcementId">
+                        Create
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <form name="annForm" novalidate>
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" 
+                                   name="title" 
+                                   ng-model="main.item.title" 
+                                   ng-class="{'form-validate': main.submitted  && annForm.title.$invalid}" 
+                                   ng-maxlength="50" required />
+                                <p ng-show="main.submitted && annForm.title.$invalid 
+                                   && !annForm.title.$error.maxlength" class="error-msg">
+                                    Title is required.
+                                </p>
+                                <p ng-show="annForm.title.$error.maxlength" class="error-msg">
+                                    Title is too long.
+                                </p>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select class="form-control" name="catId" 
+                                    ng-model="main.item.announcementCategoryId" 
+                                    ng-class="{'form-validate': main.submitted 
+                                    && annForm.catId.$invalid}" 
+                                    required>
+                                <option selected value="1">General</option>
+                                <option value="2">Squad</option>
+                                <option value="3">Mentorship</option>
+                            </select>
+                            <p ng-show="main.submitted && annForm.catId.$invalid" 
+                               class="error-msg">
+                                Category is required.
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <label for="body">Announcement</label>
+                            <textarea type="text" class="form-control" name="body" 
+                                      ng-model="main.item.body" rows="10" 
+                                      ng-class="{'form-validate': main.submitted 
+                                      && annForm.body.$invalid}" 
+                                      ng-maxlength="4000" 
+                                      required>
+                            </textarea>
+                            <p ng-show="main.submitted && annForm.body.$invalid 
+                               && !annForm.body.$error.maxlength" 
+                               class="error-msg">
+                                Announcement is required.
+                            </p>
+                            <p ng-show="annForm.body.$error.maxlength" class="error-msg">
+                                Announcement is too long.
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <label for="body">Upload Image</label>
+                                <input id="file" type="file" name="file" accept="image/*">
+                            <span><button ng-click="main.imageUpload()" type="button" class="btn btn-default btn-sm">Upload</button></span>
+                        </div>
+                        <div ng-show="main.announcementId && main.item.photoKey != null">                          
+                            <img class="announcement-image" ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{main.item.photoKey}}" />
+                            <span class="close remove-image" ng-click="main.deleteImage()" title="Remove Image">×</span>
+                        </div>
+                        <button type="button" class="btn btn-success" 
+                                ng-click="main.submitted=true; 
+                                main.submitForm(annForm.$valid)">
+                            Submit
+                        </button>
+                        <a class="btn btn-default" href="/announcements/index/admin">Cancel</a>
+                        <button ng-show="main.announcementId" 
+                                ng-click="main.delete()" type="button" class="btn btn-danger pull-right">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end form content -->
+
+@section Scripts {
+<script src="~/Scripts/sabio.services.announcement.js"></script>
+    <script src="~/Scripts/sabio.services.file.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script type="text/javascript">
+        /// <reference path="~/Scripts/angular.js" />
+        sabio.page.personId = @Model.Id;
+        sabio.page.announcementId = @Model.Item;
+
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .factory("announcementService", AnnouncementService);
+
+            AnnouncementService.$inject = ["$baseService", "$sabio"];
+
+            function AnnouncementService($baseService, $sabio) {
+                var announcementSvcObj = sabio.services.announcement;
+                var announcementService = $baseService.merge(true, {}, announcementSvcObj, $baseService);
+                return announcementService;
+            }
+        })();
+
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .factory("fileService", FileService);
+
+            FileService.$inject = ["$baseService", "$sabio"];
+
+            function FileService($baseService, $sabio) {
+                var announcementSvcObj = sabio.services.file;
+                var announcementService = $baseService.merge(true, {}, announcementSvcObj, $baseService);
+                return announcementService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller("announcementController", AnnouncementController);
+
+            AnnouncementController.$inject = ["$scope", "$window", "$baseController", "announcementService", "$sabio", "fileService"];
+
+            function AnnouncementController($scope, $window, $baseController, announcementService, $sabio, fileService) {
+                var vm = this;
+                vm.$sabio = $sabio;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.announcementService = announcementService;
+                vm.fileService = fileService;
+                vm.$window = $window;
+
+                // viewmodel
+                vm.item = {};
+                vm.items = [];
+                vm.announcementId = $sabio.announcementId;
+                vm.submitted = false;
+                vm.submitForm = _submitForm;
+                vm.delete = _delete;
+                vm.imageUpload = _imageUpload;
+                vm.deleteImage = _deleteImage;
+
+                _loadCategories();
+
+                function _loadCategories() {
+                    vm.announcementService.getAllWithCategories(_getAllSuccess, _getAllError);
+                }
+
+                function _getAllSuccess() {
+
+                }
+
+                function _getAllError() {
+
+                }
+
+                // load announcement by id
+                if ($sabio.announcementId) {
+                    vm.announcementService.getById($sabio.announcementId, _getByIdSuccess, _getByIdError);
+                } else {
+                    return;
+                }
+
+                function _getByIdSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.item = data.item;
+                        vm.item.announcementCategoryId = data.item.announcementCategory.id.toString();
+                    });
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load announcement!");
+                }
+
+                function _submitForm(isValid) {
+                    if (isValid && $sabio.announcementId === 0) {
+                        vm.item.personId = $sabio.personId;
+                        vm.announcementService.post(vm.item, _postSuccess, _postError);
+                    } else if (isValid && $sabio.announcementId !== 0) {
+                        vm.item.personId = $sabio.personId;
+                        vm.announcementService.put($sabio.announcementId, vm.item, _putSuccess, _putError);
+                    } else {
+                        return;
+                    }
+                }
+
+                function _postSuccess(data) {
+                    vm.$alertService.success("Created!");   
+                    _goToIndex();
+                }
+
+                function _postError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to create!");
+                }
+
+                function _putSuccess(data) {
+                    vm.$alertService.success("Updated!");
+                    _goToIndex();
+                }
+
+                function _putError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to update!");
+                }
+
+                function _delete() {
+                    sabio.ui.sweetalert.delete($sabio.announcementId, vm.announcementService.deleteById, _deleteByIdSuccess, _deleteByIdError);
+                }
+
+                function _deleteByIdSuccess(data) {
+                    vm.$alertService.success("Deleted!");
+                    _goToIndex();
+                }
+
+                function _deleteByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to delete!");
+                }
+
+                function _goToIndex() {
+                    setTimeout("window.location='/announcements/index/admin'", 2000);
+                }
+
+                function _imageUpload() {
+                    var formData = new FormData();
+                    formData.append("files", $("#file")[0].files[0]);
+                    vm.fileService.uploadPhoto(formData, _imageUploadSuccess, _imageUploadError);            
+                }
+
+                function _imageUploadSuccess(data) {
+                    var photoData = {
+                        id: sabio.page.announcementId,
+                        photoKey: data.item
+                    };
+
+                    vm.announcementService.uploadImage(photoData, _photoKeySuccess, _photoKeyError);
+                }
+
+                function _imageUploadError() {
+                    vm.$alertService.error("Failed to upload image!");
+                }
+
+                function _photoKeySuccess() {
+                    vm.announcementService.getById($sabio.announcementId, _getByIdSuccess, _getByIdError);
+                    vm.$alertService.success("Added image!");
+                    $(".announcement-image").removeClass("hidden");
+                    $(".remove-image").removeClass("hidden");
+                }
+
+                function _photoKeyError() {
+                    console.log("photokey error");
+                }
+
+                function _deleteImage() {
+                    vm.announcementService.deleteImage(sabio.page.announcementId, _deleteImageSuccess, _deleteImageError);
+                }
+
+                function _deleteImageSuccess(data) {
+                    vm.$alertService.success("Removed image!");
+                    $(".announcement-image").addClass("hidden");
+                    $(".remove-image").addClass("hidden");
+                }
+
+                function _deleteImageError(jqXHR) {
+                    vm.$alertService.error("Failed to remove image!");
+                }
+            }
+        })();
+    </script>
+}

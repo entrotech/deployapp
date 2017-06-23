@@ -1,0 +1,117 @@
+﻿@model Sabio.Web.Models.ViewModels.BaseViewModel
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <title>Deploy.Dev</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+
+
+    @Styles.Render("~/site/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <link href="~/assets/blog/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/assets/blog/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/assets/blog/css/animate.min.css" rel="stylesheet" />
+    <link href="~/assets/blog/css/style.css" rel="stylesheet" />
+    <link href="~/assets/blog/css/style-responsive.css" rel="stylesheet" />
+    <link href="~/assets/blog/css/theme/default.css" id="theme" rel="stylesheet" />
+    <link href="~/Content/deployBlog.css" rel="stylesheet" />
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <!-- ================== BEGIN BASE JS ================== -->
+   
+    <link href="~/Content/angular-toastr.css" rel="stylesheet" />
+    <!-- ================== END BASE JS ================== -->
+    @RenderSection("styles", required: false)
+
+    @*<style>
+        /*.dropdown-toggle:hover{
+            display: block;
+        }*/
+    </style>*@
+
+</head>
+
+<body data-ng-app="SabioApp" data-ng-controller="layoutController as lVm">
+    <!-- begin #header -->
+    @Html.Partial("~/Views/Shared/Header.cshtml")
+    <!-- end #header -->
+    
+    @RenderBody()
+    <!--Begin footer-->
+    <div id="footer" class="footer">
+        <div class="container">
+            <div class="footer-brand">
+                @*<img class="irc_mi" src="https://operationcode.org/assets/operationcode_logo-eead949a7ce5220011ea8ddeb9ec5b0a.svg" alt="Image result for operation code logo" onload="google.aft&&google.aft(this)" width="541" height="120" style="margin-top: 137px;">*@
+                @*<img src="https://files.slack.com/files-pri/T08EKJ58F-F51HG2US1/pasted_image_at_2017_04_19_09_35_am.png" width="400" height="120">*@
+                <img src="/Content/Images/DeployLogo.png" width="320" />
+            </div>
+            <p class="footer-msg">
+                © Copyright Operation Code 2017<br>
+                An admin &amp; front end theme with serious impact. Created by <a href="#">Sabio Team</a>
+            </p>
+            <p class="social-list">
+                <a href="#"><i class="fa fa-facebook fa-fw"></i></a>
+                <a href="#"><i class="fa fa-instagram fa-fw"></i></a>
+                <a href="#"><i class="fa fa-twitter fa-fw"></i></a>
+                <a href="#"><i class="fa fa-google-plus fa-fw"></i></a>
+                <a href="#"><i class="fa fa-dribbble fa-fw"></i></a>
+            </p>
+        </div>
+    </div>
+
+    <!--End footer-->
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="~/assets/blog/plugins/jquery/jquery-1.9.1.min.js"></script>
+    <script src="~/assets/blog/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+    <script src="~/assets/blog/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="assets/crossbrowserjs/html5shiv.js"></script>
+        <script src="assets/crossbrowserjs/respond.min.js"></script>
+        <script src="assets/crossbrowserjs/excanvas.min.js"></script>
+    <![endif]-->
+    <script src="~/assets/blog/plugins/jquery-cookie/jquery.cookie.js"></script>
+    <script src="~/assets/blog/plugins/masonry/masonry.min.js"></script>
+    <script src="~/assets/blog/js/apps.js"></script>
+    <!-- ================== END BASE JS ================== -->
+    <script>
+        $(document).ready(function () {
+            App.init();
+            $('div').removeAttr('style');
+        });
+    </script>
+    <script type="text/javascript">
+        var APPNAME = 'SabioApp';
+    </script>
+
+    <script src="~/Scripts/sabio.js"></script>
+
+    @Scripts.Render("~/bower/angular")
+
+    <script src="~/Assets/Admin/plugins/moment/moment.min.js"></script>
+
+    @RenderSection("pageInitScripts", required: false)
+    <script src="~/Scripts/toastr.js"></script>
+    <script src="~/Scripts/sabio.ng.app.js"></script>
+    <script src="~/Scripts/sabio.services.user.js"></script>
+    <script src="~/Scripts/sabio.services.timecardEntry.js"></script>
+
+    @Scripts.Render("~/sabio/core")
+    <script src="~/Scripts/app/controllers/LayoutController.js"></script>
+    <script src="~/Scripts/app/services/TimecardEntry.js"></script>
+    
+    @RenderSection("scripts", required: false)
+
+    <script>
+        sabio.page.model = @Html.RawJson(Model);
+    </script>
+
+</body>
+</html>

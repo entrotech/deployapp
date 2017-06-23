@@ -1,0 +1,611 @@
+﻿
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+@section styles{
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <style>
+        .blank-space {
+            margin-bottom: 500px;
+        }
+
+        #searchBarContainer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #searchString {
+            width: 30%;
+        }
+
+        .m-b-10 {
+            margin-top: 20px;
+        }
+
+        .panel {
+            padding: 0 0 0 0;
+            margin: 0 5px 0 5px;
+        }
+
+        .checkout-message {
+            padding: 20px 40px;
+        }
+
+        .checkout {
+            background: #fff;
+            border-radius: 6px;
+            margin: 20px 5px 0 5px;
+            width: 45%;
+            display: inline-block;
+        }
+
+        .checkout-header {
+            padding: 25px 30px;
+            background: #586269;
+            -webkit-border-radius: 6px 6px 0 0;
+            -moz-border-radius: 6px 6px 0 0;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .checkout-header .row > div + div {
+            border-left: 1px solid #3E4A52;
+        }
+
+        .checkout-body {
+            padding: 25px 30px;
+        }
+
+        .checkout-footer {
+            padding: 25px 30px;
+            text-align: right;
+            background: #85878A;
+            -webkit-border-radius: 0 0 6px 6px;
+            -moz-border-radius: 0 0 6px 6px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .checkout-footer .btn.btn-white {
+            border-color: #fff;
+        }
+
+        .checkout-title {
+            font-size: 14px;
+            margin: 0 0 30px;
+            font-weight: bold;
+        }
+
+        .checkout-title small {
+            display: block;
+            font-size: 14px;
+            line-height: 20px;
+            margin-top: 2px;
+        }
+
+        .checkout-info-list {
+            font-size: 12px;
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .checkout-message {
+            padding: 20px 40px;
+        }
+
+        .checkout-message h1 {
+            margin: 0 0 30px;
+            font-size: 36px;
+            font-weight: 300;
+            text-align: center;
+        }
+
+        .checkout-message h1 small {
+            display: block;
+            font-size: 18px;
+            line-height: 24px;
+            font-weight: 300;
+            margin-top: 5px;
+        }
+
+        .table.table-payment-summary th,
+        .table.table-payment-summary td {
+            padding: 10px 15px;
+            font-size: 16px;
+        }
+
+        .table.table-payment-summary .field {
+            font-weight: 600;
+            text-align: right;
+            width: 30%;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .value {
+            text-align: left;
+        }
+
+        #submitSearch {
+            padding: 5px 10px 5px 10px;
+        }
+
+        .jobPosting {
+            border-style: solid;
+            border-width: 1px;
+            padding-left: 20px;
+        }
+
+        #newPosting {
+            margin-top: 10px;
+        }
+
+        .content {
+            margin-left: 100px;
+        }
+
+        #companyAddress {
+            margin-top: 15px;
+        }
+
+        .days-ago {
+            text-align: center;
+            display: inline-block;
+        }
+
+        .float-left {
+            float: left;
+        }
+
+        .item {
+            background: #fff;
+            text-align: left;
+        }
+
+        .search-toolbar {
+            margin-top: 20px;
+        }
+
+        .title {
+            text-align: left;
+            margin-left: 30px;
+        }
+
+        .search-item-container .item-row .item {
+            width: 100%;
+        }
+
+        .days-ago {
+            float: right;
+            margin: 15px 15px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .result-list .title {
+            margin: 8px 0px 20px 20px;
+            font-size: 20px;
+            line-height: 24px;
+            display: inline-block;
+        }
+
+        .result-list .title a {
+            color: #333;
+        }
+
+        .result-list .location {
+            color: #999;
+        }
+
+        .result-list .desc {
+            margin-bottom: 20px;
+            max-height: 32px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 16px;
+        }
+
+        .float-left {
+            float: left;
+        }
+
+        .search-container .search-content {
+            width: 100%;
+        }
+
+        .content {
+            padding: 70px 0 0 0;
+            margin: 0 0 0 0;
+        }
+
+        .contact {
+            margin: 8px 0 20px 20px;
+        }
+
+        .item .row {
+            padding: 0 15px 0 30px;
+        }
+
+        .float-right {
+            float: right;
+        }
+    </style>
+}
+<div ng-controller="companyController as coVm">
+    <div class="section-container" id="checkout-cart" ng-hide="coVm.item">
+        <!-- BEGIN container -->
+        <div id="searchBarContainer">
+            <h1>Companies</h1>
+            <form ng-submit="coVm.search()">
+                <input type="text" id="searchString" placeholder="Search By Name or City" ng-model="coVm.searchString" />
+                <br/>
+                <md-button class="btn btn-xs btn-success m-b-10" ng-click="coVm.add()">
+                    <md-tooltip>Add a new Company....</md-tooltip>
+                  
+                </md-button>
+               
+            </form>
+        </div>
+        <div class="container blank-space" id="listOfCompany">
+            <div class="checkout" data-ng-repeat="item in coVm.items">
+                <form action="checkout_info.html" method="POST" name="form_checkout">
+                    <div class="checkout-header">
+                        <div class="row"></div>
+                    </div>
+                    <div class="checkout-body">
+                        <div class="checkout-message">
+                            <h3 class="cname">{{item.name}}</h3>
+                            <div class="table-responsive2">
+                                <table class="table table-payment-summary">
+                                    <tbody>
+                                        <tr>
+                                            <td class="field">Contact Information</td>
+                                            <td class="value">
+                                                <div><span class="cphone">{{item.phoneNumber}}</span></div>
+                                                <div><span class="cemail">{{item.email}}</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="field">Address</td>
+                                            <td class="value">
+                                                <span class="caddress1">{{item.address1}}</span>,&nbsp;
+                                                <span class="caddress2">{{item.address2}}</span><br />
+                                                <span class="ccity">{{item.city}}</span>,&nbsp;
+                                                <span class="cstate">{{item.stateProvince.name}}</span>&nbsp;
+                                                <span class="cpostalcode">{{item.postalCode}}</span><br />
+                                                <span class="ccountry">{{item.country.name}}</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="field">Open Positions</td>
+                                            <td class="value"><span class="cpostings">{{item.postings}}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkout-footer text-center">
+                        <p class="hidden id"></p>
+                        <button type="button" class="btn btn-white btn-lg p-l-30 p-r-30 m-l-10 view" ng-click="coVm.view(item)">View Company</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- END container -->
+    </div>
+    <div id="search-results" class="section-container bg-silver" ng-show="coVm.item">
+        <!-- BEGIN container -->
+        <div class="container">
+            <!-- BEGIN search-container -->
+            <div class="search-container">
+                <!-- BEGIN search-content -->
+                <div class="search-content" id="searchContent">
+                    <!-- BEGIN search-toolbar -->
+                    <h1><span id="companyName">{{coVm.item.name}}</span></h1>
+                    <div class="search-item-container result-list item-row item">
+                        <div class="result-info col-xs-12 col-md-6">
+                            <h4 class="contact"><strong>Contact Information</strong></h4>
+                            <div class="float-left">
+                                <div class="row">
+                                    <h4 id="companyPhoneNumber">{{coVm.item.phoneNumber}}</h4>
+                                </div>
+                                <div class="row">
+                                    <h4 id="companyEmail">{{coVm.item.email}}</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="result-info2 col-xs-12 col-md-6" id="companyAddress">
+                            <div class="float-left">
+                                <h4>
+                                    <span id="address1">{{coVm.item.address1}}</span>,&nbsp;
+                                    <span id="address2">{{coVm.item.address2}}</span>
+                                </h4>
+                                <h4>
+                                    <span id="city">{{coVm.item.city}}</span>,&nbsp;
+                                    <span id="stateProvince">{{coVm.item.stateProvince.name}}</span>&nbsp;
+                                    <span id="postalCode">{{coVm.item.postalCode}}</span>
+                                </h4>
+                                <h4>
+                                    <span id="country">{{coVm.item.country.name}}</span>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <h3><strong>Open Positions</strong></h3>
+                    <div class="search-item-container result-list" id="jobPostingContainer">
+                        <div class="item-row" data-ng-repeat="posting in coVm.item.jobPostings">
+                            <div class="item">
+                                <div class="positionName">
+                                    <h4 class="title"><a ng-href="/jobpostings/{{posting.id}}">{{posting.positionName}}</a></h4>
+                                    <span class="days-ago">
+                                        <small>Posted {{posting.daysAgo}}</small>
+                                    </span>
+                                </div>
+                                <div class="result-info col-s-5 col-xs-6">
+                                    <div class="float-left">
+                                        <p class="desc">{{posting.streetAddress}}</p>
+                                        <p class="desc">{{posting.location}}</p>
+                                        <p class="desc" ng-show="posting.jobTagsString">Tags: {{posting.jobTagsString}}</p>
+                                    </div>
+                                </div>
+                                <div class="result-info2 col-s-3 col-xs-6">
+                                    <div class="float-left">
+                                        <p class="desc">{{posting.compensationString}}</p>
+                                        <p class="desc">{{posting.experienceLevel}}</p>
+                                        <p class="desc">{{posting.duration}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-default" ng-click="coVm.close()">Close</button>
+                </div>
+            </div>
+            <hr />
+        </div>
+    </div>
+</div>
+
+@section pageInitScripts{
+
+}
+
+
+
+@section scripts {
+    <script src="~/Scripts/sabio.services.company.js"></script>
+
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('companyService', CompanyService);
+
+            CompanyService.$inject = ['$baseService', '$sabio'];
+
+            function CompanyService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.company;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('companyController', CompanyController);
+
+            CompanyController.$inject = ['$baseController', '$scope', '$window', 'companyService', '$location' ];
+
+            function CompanyController($baseController, $scope, $window, companyService, $location) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$window = $window;
+                $baseController.merge(vm, $baseController);
+                vm.companyService = companyService;
+                vm.$location = $location;
+
+                vm.searchString = "";
+                vm.items = [];
+                vm.item = null;
+                vm.search = _search;
+                vm.view = _view;
+                vm.close = _close;
+                vm.add = _add;
+
+                // Add function end
+                function _add() {
+                    console.log('add');
+                    location.replace("/companies/create");
+                }
+
+
+
+                // Add funtion end
+
+                // Search functions
+                function _search() {
+                    vm.companyService.search(vm.searchString, _searchSuccess, _searchError);
+                }
+
+                function _searchSuccess(data) {
+                    console.log(data);
+                    for (var i = 0; i < data.items.length; i++) {
+                        if (data.items[i].jobPostings) {
+                            data.items[i].postings = data.items[i].jobPostings.length;
+                        } else {
+                            data.items[i].postings = 0;
+                        }
+                    }
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                    })
+                }
+
+                function _searchError(data) {
+                    toastr.error("Search failed");
+                }
+
+                // View and Get By Id functions
+                function _view(itm) {
+                    vm.companyService.selectById(itm.id, _selectByIdSuccess, _selectByIdError);
+                }
+
+                function _selectByIdSuccess(data) {
+                    if (data.item) {
+                        if (data.item.jobPostings) {
+                            data.item.jobPostings = _formatJobPostings(data.item.jobPostings);
+                        }
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                        })
+                    }
+                }
+
+                function _selectByIdError() {
+                    toastr.error("Failed to get company");
+                }
+
+                function _close() {
+                    vm.item = null;
+                    $window.scrollTo(0, 0);
+                }
+
+                // Job Posting format functions
+                function _formatJobPostings(jobPostings) {
+                    for (i = 0; i < jobPostings.length; i++) {
+                        // Attach job tags
+                        if (jobPostings[i].jobTags) {
+                            var jobTagsArray = [];
+                            for (j = 0; j < jobPostings[i].jobTags.length; j++) {
+                                jobTagsArray.push(jobPostings[i].jobTags[j].keyword);
+                            }
+                            var jobTagsString = jobTagsArray.join(", ");
+                            jobPostings[i].jobTagsString = jobTagsString;
+                        }
+                        // Attach days ago
+                        var t = jobPostings[i].dateCreated.split(/[- : T]/);
+                        var d = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5]));
+                        var today = new Date();
+                        var daysAgo = parseInt((today - d) / 86400000);
+                        if (daysAgo == 1) {
+                            daysAgo = daysAgo + " day ago";
+                        } else {
+                            daysAgo = daysAgo + " days ago";
+                        }
+                        jobPostings[i].daysAgo = daysAgo;
+                        // Build location
+                        var locationArray = [];
+                        if (jobPostings[i].city) {
+                            locationArray.push(jobPostings[i].city);
+                        }
+                        if (jobPostings[i].stateProvinceName) {
+                            locationArray.push(jobPostings[i].stateProvinceName);
+                        }
+                        if (jobPostings[i].countryName) {
+                            locationArray.push(jobPostings[i].countryName);
+                        }
+                        var locationString = locationArray.join(", ");
+                        jobPostings[i].location = locationString;
+                        // Build compensation, experience and duration
+                        if (jobPostings[i].compensation) {
+                            jobPostings[i].compensationString = _compensationStringBuilder(jobPostings[i].compensation, jobPostings[i].compensationRateId);
+                        }
+                        if (jobPostings[i].experienceLevelId) {
+                            jobPostings[i].experienceLevel = _convertExperienceLevelId(jobPostings[i].experienceLevelId);
+                        }
+                        if (jobPostings[i].fullPartId || jobPostings[i].contractPermanentId) {
+                            jobPostings[i].duration = _durationStringBuilder(jobPostings[i].fullPartId, jobPostings[i].contractPermanentId);
+                        }
+                    }
+                    return jobPostings;
+                }
+
+                function _convertExperienceLevelId(id) {
+                    var string = "";
+                    switch (id) {
+                        case 1:
+                            string = "Entry level";
+                            break;
+                        case 2:
+                            string = "Mid-level";
+                            break;
+                        case 3:
+                            string = "Senior level";
+                            break;
+                        default:
+                            break;
+                    }
+                    return string;
+                }
+
+                function _compensationStringBuilder(amt, rate) {
+                    var formattedAmt = amt.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+                    var formattedRate = "";
+                    if (rate) {
+                        switch (rate) {
+                            case 1:
+                                formattedRate = " per hour";
+                                break;
+                            case 2:
+                                formattedRate = " per day";
+                                formattedAmt = formattedAmt.slice(0, -3);
+                                break;
+                            case 3:
+                                formattedRate = " per year";
+                                formattedAmt = formattedAmt.slice(0, -3);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    return "$" + formattedAmt + formattedRate;
+                }
+
+                function _durationStringBuilder(fullPartId, contractPermanentId) {
+                    var stringArray = [];
+                    if (fullPartId) {
+                        switch (fullPartId) {
+                            case 1:
+                                stringArray.push("Part-time");
+                                break;
+                            case 2:
+                                stringArray.push("Full-time");
+                                break;
+                            case 3:
+                                stringArray.push("Part-time to full-time");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    if (contractPermanentId) {
+                        switch (contractPermanentId) {
+                            case 1:
+                                stringArray.push("Contract");
+                                break;
+                            case 2:
+                                stringArray.push("Permanent");
+                                break;
+                            case 3:
+                                stringArray.push("Contract-to-hire");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    var string = stringArray.join(", ");
+                    return string;
+                }
+            }
+        })();
+
+
+    </script>
+
+
+}

@@ -1,0 +1,87 @@
+﻿
+@{
+    ViewBag.Title = "Scope01";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+
+<h2>Scope Hierarchies</h2>
+<ul>
+    <li>
+        Using &quot;controller as&quot; syntax sort of changes
+        the nature of this example, but still illustrates that the
+        $rootScope can be accessed without dot notation using
+        prototypical scope inheritance.
+    </li>
+</ul>
+
+@section styles{
+    <style>
+        .show-scope-demo.ng-scope,
+        .show-scope-demo .ng-scope {
+            border: 1px solid red;
+            margin: 3px;
+        }
+    </style>
+
+}
+
+
+<div ng-app="scopeExample" class="show-scope-demo">
+    <div ng-controller="GreetController as gc">
+        Hello {{gc.name}}!
+    </div>
+    <div ng-controller="ListController as lc">
+        <ol>
+            @* Note that department is not qualified with a controller alias
+            and still binds to the root scope *@
+            <li ng-repeat="name in lc.names">{{name}} from {{department}}</li>
+        </ol>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script src="~/Scripts/angular.js"></script>
+
+    <script>
+        (function () {
+            "use strict";
+
+            angular.module('scopeExample', [])
+                .controller('GreetController', GreetController);
+
+            GreetController.$inject = ['$scope','$rootScope'];
+
+            function GreetController($scope, $rootScope) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$rootScope = $rootScope;
+
+                vm.name = 'World';
+                vm.$rootScope.department = 'Dog';
+            }
+
+            angular.module('scopeExample')
+                .controller('ListController', ListController);
+
+            ListController.$inject = ['$scope'];
+
+            function ListController($scope) {
+                var vm = this;
+                vm.names = ['Igor', 'Misko', 'Vojta'];
+            }
+
+
+        })();
+
+
+    </script>
+
+
+}
+
+
+
+
+

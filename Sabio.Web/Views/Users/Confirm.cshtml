@@ -1,0 +1,87 @@
+﻿@{
+    ViewBag.Title = "ConfirmEmail";
+    Layout = "~/Views/Shared/_blogLayout.cshtml";
+}
+
+@section styles {
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <style>
+        .btn {
+            margin-top: 10px;
+        }
+    </style>
+}
+<div class="content">
+    <div class="container">
+        <div class="col-md-8">
+            <h1 class="page-header">Email confirmed!</h1>
+
+            <div class="row">
+                <div class="result-info col-md-12">
+                    <h4 class="title">Thank you for authenticating your email. You are now ready to be Deployed!</h4>
+                </div>
+            </div>
+            <hr />
+            <button type="button" class="btn btn-info hidden" id="resend">Resend Confirmation</button>
+            <button type="button" class="btn btn-info" id="goToProfile">Your Profile</button>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/sabio.services.user.js"></script>
+    <script type="text/javascript">
+        sabio.page.id = 0;
+
+        sabio.page.handlers.confirmToken = function () {
+            sabio.services.user.getConfirmToken('@Model.Item', sabio.page.confirmTokenSuccess, sabio.page.confirmTokenError);
+        }
+        sabio.page.confirmTokenSuccess = function (data) {
+            
+        }
+        sabio.page.confirmTokenError = function (data) {
+            responseText = JSON.parse(data.responseText);
+            var errorType = responseText.errors[0].split("|")[0];
+            if (errorType == 1) {
+                sabio.page.handlers.formatExpiredToken();
+            } else {
+                $(".title").text("Failed to confirm Email");
+                $(".title").css("color", "darkred");
+            }
+        }
+        sabio.page.handlers.formatExpiredToken = function () {
+            $(".page-header").text("Your confirmation has expired");
+            $(".page-header").css("color", "darkred");
+            $(".title").text("Email addresses must be confirmed within 24 hours.")
+            $("#resend").removeClass("hidden");
+            $("#goToProfile").addClass("hidden");
+        }
+
+        sabio.page.handlers.resendConfirmation = function () {
+            sabio.services.user.putConfirmToken('@Model.Item', sabio.page.confirmResendSuccess, sabio.page.confirmResendError);
+        }
+
+        sabio.page.confirmResendSuccess = function (data) {
+            sabio.ui.sweetalert.confirmRegistration();
+        }
+
+        sabio.page.confirmResendError = function (data) {
+            sabio.ui.sweetalert.registrationError();
+        }
+
+        sabio.page.handlers.goToProfile = function () {
+            window.location.href = "/person/" + sabio.page.id + "/edit"
+        }
+
+        sabio.page.startUp = function () {
+            sabio.page.handlers.confirmToken();
+            $("#resend").on("click", sabio.page.handlers.resendConfirmation)
+            $("#goToProfile").on("click", sabio.page.handlers.goToProfile)
+        }
+    </script>
+
+}

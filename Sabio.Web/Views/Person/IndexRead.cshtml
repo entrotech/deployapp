@@ -1,0 +1,175 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    ViewBag.Title = "IndexRead";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+@section styles{
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+
+    <style>
+        #name {
+            text-align: center;
+        }
+
+        .profile-right {
+            background-color: white;
+            font-size: 20px;
+        }
+       
+        .photo {
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+        }
+
+    </style>
+
+}
+<div class="profile-container" ng-controller="personController as vmP" data-ng-app="SabioApp">
+    <div class="container">
+        <ul class="breadcrumb m-b-10 f-s-12">
+            <li><a href="/home/index">HOME</a></li>
+            <li><a href="/person/index">MEMBERS</a></li>
+            <li class="active personName">{{vmP.item.firstName}}</li>
+        </ul>
+        <div class="profile-right col-md-6">
+            <!-- begin profile-info -->
+            <div class="" data-ng-show="vmP.item">
+                <!-- begin table -->
+                    <label class="divider">
+                        <span colspan="2"></span>
+                    </label>
+                <div>
+                    <span><img ng-src={{vmP.item.profilePicture}} class="photo"></span>
+                </div>
+                <div>
+                    <span id="name">
+                        <span><strong>{{vmP.item.firstName}}{{vmP.item.middleName}}&nbsp;{{vmP.item.lastName}}</strong></span>
+                    </span>
+                </div>
+                <div>
+                    <div class="divider">
+                        <label colspan="2"></label>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-briefcase">&nbsp</i>Skills:</label>
+                        <span>{{vmP.item.jobTitle}}</span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-phone">&nbsp</i>Mobile:</label>
+                        <span>{{vmP.item.phoneNumber | tel}}</span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-envelope">&nbsp</i>Email:</label>
+                        <span>{{vmP.item.email}}</span>
+                    </div>
+
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-home">&nbsp</i>Country/Region:</label>
+                        <span>
+                            {{vmP.item.country.name}}
+                        </span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-home">&nbsp</i>Address:</label>
+                        <span>{{vmP.item.address1}}{{vmP.item.address2}}</span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-home">&nbsp</i>City:</label>
+                        <span>{{vmP.item.city}}</span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-home">&nbsp</i>State:</label>
+                        <span>{{vmP.item.stateProvince.name}}</span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-home">&nbsp</i>Postal Code:</label>
+                        <span>{{vmP.item.postalCode}}</span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-home">&nbsp</i>Military Bases:</label>
+                        <span ng-show="!$last">,</span>
+                        <span ng-repeat="m in vmP.item.militaryBases">
+                            {{m.militaryBaseName}}{{$last ? '' : ', '}}
+                        </span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-gift">&nbsp;</i>Birthdate:</label>
+                        <span>{{vmP.item.dobFormatted}} </span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-wrench">&nbsp</i>Skills:</label>
+                        <span ng-show="!$last">,</span>
+                        <span ng-repeat="o in vmP.item.skills">
+                            {{o.name}}{{$last ? '' : ', '}}
+                        </span>
+                    </div>
+                    <div>
+                        <label class="field"><i class="glyphicon glyphicon-globe">&nbsp;</i>Language:</label>
+                        <span  ng-repeat="n in vmP.item.languages">
+                            {{n.languageName}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- end table -->
+        </div>
+        <!-- end profile-info -->
+    </div>
+</div>
+@section pageInitScripts {
+
+}
+@section scripts{
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/app/filters/tel.js"></script>
+    <script src="~/Scripts/jquery.tmpl.js"></script>
+    <script type="text/javascript">
+        sabio.page.id = @Model.Item;
+        sabio.page.personId =@Model.Id;
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+            .factory('personService', PersonService);
+            PersonService.$inject = ['$baseService', '$sabio'];
+            function PersonService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.person;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+        (function () {
+            angular.module(APPNAME)
+            .controller('personController', PersonController);
+            PersonController.$inject = ['$scope', '$window', '$baseController', 'personService', '$sabio'];
+            function PersonController($scope, $window, $baseController, personService, $sabio) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm.$baseController);
+                vm.personService = personService;
+                vm.$window = $window;
+                //vm.item = null;
+                vm.id = $sabio.id;
+
+
+                vm.personService.getById(vm.id, _getByIdSuccess, _getByIdError);
+
+                function _getByIdSuccess(data){
+                    if(data.item){
+                        vm.$scope.$apply(function(){
+                            vm.item = data.item;
+                        });
+                        console.log("get by Id successfuly");
+                    }
+                }
+                function _getByIdError(jqXHR){
+                    toastr.error(jqXHR.responseText, "Get By Id Failed");
+                }
+
+            }
+        })();
+    </script>
+
+
+
+}

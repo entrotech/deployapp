@@ -1,0 +1,758 @@
+﻿
+@{
+    ViewBag.Title = "Contact";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section Styles {
+    <style>
+        .product {
+            background: #fff;
+            border: 1px solid #c5ced4;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            padding: 30px 30px 30px 30px;
+            margin-bottom: 15px;
+        }
+        .emailPreview {
+            border: 1px solid black;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .emailModal {
+            background-color: rgb(217, 224, 231);
+            padding: 30px 30px 30px 30px;
+        }
+        .footer {
+            border-style: none;
+        }
+    </style>
+    <style type="text/css">
+        /******************************************************
+        * INK RESPONSIVE EMAIL TEMPLATE: http://zurb.com/ink/ *
+        ******************************************************/
+
+        /* Client-specific Styles & Reset */
+
+        #outlook a {
+            padding: 0;
+        }
+
+        body {
+            width: 100% !important;
+            min-width: 100%;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        .emailPreview img {
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+            width: auto;
+            max-width: 100%;
+            float: left;
+            clear: both;
+            display: block;
+        }
+
+        center {
+            width: 100%;
+            min-width: 580px;
+        }
+
+        a img {
+            border: none;
+        }
+
+        p {
+            margin: 0 0 0 10px;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        td {
+            word-break: break-word;
+            -webkit-hyphens: auto;
+            -moz-hyphens: auto;
+            hyphens: auto;
+            border-collapse: collapse !important;
+        }
+
+        table, tr, td {
+            padding: 0;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        hr {
+            color: #d9d9d9;
+            background-color: #d9d9d9;
+            height: 1px;
+            border: none;
+        }
+
+        /* Responsive Grid */
+
+        table.body {
+            height: 100%;
+            width: 100%;
+        }
+
+        table.container {
+            width: 580px;
+            margin: 0 auto;
+            text-align: inherit;
+        }
+
+        table.row {
+            padding: 0px;
+            width: 100%;
+            position: relative;
+        }
+
+        table.container table.row {
+            display: block;
+        }
+
+        td.wrapper {
+            padding: 10px 20px 0px 0px;
+            position: relative;
+        }
+
+        table.columns,
+        table.column {
+            margin: 0 auto;
+        }
+
+            table.columns td,
+            table.column td {
+                padding: 0px 0px 10px;
+            }
+
+                table.columns td.sub-columns,
+                table.column td.sub-columns,
+                table.columns td.sub-column,
+                table.column td.sub-column {
+                    padding-right: 10px;
+                }
+
+        td.sub-column, td.sub-columns {
+            min-width: 0px;
+        }
+
+        table.row td.last,
+        table.container td.last {
+            padding-right: 0px;
+        }
+
+        table.six {
+            width: 280px;
+        }
+
+        table.seven {
+            width: 330px;
+        }
+
+        table.eight {
+            width: 380px;
+        }
+
+        table.nine {
+            width: 430px;
+        }
+
+        table.ten {
+            width: 480px;
+        }
+
+        table.eleven {
+            width: 530px;
+        }
+
+        table.twelve {
+            width: 580px;
+        }
+
+        table.six center {
+            min-width: 280px;
+        }
+
+        table.six .panel center {
+            min-width: 260px;
+        }
+
+        td.expander {
+            visibility: hidden;
+            width: 0px;
+            padding: 0 !important;
+        }
+
+        /* Alignment & Visibility Classes */
+
+        table.center, td.center {
+            text-align: center;
+        }
+
+        span.center {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        img.center {
+            margin: 0 auto;
+            float: none;
+        }
+
+        .show-for-small,
+        .hide-for-desktop {
+            display: none;
+        }
+
+        /* Typography */
+
+        body, table.body, h1, h2, h3, h4, h5, h6, p, td {
+            color: #222222;
+            font-family: "Helvetica", "Arial", sans-serif;
+            font-weight: normal;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+            line-height: 1.3;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            word-break: normal;
+        }
+
+        h4 {
+            font-size: 28px;
+        }
+
+        body, table.body, p, td {
+            font-size: 14px;
+            line-height: 19px;
+        }
+
+            p.lead, p.lede, p.leed {
+                font-size: 18px;
+                line-height: 21px;
+            }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        small {
+            font-size: 10px;
+        }
+
+        a {
+            color: #2ba6cb;
+            text-decoration: none;
+        }
+
+            a:hover {
+                color: #2795b6 !important;
+            }
+
+            a:active {
+                color: #2795b6 !important;
+            }
+
+
+        /* Panels */
+
+        .panel {
+            background: #f2f2f2;
+            border: 1px solid #d9d9d9;
+            padding: 10px !important;
+        }
+
+        /* Outlook First */
+
+        body.outlook p {
+            display: inline !important;
+        }
+    </style>
+    <style type="text/css">
+        /********************************
+        * CUSTOM STYLING - SYSTEM EMAIL *
+        ********************************/
+        body {
+            background: #d9e0e7;
+        }
+
+        a:hover,
+        a:focus {
+            text-decoration: underline;
+        }
+
+        /* Typography */
+
+        body, table.body, p, td {
+            font-size: 12px;
+        }
+
+        h1, h2, h3, h4 {
+            margin: 5px 0 10px;
+        }
+
+        h4 {
+            font-size: 18px;
+        }
+
+            /* Predefined Class */
+
+            h1.last,
+            h2.last,
+            h3.last,
+            h4.last,
+            h5.last,
+            h6.last,
+            p.last {
+                margin-bottom: 0;
+            }
+
+        td.last {
+            padding-bottom: 0 !important;
+        }
+
+        td.wrapper {
+            padding: 15px 15px 0 15px;
+        }
+
+        table.columns td, table.column td {
+            padding: 0 0 15px 0;
+        }
+
+        .emailPreview .header,
+        .emailPreview .footer {
+            background: #ffffff;
+        }
+
+        .content.dark-theme {
+            background: #2d353c;
+        }
+
+            .content.dark-theme .panel {
+                background: #1b2024;
+                border: none;
+            }
+
+            .content.dark-theme h1,
+            .content.dark-theme h2,
+            .content.dark-theme h3,
+            .content.dark-theme h4,
+            .content.dark-theme h5,
+            .content.dark-theme h6,
+            .content.dark-theme .highlight {
+                color: #fff !important;
+            }
+
+            .content.dark-theme a, a {
+                color: #00acac;
+            }
+
+            .content.dark-theme p,
+            .content.dark-theme td {
+                color: #a8acb1 !important;
+            }
+
+        .divider {
+            height: 1px;
+            width: 100%;
+            background: #000;
+            margin-top: 5px;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .valign-middle {
+            vertical-align: middle;
+        }
+
+        .m-t-0 {
+            margin-top: 0px !important;
+        }
+
+        .m-t-5 {
+            margin-top: 5px !important;
+        }
+
+        .m-t-10 {
+            margin-top: 10px !important;
+        }
+
+        .m-t-15 {
+            margin-top: 15px !important;
+        }
+
+        .m-b-0 {
+            margin-bottom: 0px !important;
+        }
+
+        .m-b-5 {
+            margin-bottom: 5px !important;
+        }
+
+        .m-b-10 {
+            margin-bottom: 10px !important;
+        }
+
+        .m-b-15 {
+            margin-bottom: 15px !important;
+        }
+
+        .p-t-0 {
+            padding-top: 0px !important;
+        }
+
+        .p-t-5 {
+            padding-top: 5px !important;
+        }
+
+        .p-t-10 {
+            padding-top: 10px !important;
+        }
+
+        .p-t-15 {
+            padding-top: 15px !important;
+        }
+
+        @@media only screen and (max-width: 600px) {
+            .body .container.content {
+                width: 100% !important;
+            }
+
+            table[class="body"] .wrapper {
+                padding-right: 15px !important;
+            }
+
+            .text-right {
+                text-align: left !important;
+            }
+        }
+    </style>
+}
+
+
+<h1 class="page-header">Contact Users</h1>
+<div ng-controller="contactController as cnVm" class="row">
+    <div class="col-md-12">
+        <div class="product">
+            <div class="form-group">
+                <label>Set user group</label>
+                <select ng-model="cnVm.selectedRole" ng-options="role.name for role in cnVm.userRoles track by role.id"></select>
+            </div>
+            <div class="form-group">
+                <label>Email Subject</label>
+                <input type="text" class="form-control" ng-model="cnVm.submit.subject" />
+            </div>
+            <div class="form-group">
+                <label>Email Title</label>
+                <input type="text" class="form-control" ng-model="cnVm.submit.title" />
+            </div>
+            <div class="form-group">
+                <label Email Body></label>
+                <textarea class="form-control ckeditor" rows="5" id="emailBody"></textarea>
+            </div>
+            <button type="button" class="btn btn-primary" ng-click="cnVm.preview()">Preview and Send</button>
+        </div>
+        
+    </div>
+</div>
+
+@section PageInitScripts{
+    <script src="~/Scripts/ng/angular-sanitize.js"></script>
+    <script src="~/Assets/Admin/plugins/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ng/angular-ckeditor.min.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("ngSanitize");
+    </script>
+
+}
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.contactUsers.js"></script>
+
+    <script type="text/ng-template" id="emailTemplate.html">
+        <div class="emailModal">
+            <div class="emailPreview">
+                <table class="body">
+                    <tr>
+                        <td class="center" align="center" valign="top">
+                            <center>
+                                <!-- begin page header -->
+                                <table class="row header">
+                                    <tr>
+                                        <td class="center" align="center">
+                                            <center>
+                                                <!-- begin container -->
+                                                <table class="container">
+                                                    <tr>
+                                                        <td class="wrapper">
+                                                            <!-- begin six columns -->
+                                                            <table class="six columns">
+                                                                <tr>
+                                                                    <td>
+                                                                        <a href="deploy.dev/home/index"><img src="http://deploy.dev/Content/Images/DeployLogo.png" width="60" /></a>
+                                                                    </td>
+                                                                    <td class="expander"></td>
+                                                                </tr>
+                                                            </table>
+                                                            <!-- end six columns -->
+                                                        </td>
+                                                        <td class="wrapper">
+                                                            <!-- begin six columns -->
+                                                            <table class="six columns">
+                                                                <tr>
+                                                                    <td class="text-right valign-middle"></td>
+                                                                    <td class="expander"></td>
+                                                                </tr>
+                                                            </table>
+                                                            <!-- end six columns -->
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <!-- end container -->
+                                            </center>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- end page header -->
+                                <!-- begin page container -->
+                                <table class="container content dark-theme">
+                                    <tr>
+                                        <td>
+                                            <!-- begin row -->
+                                            <table class="row">
+                                                <tr>
+                                                    <!-- begin wrapper -->
+                                                    <td class="wrapper">
+                                                        <table class="twelve columns">
+                                                            <tr>
+                                                                <td class="last">
+                                                                    <h4 ng-bind="mc.emailTitle"></h4>
+                                                                    <p class="m-b-5" ng-bind-html="mc.sanitize(mc.emailBody)"></p>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                    <!-- end wrapper -->
+                                                </tr>
+                                            </table>
+                                            <!-- end row -->
+                                            <!-- begin divider -->
+                                            <table class="divider"></table>
+                                            <!-- end divider -->
+                                            <!-- begin row -->
+                                            <table class="row">
+                                                <tr>
+                                                    <!-- begin wrapper -->
+                                                    <td class="wrapper">
+                                                        <p>
+                                                            <i>This is a system generated email and reply is not required.</i>
+                                                        </p>
+                                                    </td>
+                                                    <!-- end wrapper -->
+                                                </tr>
+                                            </table>
+                                            <!-- end row -->
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- end page container -->
+                                <!-- begin page footer -->
+                                <table class="row footer">
+                                    <tr>
+                                        <td class="center" align="center">
+                                            <center>
+                                                <!-- begin container -->
+                                                <table class="container">
+                                                    <tr>
+                                                        <td class="wrapper">
+                                                            <table class="six columns">
+                                                                <tr>
+                                                                    <td>
+                                                                    </td>
+                                                                    <td class="expander"></td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                        <td class="wrapper">
+                                                            <table class="six columns">
+                                                                <tr>
+                                                                    <td class="wrapper text-right valign-middle">
+                                                                        <a href="javascript:;">About Us</a>
+                                                                        &nbsp;
+                                                                        <a href="javascript:;">Privacy Policy</a>
+                                                                        &nbsp;
+                                                                        <a href="javascript:;">Terms of Use</a>
+                                                                    </td>
+                                                                    <td class="expander"></td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <!-- end container -->
+                                            </center>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!-- end page footer -->
+                            </center>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <hr />
+            <button type="button" class="btn btn-primary" ng-click="mc.send()">Send Email</button>
+            <button type="button" class="btn btn-default" ng-click="mc.cancel()">Cancel</button>
+        </div>
+
+    </script>
+    
+    <script>
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('contactUsersService', ContactUsersService);
+
+            function ContactUsersService() {
+                var aSabioServiceObject = sabio.services.contactUsers;
+                return aSabioServiceObject;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('contactController', ContactController);
+
+            ContactController.$inject = ['$baseController', '$scope', '$window', '$sabio', '$sce', '$sanitize', '$uibModal', 'contactUsersService']
+
+            function ContactController($baseController, $scope, $window, $sabio, $sce, $sanitize, $uibModal, contactUsersService) {
+                var vm = this;
+                $baseController.merge(vm, $baseController);
+                vm.$scope = $scope;
+                vm.$sanitize = $sanitize;
+                vm.$uibModal = $uibModal;
+
+                vm.submit = {
+                    aspNetUserRoleId: "",
+                    subject: "",
+                    title: "",
+                    body: "",
+                    plainText: ""
+                }
+                vm.userRoles = [];
+                vm.allUsers = {
+                    id: "",
+                    name: "All Users"
+                }
+                vm.selectedRole = {};
+
+                vm.preview = _preview;
+                vm.contactUsersService = contactUsersService;
+
+                // FOLD
+
+                vm.contactUsersService.getUserRoles(_getRolesSuccess, _getRolesError);
+
+                function _getRolesSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.userRoles = data.items;
+                        vm.userRoles.unshift(vm.allUsers);
+                        vm.selectedRole = vm.allUsers;
+                    })
+                }
+
+                function _getRolesError(data) {
+                    console.log(data);
+                }
+
+                function _preview() {
+                    vm.submit.aspNetUserRoleId = vm.selectedRole.id;
+                    vm.submit.body = vm.$sanitize(CKEDITOR.instances.emailBody.getData());
+                    vm.submit.plainText = _htmlToPlaintext(vm.submit.body);
+                    var modalInstance = vm.$uibModal.open({
+                        animation: true,
+                        templateUrl: 'emailTemplate.html',
+                        controller: 'modalController as mc',
+                        size: 'lg',
+                        resolve: {
+                            items: function () {
+                                return vm.submit;
+                            }
+                        }
+                    })
+                    modalInstance.result.then(function () {
+                        vm.contactUsersService.sendEmail(vm.submit, _onSendEmailSuccess, _onSendEmailError);
+                    }, function () {
+
+                    });
+                }
+
+                function _onSendEmailSuccess(data) {
+                    vm.$alertService.success("Email sent!");
+                }
+
+                function _onSendEmailError(data) {
+                    vm.$alertService.error("Email failed to send");
+                }
+
+                function _htmlToPlaintext(text) {
+                    return text ? String(text).replace(/<[^>]+>/gm, '') : '';
+                }
+            }
+        })();
+
+        // Modal Controller
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller('modalController', ModalController);
+
+            ModalController.$inject = ['$scope', '$baseController', '$uibModalInstance', 'items', '$sce']
+
+            function ModalController($scope, $baseController, $uibModalInstance, items, $sce) {
+                var vm = this;
+                $baseController.merge(vm, $baseController);
+                vm.$scope = $scope;
+                vm.$uibModalInstance = $uibModalInstance;
+
+                vm.sanitize = _sanitize;
+                vm.send = _send;
+                vm.cancel = _cancel;
+
+                vm.modalItems = items;
+                vm.emailTitle = vm.modalItems.title;
+                vm.emailBody = vm.modalItems.body;
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+
+                function _send() {
+                    vm.$uibModalInstance.close();
+                }
+
+                function _cancel() {
+                    vm.$uibModalInstance.dismiss();
+                }
+            }
+        })();
+    </script>
+}

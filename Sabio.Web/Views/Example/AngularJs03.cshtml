@@ -1,0 +1,103 @@
+﻿
+@{
+    ViewBag.Title = "ConceptualOverview03";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+
+<h2>View-independent business logic: Services</h2>
+<ul>
+    <li>Encapsulate angular components in IIFEs.</li>
+    <li>Use the $inject property for dependency injection (vs. array notation in constructor arguments)</li>
+</ul>
+
+<div ng-app="invoice2" ng-controller="InvoiceController as invoice">
+    <b>Invoice:</b>
+    <div>
+        Quantity: <input type="number" min="0" ng-model="invoice.qty" required>
+    </div>
+    <div>
+        Costs: <input type="number" min="0" ng-model="invoice.cost" required>
+        <select ng-model="invoice.inCurr">
+            <option ng-repeat="c in invoice.currencies">{{c}}</option>
+        </select>
+    </div>
+    <div>
+        <b>Total:</b>
+        <span ng-repeat="c in invoice.currencies">
+            {{invoice.total(c) | currency:c}}
+        </span><br>
+        <button class="btn" ng-click="invoice.pay()">Pay</button>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/angular.js"></script>
+
+    <script>
+
+        (function () {
+            angular.module('finance2', [])
+            .factory('currencyConverter', CurrencyConverter);
+
+            function CurrencyConverter() {
+                var currencies = ['USD', 'EUR', 'CNY'];
+                var usdToForeignRates = {
+                    USD: 1,
+                    EUR: 0.74,
+                    CNY: 6.09
+                };
+                var convert = function (amount, inCurr, outCurr) {
+                    return amount * usdToForeignRates[outCurr] / usdToForeignRates[inCurr];
+                };
+
+                return {
+                    currencies: currencies,
+                    convert: convert
+                };
+            }
+        })();
+        
+        (function () {
+            angular.module('invoice2', ['finance2'])
+          .controller('InvoiceController', InvoiceController);
+
+            InvoiceController.$inject = ['currencyConverter'];
+
+            function InvoiceController(currencyConverter) {
+                vm = this;
+
+                // ViewModel
+                vm.qty = 1;
+                vm.cost = 2;
+                vm.inCurr = 'EUR';
+                vm.currencies = ['USD', 'EUR', 'CNY'];
+                vm.usdToForeignRates = {
+                    USD: 1,
+                    EUR: 0.74,
+                    CNY: 6.09
+                };
+
+                vm.total = _total;
+                vm.convertCurrency = _convertCurrency;
+                vm.pay = _pay;
+
+                // Fold
+
+                function _total(outCurr) {
+                    return vm.convertCurrency(vm.qty * vm.cost, vm.inCurr, outCurr);
+                }
+
+                function _convertCurrency(amount, inCurr, outCurr) {
+                    return amount * vm.usdToForeignRates[outCurr] / vm.usdToForeignRates[inCurr];
+                }
+
+                function _pay() {
+                    window.alert('Thanks!');
+                }
+            }
+        })();
+
+
+    </script>
+}
+

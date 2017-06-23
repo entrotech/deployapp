@@ -1,0 +1,419 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+@section styles {
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <style>
+        .validationMessage {
+            color: red;
+        }
+
+        .checkbox {
+            margin-top: 10px;
+            height: 20px;
+        }
+
+        label {
+            display: inline-block;
+            text-align: right;
+            margin-right: 15px;
+            margin-bottom: 10px;
+        }
+
+        .create {
+            margin-bottom: 10px;
+        }
+
+        label .sort {
+            font-family: Calibri;
+        }
+
+        .photo {
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+        }
+
+        .personList {
+            list-style-type: none;
+        }
+
+        .name {
+            text-align: center;
+        }
+        .btnSelect{
+            text-align: center;
+            margin-top:5px;
+        }
+    </style>
+}
+<!-- begin breadcrumb -->
+<div class="row">
+
+    <ol class="breadcrumb pull-right">
+        <li><a href="/home/">Home</a></li>
+        <li class="active">Testimonials</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <h1 class="page-header">Testimonials</h1>
+    <!-- begin #content -->
+    <div ng-controller='mainController as mVm'>
+        <!-- begin col-8 -->
+
+        <div class="col-md-8">
+            <div class="result-container" data-ng-hide="mVm.item">
+                <label for="statusSelect"> Sort By Active/Inactive: </label><br>
+                <select name="statusSelect" class="statusSelect" ng-model="mVm.selectedItem" ng-change="mVm.sort()">
+                    <option value="all" selected="selected">All</option>
+                    <option value="false">
+                        Active
+                    </option>
+                    <option value="True">Inactive</option>
+                </select>
+                <button type="button" class="btn btn-success create pull-right" data-ng-click="mVm.add()">Add Testimonial</button>
+                <div class="result-list col-md-5">
+                    <div data-ng-repeat="item in mVm.items">
+                        <div class="panel panel-inverse">
+                            <div class="panel-heading">
+                                <div class="panel-heading-btn">
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload" data-original-title="" title="" data-init="true"><i class="fa fa-repeat"></i></a>
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove" data-original-title="" title="" data-init="true"><i class="fa fa-times"></i></a>
+                                </div>
+                                <h4 class="panel-title">{{item.id}} {{item.person.firstName}} {{item.person.lastName}}</h4>
+                            </div>
+                            <div class="panel-body">
+                                <h4 class="keyword">{{item.person.firstName}} {{item.person.lastName}}                  </h4>
+                                <p data-ng-bind-html="mVm.sanitize(item.content)"></p>
+                                <input type="button" class="btn btn-warning edit" ng-click="mVm.select(item)" value="Edit" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-inverse" data-sortable-id="form-stuff-1" data-ng-show="mVm.item">
+                <div class="panel-heading">
+                    <div class="panel-heading-btn">
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                    </div>
+                    <h4 ng-show="mVm.addedItem" class="panel-title">Write Your Testimonial!</h4>
+                </div>
+                <div class="panel-body">
+                    <form class="testimonials">
+                        <div ng-show="mVm.item.fullName">
+                            <label for="selectUser">Testimonial for:</label>
+                            {{mVm.item.fullName}} <br />
+                        </div>
+                        <textarea class="ckeditor" id="ckeditor" data-ng-model="ckeditor" data-ng-bind-html="mVm.sanitize(mVm.item.content)"></textarea>
+                        <button type="button" class="btn btn-primary" data-ng-click="mVm.save()">Save</button>
+                        <button type="button" class="btn btn-default" data-ng-click="mVm.cancel()">Cancel</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal"
+                                data-ng-click="mVm.delete()">
+                            Delete
+                        </button>
+                        <label for="basicCheck">Inactive/Hidden From Public View:</label>
+                        <input id="basicCheck" class="check" type="checkbox" ng-model="mVm.basicCheckValue" />
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- end col-8 -->
+        <div class="col-md-4" ng-show="mVm.addedItem">
+            <div class="sidebar-search">
+                <input type="text" class="form-control input-white" id="searchBarName" placeholder="Search for User" ng-model="mVm.searchString" />
+            </div>
+            <br />
+            <div class="checkBoxes">
+                <label for="veterans"><input type="checkbox" ng-model="mVm.isVeteran" />&nbsp;<span>Veterans</span></label>
+                <label for="employers"><input type="checkbox" ng-model="mVm.isEmployer" />&nbsp;<span>Employers</span></label>
+                <label for="families"><input type="checkbox" ng-model="mVm.isFamilyMember" />&nbsp;<span>Family Member</span></label>
+                <br />
+            </div>
+            <div class="btnSearch">
+                <input type="button" class="btn btn-success" ng-click="mVm.search(searchString)" value="Submit" />
+                <input type="button" class="btn btn-danger btn-xs reset pull-right" value="Reset Search" ng-click="mVm.add()" />
+            </div>
+            <div class="panel-body profile-item">
+                <ul ng-class-even="pull-left">
+                    <li class="data-list personList" ng-repeat="item in mVm.pagedItems">
+                        <div class="panel panel-body">
+                            <a ng-href="/person/{{item.id}}">
+                                <div class="name">
+                                    Name: {{item.fullName}}<br />
+                                    <span><img ng-src={{item.profilePicture}} class="photo"></span>
+                                </div>
+                            </a>
+                            <div class="btnSelect"> <input type="button" class="btn btn-success btn-sm " value="Select User" ng-click="mVm.selectPerson(item)" /></div>
+                         
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            @*---------- Pagination ------- *@
+            <div class="row" ng-show="mVm.pagedItems">
+                <ul uib-pagination ng-model="mVm.currentPage" total-items="mVm.totalItems" boundary-link="true" ng-change="mVm.search()" items-per-page="mVm.itemsPerPage"></ul>
+            </div>
+            <!-- end col-8 -->
+        </div>
+    </div>
+</div>
+<!-- end #content -->
+
+@section pageInitScripts{
+    <script src="~/Assets/Admin/plugins/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ng/angular-ckeditor.min.js"></script>
+}
+
+@section scripts{
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/sabio.services.testimonial.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('testimonialService', TestimonialService);
+
+            TestimonialService.$inject = ['$baseService', '$sabio'];
+
+            function TestimonialService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.testimonial;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('personService', PersonService);
+
+            PersonService.$inject = ['$baseService', '$sabio'];
+
+            function PersonService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.person;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+        (function () {
+            angular.module(APPNAME)
+                .controller('mainController', MainController);
+
+            MainController.$inject = ['$scope', '$window', '$baseController', 'testimonialService', 'personService', '$sce'];
+
+            function MainController($scope, $window, $baseController, testimonialService, personService, $sce) {
+                // Administrative stuff
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.testimonialService = testimonialService;
+                vm.personService = personService;
+                vm.$window = $window;
+                vm.pagedItems = [];
+                // ViewModel
+                vm.goHome = _goHome;
+                vm.items = [];
+                vm.item = null;
+                vm.sanitize = _sanitize;
+                vm.itemIndex = -1;
+                vm.pagedItems = [];//list of search results
+                vm.currentPage = 1;
+                vm.itemsPerPage = 3;
+                vm.maxPaginationButtons = 5;
+                vm.totalItems = 0;
+                vm.select = _select;
+                vm.save = _save;
+                vm.cancel = _cancel;
+                vm.add = _add;
+                vm.delete = _delete;
+                vm.basicCheckValue = '';
+                vm.sort = _sort; //dropdown function
+                vm.selectedItem = null;
+                vm.addedItem = false;
+                vm.isVeteran = false;
+                vm.isEmployer = false;
+                vm.isFamilyMember = false;
+                vm.search = _search;
+                vm.selectPerson = _selectPerson; //select person to submit testimonial
+
+                // "The fold"
+
+                _render();
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+
+                function _render() {
+                    sabio.services.testimonial.getAll(_getAllSuccess, _getAllError);
+                }
+                function _sort() {
+                    if (vm.selectedItem != 'all') {
+                        var inactive = vm.selectedItem;
+                        vm.testimonialService.search(inactive, _searchSuccess, _searchError);
+                    }
+                    else {
+                        _render();
+                    }
+                }
+                function _goHome() {
+                    vm.$window.location.href = '/';
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                        vm.totalItems = data.items.length;
+                        vm.filteredItems = vm.items.slice(0, vm.itemsPerPage);
+                    });
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+                }
+
+                function _searchSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                    });
+                }
+
+                function _searchError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Search failed");
+                }
+
+                function _select(data) {
+                    vm.itemIndex = vm.items.indexOf(data);
+                    vm.testimonialService.getById(data.id, _getByIdSuccess, _getByIdError)
+                }
+
+                function _getByIdSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                            vm.basicCheckValue = data.item.inactive;
+                            CKEDITOR.instances.ckeditor.insertHtml(data.item.content)
+                        });
+                    }
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetById failed");
+                }
+                function _selectPerson(data) {
+                    vm.personService.getById(data.id, _getPersonByIdSuccess, _getPersonByIdError);
+                }
+                function _getPersonByIdSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                        });
+                    }
+                    window.scroll(0, 0);
+                }
+                function _getPersonByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetByPersonId failed");
+                }
+                // create a new empty item
+                function _add() {
+                    CKEDITOR.instances.ckeditor.setData("")
+                    vm.item = {};
+                    vm.itemIndex = -1;
+                    vm.addedItem = true;
+                    vm.searchString = '';
+                    vm.pagedItems = null;
+                }
+
+                function _search() {
+                    vm.personService.search(vm.searchString, vm.itemsPerPage, vm.currentPage, _getPersonSearchSuccess, _getPersonSearchError, vm.isVeteran, vm.isEmployer, vm.isFamilyMember);
+                }
+
+                function _getPersonSearchSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        data.items;
+                        vm.totalItems = data.resultCount;
+                        vm.pagedItems = data.items;
+
+                    });
+                }
+
+                function _getPersonSearchError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetAll People failed");
+                }
+
+                function _cancel() {
+                    _endEdit();
+                }
+
+                function _endEdit() {
+                    vm.item = null;
+                    vm.itemIndex = -1;
+                    CKEDITOR.instances.ckeditor.setData("")
+                    vm.addedItem = false;
+                    $(".validationMessage").html("")
+                }
+
+                function _save() {
+                    vm.item.content = CKEDITOR.instances.ckeditor.getData()
+                    if (vm.item.content) {
+                        if (vm.item.id && vm.item.fullName) {
+                            vm.testimonialService.post(vm.item.content, vm.item.id, _postSuccess, _postError);
+                        }
+                        else {
+                            vm.item.inactive = vm.basicCheckValue;
+                            vm.testimonialService.put(vm.item.id, vm.item, _putSuccess, _putError);
+                        }
+                    } else {
+                        $(".validationMessage").html("")
+                        $(".testimonial").append("<div class='validationMessage'>Please enter your testimonial</div>")
+                    }
+                }
+                function _putSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items[vm.itemIndex] = vm.item;
+                        _endEdit();
+                        vm.$alertService.success("Update successful");
+                    });
+                }
+                function _putError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Update failed");
+                }
+
+                function _postSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            document.location = "/testimonials/index/"
+                            //vm.$alertService.success("Insert successful");
+                        });
+                    }
+                    vm.addedItem = false;
+                }
+                function _postError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Insert failed");
+                }
+                function _delete() {
+                    if (vm.item.id) {
+                        sabio.ui.sweetalert.delete(vm.item.id, vm.testimonialService.delete, _deleteSuccess, _deleteError)
+                    }
+                }
+                function _deleteSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items.splice(vm.itemIndex, 1);
+                        _endEdit();
+                    });
+                }
+                function _deleteError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Delete failed");
+                }
+            }
+        })();
+    </script>
+}

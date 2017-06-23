@@ -1,0 +1,222 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <title>Deploy - Built by Vets</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    <link href="/assets/admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
+    <link href="/assets/admin/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/animate.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/style.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/style-responsive.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/theme/default.css" rel="stylesheet" id="theme" />
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <link href="~/Content/deployAdmin.css" rel="stylesheet" />
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="/assets/admin/plugins/pace/pace.min.js"></script>
+    <!-- ================== END BASE JS ================== -->
+</head>
+<body class="pace-top bg-white">
+    <!-- begin #page-loader -->
+    <div id="page-loader" class="fade in"><span class="spinner"></span></div>
+    <!-- end #page-loader -->
+    <!-- begin #page-container -->
+    <div id="page-container" class="fade">
+        <!-- begin register -->
+        <div class="register register-with-news-feed">
+            <!-- begin news-feed -->
+            <div class="news-feed">
+                <div class="news-image">
+                    <img src="/assets/admin/img/login-bg/bg-8.jpg" alt="" />
+                </div>
+                <div class="news-caption">
+                    <h4 class="caption-title"><i class="fa fa-edit text-success"></i> Operation Code</h4>
+                    <p>
+                        The fastest way for military, veterans and their families to get coding. Learn about code schools,
+                        scholarships, career opportunities, and more.
+                    </p>
+                </div>
+            </div>
+            <!-- end news-feed -->
+            <!-- begin right-content -->
+            <div class="right-content">
+                <!-- begin register-header -->
+                <h1 class="register-header">
+                    Sign Up
+                    <small>Create your Operation Code Account. It’s free and always will be.</small>
+                </h1>
+                <!-- end register-header -->
+                <!-- begin register-content -->
+                <div class="register-content">
+                    <form action="index.html" method="POST" class="margin-bottom-0" id="registerNewUser">
+                        <label class="control-label">Name <span class="text-danger">*</span></label>
+                        <div class="row row-space-10">
+                            <div class="col-md-6 m-b-15">
+                                <input type="text" class="form-control" placeholder="First name" name="firstName" required />
+                            </div>
+                            <div class="col-md-6 m-b-15">
+                                <input type="text" class="form-control" placeholder="Last name" name="lastName" required />
+                            </div>
+                        </div>
+                        <label class="control-label">Email <span class="text-danger">*</span></label>
+                        <div class="row m-b-15">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" placeholder="Email address" name="email" required />
+                            </div>
+                        </div>
+                        <label class="control-label">Password <span class="text-danger">*</span></label>
+                        <div class="row m-b-15">
+                            <div class="col-md-12">
+                                <input type="password" class="form-control" placeholder="Password" name="password" id="password" required />
+                            </div>
+                        </div>
+                        <label class="control-label">Re-enter Password <span class="text-danger">*</span></label>
+                        <div class="row m-b-15">
+                            <div class="col-md-12">
+                                <input type="password" class="form-control" placeholder="Re-enter password" name="confirmPassword" required />
+                            </div>
+                        </div>
+                        <div class="checkbox m-b-30">
+                            <label>
+                                <input type="checkbox" name="terms" required /> By clicking Sign Up, you agree to our <a href="#">Terms</a> and that you have read our <a href="#">Data Policy</a>, including our <a href="/users/cookies">Cookie Use</a>.
+                            </label>
+                        </div>
+                        <div class="register-buttons">
+                            <button type="button" class="btn btn-primary btn-block btn-lg" id="submit">Sign Up</button>
+                        </div>
+                        <div class="m-t-20 m-b-40 p-b-40 text-inverse">
+                            Already a member? Click <a href="/users/login">here</a> to login.
+                        </div>
+                        <hr />
+                        <p class="text-center">
+                            &copy; Color Admin All Right Reserved 2015
+                        </p>
+                    </form>
+                </div>
+                <!-- end register-content -->
+            </div>
+            <!-- end right-content -->
+        </div>
+        <!-- end register -->
+    </div>
+    <!-- end page container -->
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="/assets/admin/plugins/jquery/jquery-1.9.1.min.js"></script>
+    <script src="/assets/admin/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+    <script src="/assets/admin/plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+    <script src="/assets/admin/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="assets/crossbrowserjs/html5shiv.js"></script>
+        <script src="assets/crossbrowserjs/respond.min.js"></script>
+        <script src="assets/crossbrowserjs/excanvas.min.js"></script>
+    <![endif]-->
+    <script src="/assets/admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="/Assets/Admin/plugins/jquery-ui/ui/minified/jquery.ui.sortable.min.js"></script>
+    <script src="/assets/admin/plugins/jquery-cookie/jquery.cookie.js"></script>
+    <!-- ================== END BASE JS ================== -->
+    <!-- ================== BEGIN PAGE LEVEL JS ================== -->
+    <script src="/assets/admin/js/apps.min.js"></script>
+    <script src="~/Scripts/sabio.js"></script>
+    <script src="~/Scripts/toastr.js"></script>
+    <script src="~/Scripts/sabio.ui.toastr.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <!-- ================== END PAGE LEVEL JS ================== -->
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/sabio.services.user.js"></script>
+    <script>
+
+        sabio.page.handlers.submitRegister = function () {
+            if ($("#registerNewUser").valid()) {
+                var data = $("#registerNewUser").serialize();
+                sabio.services.user.postRegister(data, sabio.page.confirmRegisterSuccess, sabio.page.confirmRegisterError);
+            }
+        }
+        sabio.page.confirmRegisterSuccess = function (data) {
+            // email security token is in data.item
+            sabio.ui.sweetalert.confirmRegistration();
+            console.log(data);
+        }
+        sabio.page.confirmRegisterError = function () {
+            toastr.error("Failed to register");
+        }
+        $("#registerNewUser").validate({
+            highlight: function (element) {
+                $(element).addClass("form-validate");
+            },
+            unhighlight: function (element) {
+                $(element).removeClass("form-validate");
+            },
+            errorPlacement: function (label, element) {
+                element.parent().append(label);
+            },
+            errorClass: "error-msg",
+            errorElement: "span",
+            rules: {
+                firstName: {
+                    required: true,
+                    maxlength: 50
+                },
+                lastName: {
+                    required: true,
+                    maxlength: 50
+                },
+                email: {
+                    required: true,
+                    maxlength: 256,
+                    email: true
+                },
+                password: {
+                    required: true,
+                    minlength: 6,
+                    passUpper: true,
+                    passLower: true,
+                    passDigit: true,
+                    passSpecialChar: true
+                },
+                confirmPassword: {
+                    required: true,
+                    equalTo: '#password'
+                }
+            },
+            messages: {
+                confirmPassword: {
+                    equalTo: "Passwords must match"
+                }
+            }
+        });
+        jQuery.validator.addMethod("passUpper", function (value, element) {
+            return this.optional(element) || /(?=.*[A-Z])/.test(value);
+        }, "Must contain an uppercase letter");
+        jQuery.validator.addMethod("passLower", function (value, element) {
+            return this.optional(element) || /(?=.*[a-z])/.test(value);
+        }, "Must contain a lowercase letter");
+        jQuery.validator.addMethod("passDigit", function (value, element) {
+            return this.optional(element) || /(?=.*\d)/.test(value);
+        }, "Must contain a number");
+        jQuery.validator.addMethod("passSpecialChar", function (value, element) {
+            return this.optional(element) || /(?=.*[^a-zA-Z0-9])/.test(value);
+        }, "Must contain a special character");
+
+        sabio.page.startUp = function () {
+            App.init();
+            $("#submit").on("click", sabio.page.handlers.submitRegister);
+        }
+    </script>   
+</body>
+</html>

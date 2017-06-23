@@ -1,0 +1,737 @@
+﻿
+@{
+    ViewBag.Title = "IndexNg5";
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+
+<style>
+    #content {
+        margin-top: 25px;
+    }
+
+    /*.recent-post-container {
+        margin-top: 63px;
+    }*/
+
+    .recent-post-padding {
+        padding: 0px !important;
+    }
+
+    /*.post-desc {
+        height: 100%;
+    }*/
+
+    #map {
+        height: 550px;
+        width: 100%;
+        margin-bottom: .5%;
+    }
+
+    /*.rounded {
+        margin-top: 3%;
+        border-radius: 10px;
+    }*/
+
+    .postPadding {
+        padding: 10px;
+    }
+
+    .postContainer {
+        width: 100%;
+        border: 1px solid;
+        padding: 15px;
+        /*border-color: rgb(112, 116, 120);*/
+        border-color: #ccd0d4;
+    }
+
+    .post-li {
+        width: 100%;
+    }
+
+    .search-box-container {
+        padding-top: 50px;
+    }
+
+    .sidebar {
+        padding-top: 10px;
+    }
+
+    .sort-dropDown {
+        padding-top: 6px;
+    }
+</style>
+
+
+<div data-ng-app="SabioApp">
+    <div ng-controller="opportunityController as oppVm" ng-cloak>
+        <div class="content" id="content">
+            <div class="container" ng-hide="oppVm.houdini">
+                <div class="row row-space-20">
+                    <div class="row">
+                        <div class="section-container  search-box-container">
+                            <div class="input-group ">
+                                <input type="text" class="form-control " placeholder="Search for Resources"
+                                       ng-model="oppVm.searchText" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-inverse" type="button" ng-click="oppVm.searchBtn()">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row date-sort">
+                            <div class="col-md-12">
+
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" name="beginDate" placeholder="Set Start Date"
+                                           datetimepicker ng-model="oppVm.beginDate"
+                                           on-change="oppVm.dateRange(oppVm.beginDate, oppVm.endDate)"
+                                           options="oppVm.optionsFrom2" />
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" name="endDate" placeholder="Set End Date"
+                                           datetimepicker ng-model="oppVm.endDate"
+                                           on-change="oppVm.dateRange(oppVm.beginDate, oppVm.endDate)"
+                                           options="oppVm.optionsTo2" />
+                                </div>
+
+                                <div class="checkbox col-md-4 col-md-offset-1">
+                                    <label><strong>Sort By:&nbsp;&nbsp;</strong></label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optradio"
+                                               ng-model="oppVm.sortByColumn" value="Name">
+                                        Name
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optradio"
+                                               ng-model="oppVm.sortByColumn" value="DateTimePickerStart">
+                                        Start date
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="checkbox" name="Descending"
+                                               ng-model="oppVm.descending" value="Descending">
+                                        Descending
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9 ">
+                        <div class="" ng-hide="oppVm.indexView">
+                            <div class="postPadding post-li" ng-repeat="item in oppVm.items">
+                                <div class="post-content postContainer ">
+                                    <h4 class="post-title">{{item.name}}</h4>
+                                    <div class="post-by">{{item.dateTimeStart | date : "MMMM d, y"}} | {{item.dateTimeEnd | date : "MMMM d, y"}} <span class="pull-right">{{item.city}}, {{item.stateProvince.code}}, {{item.country.longCode}}</span></div>
+                                    <div class="post">{{item.description | limitTo: 100}}{{item.description.length > 100 ? '...' : ''}}</div>
+                                    <hr />
+                                    <div class="clearfix">
+                                        @*<a class="pull-right" ng-click="oppVm.edit(item)">
+                                                Edit
+                                            </a>*@
+                                        <a ng-click="oppVm.goToDetails(item)">Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center" ng-show="oppVm.showSearchElements">
+                                <ul uib-pagination ng-model="oppVm.currentPage" total-items="oppVm.totalItems" boundary-link="true"
+                                    items-per-page="oppVm.itemsPerPage" ng-change="oppVm.search()"></ul>
+                            </div>
+                        </div>
+                        <div class="post-content postContainer" ng-show="oppVm.details">
+                            <p>{{oppVm.item.Id}}</p>
+                            <h4>{{oppVm.item.name}}</h4>
+                            <p>{{oppVm.item.dateTimeStart | date : "MMMM d, y"}} | {{oppVm.item.dateTimeEnd | date : "MMMM d, y"}}</p>
+                            <span>{{oppVm.item.address1}}, {{oppVm.item.address2}}</span>
+                            <span>{{oppVm.item.city}}, {{oppVm.item.stateProvince.name}}, {{oppVm.item.postalCode}}, {{oppVm.item.country.name}}</span>
+                            <p>{{oppVm.item.phone}} | {{oppVm.item.email}}</p>
+                            <p>{{oppVm.item.description}}</p>
+                            <div class="" id="map">
+                            </div>
+                            <div class="clearfix">
+                                <a class="pull-right" ng-click="oppVm.goToIndex()">
+                                    back to index
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+
+                        <div class="sidebar" style="padding-top: 10px;">
+                            <div class="section-container text-center postContainer">
+                                <a ng-click="oppVm.create()">
+                                    Add Resource
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="panel-group col-md-12">
+                        <div class="panel panel-inverse" data-sortable-id="form-stuff-1" ng-show="oppVm.houdini">
+                            <div class="panel-heading">
+                                <h4 class="panel-title text-center">Add Resource</h4>
+                            </div>
+                            <div class="panel-body">
+                                <form name="opportunityForm" ng-submit="oppVm.submitForm(opportunityForm.$valid)" novalidate>
+                                    <div class="form-group">
+                                        <label for="name">Name / Title</label>
+                                        <input type="text" class="form-control" name="name" ng-model="oppVm.item.name" ng-maxlength="50"
+                                               ng-class="{'form-validate' : oppVm.submitted && opportunityForm.name.$invalid}" required>
+                                        <p ng-show="oppVm.submitted && opportunityForm.name.$invalid" class="error-msg">Name / Title is required.</p>
+                                        <p ng-show="opportunityForm.name.$error.maxlength" class="error-msg">Name / Title is too long.</p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Date(s)</label>
+                                        <div class="">
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <input type="text" class="form-control" name="dateTimeStart" placeholder="Start Date"
+                                                           datetimepicker ng-model="oppVm.item.dateTimeStart"
+                                                           on-change="oppVm.update(oppVm.item.dateTimeStart, oppVm.item.dateTimeEnd)"
+                                                           options="oppVm.optionsFrom" />
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <input type="text" class="form-control" name="dateTimeEnd" placeholder="End Date"
+                                                           datetimepicker ng-model="oppVm.item.dateTimeEnd"
+                                                           on-change="oppVm.update(oppVm.item.dateTimeStart, oppVm.item.dateTimeEnd)"
+                                                           options="oppVm.optionsTo" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="description">Description</label>
+                                        <textarea type="text" class="form-control" name="description" rows="5" ng-model="oppVm.item.description" ng-maxlength="500"
+                                                  ng-class="{'form-validate' : oppVm.submitted && opportunityForm.description.$invalid}" required></textarea>
+                                        <p ng-show="oppVm.submitted && opportunityForm.description.$invalid" class="error-msg">Description is required.</p>
+                                        <p ng-show="opportunityForm.description.$error.maxlength" class="error-msg">Description is too long.</p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="contactPersonFirstName">Contact Person First Name</label>
+                                        <input type="text" class="form-control" name="contactPersonFirstName" ng-model="oppVm.item.contactPersonFirstName" ng-maxlength="50"
+                                               ng-class="{'form-validate' : oppVm.submitted && opportunityForm.contactPersonFirstName.$invalid}" required>
+                                        <p ng-show="oppVm.submitted && opportunityForm.contactPersonFirstName.$invalid" class="error-msg">First name is required.</p>
+                                        <p ng-show="opportunityForm.contactPersonFirstName.$error.maxlength" class="error-msg">First name is too long.</p> <!-- not needed.  input has native limit?-->
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="contactPersonLastName">Contact Person Last Name</label>
+                                        <input type="text" class="form-control" name="contactPersonLastName" ng-model="oppVm.item.contactPersonLastName" ng-maxlength="50"
+                                               ng-class="{'form-validate' : oppVm.submitted && opportunityForm.contactPersonLastName.$invalid}" required>
+                                        <p ng-show="oppVm.submitted && opportunityForm.contactPersonLastName.$invalid" class="error-msg">Last name is required.</p>
+                                        <p ng-show="opportunityForm.contactPersonLastName.$error.maxlength" class="error-msg">Last name is too long.</p> <!-- not needed.  input has native limit?-->
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" name="email" ng-model="oppVm.item.email" ng-maxlength="50"
+                                               ng-class="{'form-validate' : oppVm.submitted && opportunityForm.email.$invalid}" required>
+                                        <p ng-show="oppVm.submitted && opportunityForm.email.$invalid" class="error-msg">Email is required.</p>
+                                        <p ng-show="opportunityForm.email.$error.maxlength" class="error-msg">Email is too long.</p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="phone">Phone</label>
+                                        <input type="text" class="form-control" name="phone" ng-model="oppVm.item.phone">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="address1">Address 1</label>
+                                        <input type="text" class="form-control" name="address1" ng-model="oppVm.item.address1">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="address2">Address 2</label>
+                                        <input type="text" class="form-control" name="address2" ng-model="oppVm.item.address2">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <input type="text" class="form-control" name="city" ng-model="oppVm.item.city">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="stateProvinceId">State / Province</label>
+                                        <select class="form-control" name="stateProvinceId" ng-model="oppVm.item.stateProvinceId"
+                                                ng-options="stateProvince.id as stateProvince.name for stateProvince in oppVm.stateprovinceitems">
+                                            <option>{{oppVm.item.stateProvince}}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="postalCode">Zip Code</label>
+                                        <input type="text" class="form-control" name="postalCode" ng-model="oppVm.item.postalCode">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="countryId">Country</label>                                                          <!-- first position = value of select box; 2nd position is name of value, oppend up by "as"; 3rd line level variable; 4th pulls in data.items. -->
+                                        <select class="form-control" name="countryId" ng-model="oppVm.item.countryId"
+                                                ng-options="country.id as country.name for country in oppVm.countryitems"
+                                                g-click="oppVm.GetTargetStateProv()">
+                                            <option>{{oppVm.item.country}}</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="button" class="btn btn-primary save" ng-click="oppVm.submitted=true; oppVm.submitForm(opportunityForm.$valid)">Save</button>
+
+                                    <a class="btn btn-default" ng-click="oppVm.cancel()">Cancel</a>
+                                    @*<button type="button" class="btn btn-danger delete" ng-click="oppVm.delete()">Delete</button>*@
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section pageInitScripts{
+    <script src="~/Assets/Admin/plugins/moment/moment.min.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-eonasdan-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/Scripts/angular-eonasdan-datetimepicker.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push('ae-datetimepicker');
+    </script>
+}
+
+@section scripts{
+    <script src="~/Scripts/sabio.services.opportunity.js"></script>
+    <script src="~/Scripts/sabio.services.geography.js"></script>
+
+    <script type="text/javascript">
+
+        // OPPORTUNITY SERVICE
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('opportunityService', OpportunityService);
+
+            OpportunityService.$inject = ['$baseService', '$sabio'];
+
+            function OpportunityService($baseService, $sabio) {
+                var opportunitySvcObj = sabio.services.opportunity;
+                var newOpportunitySvc = $baseService.merge(true, {}, opportunitySvcObj, $baseService);
+                return newOpportunitySvc;
+            }
+        })();
+        // GEOGRAPHY SERVICE
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('geographyService', GeographyService);
+
+            GeographyService.$inject = ['$baseService', '$sabio'];
+
+            function GeographyService($baseService, $sabio) {
+                var SvcObj = sabio.services.geography;
+                var newSvcObj = $baseService.merge(true, {}, SvcObj, $baseService);
+                return newSvcObj;
+            }
+        })();
+        // OPPORTUNITY CONTROLLER
+        (function () {
+            angular.module(APPNAME)
+                .controller('opportunityController', OpportunityController);
+
+            OpportunityController.$inject = ['$scope', '$window', '$baseController', 'opportunityService', 'geographyService'];
+
+            function OpportunityController($scope, $window, $baseController, opportunityService, geographyService) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.opportunityService = opportunityService;
+                vm.geographyService = geographyService;
+                vm.$window = $window;
+
+                // view model
+                vm.items = [];
+                vm.item = null;
+                vm.itemIndex = -1;
+                vm.submitted = false;
+                vm.submitForm = _submitForm;
+                vm.save = _save;
+                vm.cancel = _cancel;
+                vm.delete = _delete;
+                //vm.edit = _edit;      // NOT NEEDED FOR PUBLIC
+                vm.goToDetails = _goToDetails;
+                vm.goToIndex = _goToIndex;
+                vm.create = _create;
+
+                // pagination
+                vm.totalItems = null;
+                vm.currentPage = 1;
+                vm.itemsPerPage = 5;
+
+                // search
+                vm.search = _search;
+                vm.isBusy = false;
+                vm.emptyString = "";
+                vm.futureOpportunities = [];                //  for upcoming events
+                vm.futureResources = [];
+                vm.beginDate = moment(new Date()).add(-1, 'year');
+                vm.endDate = moment(new Date()).add(1, 'year');
+                //vm.beginDate = '1991-01-02 12:01:59'
+                //vm.endDate = '2018-01-02 12:01:59'
+                vm.sortByColumn = 'Name';                   // 'Name'  or 'dateTimeStart'
+                vm.descending = 0;
+                vm.searchBtn = _searchBtn;
+                // google maps
+                vm.map = null;
+                vm.mapMarker = null;
+                vm.userLat = null;
+                vm.userLng = null;
+                vm.mapMarkers = [];
+                vm.GetTargetStateProv = _GetTargetStateProv;
+
+                // date formatting1
+                vm.optionsFrom = { format: 'LLL', showClear: true };
+                vm.optionsTo = { format: 'LLL', showClear: true };
+                vm.update = function (dateTimeStart, dateTimeEnd) {
+                    vm.optionsFrom.maxDate = dateTimeEnd;
+                    vm.optionsTo.minDate = dateTimeStart;
+                };
+                vm.optionsFrom2 = { format: 'LLL', showClear: true };
+                vm.optionsTo2 = { format: 'LLL', showClear: true };
+                vm.dateRange = function (beginDate, endDate) {
+                    vm.optionsFrom.maxDate = endDate;
+                    vm.optionsTo.minDate = beginDate;
+                };
+
+                _render();
+
+                function _render() {
+                    vm.geographyService.getAllCountries(_getAllCountrySuccess, _getAllCountryError);
+                    vm.geographyService.getAllStateProvinces(_getAllStateProvincesSuccess, _getAllStateProvincesError);
+                    //vm.opportunityService.search(vm.emptyString, vm.itemsPerPage, vm.currentPage, vm.beginDate, vm.endDate, vm.sortByColumn, vm.descending, _onSearchSuccess, _onSearchError);
+
+                }
+
+                function _timeConvert() {
+                    console.log("this is my Time Convert function.")
+                    vm.item.dateTimeStart = vm.item.dateTimeStart.toISOString();
+                    vm.item.dateTimeEnd = vm.item.dateTimeEnd.toISOString();
+                }
+
+                function _timeConvert2() {
+                    console.log("this is my Time Convert function 2.")
+                    vm.beginDate = vm.beginDate.toISOString();
+                    vm.endDate = vm.endDate.toISOString();
+                }
+
+                function _getByIdSuccess(data) {
+                    console.log("GetById success");
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                            vm.item.stateProvinceId = vm.item.stateProvince.id;
+                            vm.item.countryId = vm.item.country.id;
+                            vm.item.dateTimeStart = moment(vm.item.dateTimeStart).toDate();
+                            vm.item.dateTimeEnd = moment(vm.item.dateTimeEnd).toDate();
+                        });
+                    }
+                    vm.$alertService.success("GetById success");
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responsiveText, "GetById failed");
+                }
+
+                function _getAllCountrySuccess(data) {
+                    console.log("Get all COUNTRY success.");
+                    console.log(data);
+                    if (data.items) {
+                        vm.countryitems = data.items;
+                    }
+                }
+
+                function _getAllCountryError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responsiveText, "GetAll countries failed");
+                }
+
+                function _getAllStateProvincesSuccess(data) {
+                    console.log("Get all STATE success.");
+                    console.log(data);
+                    if (data.items) {
+                        vm.stateprovinceitems = data.items;
+                    }
+                }
+
+                function _getAllStateProvincesError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responsiveText, "GetAll state / provinces failed");
+                }
+
+                function _GetTargetStateProv() {
+                    console.log("This is my Get Target StateProv Function.");
+                    vm.geographyService.getStateProvincesByCountryId(
+                        vm.item.countryId,
+                        _getAllStateProvincesSuccess,
+                        _getAllStateProvincesError);
+                }
+
+                function _submitForm(isValid) {
+                    if (isValid) {
+                        console.log("data is valid.");
+                        _save();
+                    }
+                    else {
+                        console.log("form data is invalid.");
+                    }
+                }
+
+                /*  // NOT NEEDED FOR PUBLIC
+                function _edit(data) {
+                    vm.itemIndex = vm.items.indexOf(data);
+                    console.log(data);
+                    vm.opportunityService.getById(data.id, _getByIdSuccess, _getByIdError);
+                    vm.houdini = true;
+                }
+                */
+
+                // DEAD CODE
+                //function _endEdit() {
+                //    vm.item = null;
+                //    vm.itemIndex = -1;
+                //    vm.submitted = false;
+
+                //}
+
+                function _goToDetails(data) {
+                    console.log("go to details.");
+                    vm.indexView = true;
+                    vm.details = true;
+                    vm.itemIndex = vm.items.indexOf(data);
+                    console.log(data);
+
+                    vm.opportunityService.getById(data.id, _getByIdSuccess, _getByIdError);
+                    _initMap(data);
+
+                }
+
+                function _goToIndex(data) {
+                    console.log("go to index.");
+                    vm.indexView = false;
+                    vm.details = false;
+                }
+
+                function _save() {
+                    if (vm.item.id) {
+                        _timeConvert();
+                        console.log("This is my SAVE function.")
+
+                        vm.opportunityService.putJson(vm.item.id, vm.item, _putSuccess, _putError);
+                    }
+                    else {
+                        _timeConvert();
+                        vm.opportunityService.postJson(vm.item, _postSuccess, _postError);
+                    }
+                }
+
+                function _postSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item.id = data.item;
+                            vm.items.push(vm.item);
+                            vm.$alertService.success("POST successful.");
+                            console.log("This is my POST Success function.");
+                            console.log(data);
+                            vm.houdini = false;
+                            vm.showSearchElements = true;
+                            vm.item = null;
+                            vm.itemIndex = -1;
+                        })
+                    }
+                }
+
+                function _postError(jqXHR) {
+                    console.log(jqXHR);
+                    vm.$alertService.error(jqXHR.responseText, "POST failed.");
+                }
+
+                function _putSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items[vm.itemIndex] = data.item;
+                        vm.$alertService.success("PUT successful.");
+                        console.log("this is my PUT SUCCESS function.");
+                        console.log(data);
+                        vm.houdini = false;
+                        vm.showSearchElements = true;
+                        $window.location.reload();
+                    })
+                }
+
+                function _putError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responsiveText, "PUT failed");
+                    console.log("PUT failed.");
+                }
+
+                function _delete() {
+                    console.log("this is my delete function.");
+                    vm.opportunityService.deleteJson(vm.item.id, _deleteSuccess, _deleteError);
+                }
+
+                function _deleteSuccess(data) {
+                    vm.$scope.$apply(function (data) {
+                        vm.items.splice(vm.itemIndex, 1);
+                        vm.houdini = false;
+                        vm.showSearchElements = true;
+                        vm.$alertService.success("Delete successful.");
+                        console.log("this is my delete success function.");
+                    });
+                }
+
+                function _deleteError() {
+                    vm.$alertService.error(jqXHR.responseText, "Delete failed");
+                    console.log("delete failed");
+                }
+
+                function _cancel() {
+                    console.log("This is my cancel function");
+                    vm.houdini = false;
+                    vm.showSearchElements = true;
+                    vm.item = null;
+                    vm.itemIndex = -1;
+
+                }
+
+                function _searchBtn(searchText) {
+                    console.log("this is my search button test.");
+                    _search(searchText);
+                }
+
+                function _search() {
+                    vm.searchText = vm.searchText || '';
+                    vm.lastSearchText = vm.searchText;
+                    if (!vm.isBusy) {
+                        vm.isBusy = true;
+                        _timeConvert2();
+                        vm.opportunityService.search(vm.searchText
+                            , vm.itemsPerPage
+                            , vm.currentPage
+                            , vm.beginDate
+                            , vm.endDate
+                            , vm.sortByColumn
+                            , vm.descending
+                            , _onSearchSuccess
+                            , _onSearchError);
+                    }
+                }
+
+                function _onSearchSuccess(data) {
+                    vm.items = [];
+                    vm.$scope.$apply(function () {
+                        vm.isBusy = false;
+                        if (data.items) {
+                            if (!vm.futureOpportunities[0]) {
+                                vm.futureOpportunities = data.items;
+                            }
+                            vm.items = data.items;
+                            vm.totalItems = data.resultCount;
+                            vm.showSearchElements = true;                       // adding "ng-show" to the panel div hides it (kind counter intuitive).  declaring it "true" here exposes it.
+                        }
+                        if (vm.lastSearchText != vm.searchText) {
+                            _search();
+                        }
+                    });
+                }
+
+
+
+
+
+                function _onSearchError(data) {
+                    vm.isBusy = false;
+                    //vm.$alertService.error(jqXHR.responseText);
+                    console.log("SEARCH failed");
+                    console.log(data);
+                }
+
+
+
+                function _create() {
+                    console.log("This is my Create Form function.")
+                    vm.houdini = true;
+                    vm.itemIndex = -1;
+
+                }
+
+                function _initMap(data) {
+                    var sabio = { lat: 33.9885, lng: -118.3869007 };
+
+                    vm.map = new google.maps.Map($("#map")[0], {
+                        zoom: 10,
+                        center: sabio
+                    });
+                    _captureAddress(data);
+                }
+
+                function _captureAddress(data) {
+                    console.log(data);
+
+                    address1 = data.address1;
+                    state = data.stateProvince.name;
+                    country = data.country.name;
+                    zip = data.postalCode;
+
+                    var googleAddress = address1 + " " + state + " " + country + " " + zip;
+
+                    _addMapMarker(googleAddress);
+
+                }
+
+                function _addMapMarker(googleAddress) {
+                    vm.opportunityService.getLatLng(
+                        googleAddress
+                        , _addMapMarkerSuccess
+                        , _addMapMarkerError)
+                }
+
+                function _addMapMarkerSuccess(data) {
+                    console.log(data);
+                    if (data.status !== "ZERO RESULTS") {
+                        var lat = data.results[0].geometry.location.lat;
+                        var lng = data.results[0].geometry.location.lng;
+                        var latLng = new google.maps.LatLng(lat, lng);
+
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            map: vm.map,
+                            animation: google.maps.Animation.DROP
+                        });
+
+                        vm.map.setCenter(latLng);
+
+                    }
+                    else {
+                        console.log("failed");
+                    }
+                }
+
+                function _addMapMarkerError() {
+                    console.log("add map marker error.");
+                }
+
+            }
+
+
+        })();
+
+    </script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI">
+    </script>
+
+}
+
+

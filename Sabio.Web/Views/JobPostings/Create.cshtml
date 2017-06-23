@@ -1,0 +1,878 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    ViewBag.Title = "JobPostings";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+@section styles {
+
+    <link href="~/Content/select2.css" rel="stylesheet" />
+    <link href="~/Content/select.css" rel="stylesheet" />
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+
+    <style>
+        #viewAll {
+            margin-bottom: 5px;
+        }
+
+        #compensationRate {
+            margin-top: 1%;
+        }
+
+        .fullPartContainer {
+            padding-left: 10px;
+        }
+
+        .product {
+            background: #fff;
+            border: 1px solid #c5ced4;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            padding: 30px 30px 30px 30px;
+            margin-bottom: 15px;
+        }
+
+        #applications {
+            border-style: none;
+            text-align: center;
+        }
+
+        .product .application {
+            width: 100%;
+            display: inline-block;
+            border-style: solid;
+            border-color: rgb(197, 206, 212);
+            border-width: 1px;
+            border-radius: 3px;
+            padding: 10px 0 0 0;
+            margin: 0 0 5px 0;
+        }
+
+        .product .application:hover {
+            cursor: pointer;
+        }
+
+        .product .application:focus {
+            background-color: rgb(230, 230, 230);
+        }
+
+        .ui-select-match-item {
+            padding: 2px 2px 2px 2px;
+        }
+
+        .ui-select-container {
+            background-color: rgb(240, 243, 244);
+        }
+
+        #notes {
+            width: 100%;
+        }
+
+        .applications {
+            text-align: center;
+        }
+
+        .applicationFilter {
+            margin-bottom: 10px;
+        }
+
+        .application2ndColumn {
+            margin-top: 37px;
+        }
+
+        p .addressRead {
+            display: block;
+        }
+
+        .checkout-header {
+            padding: 20px 20px 5px 20px;
+            background: #586269;
+            -webkit-border-radius: 6px 6px 0 0;
+            -moz-border-radius: 6px 6px 0 0;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .checkout-header .row > div + div {
+            border-left: 1px solid #3E4A52;
+        }
+
+        .checkout {
+            background: #fff;
+            border-radius: 6px;
+            margin: 20px 5px 0 5px;
+            display: inline-block;
+            padding: 0 0 0 0;
+        }
+
+        .checkout-body {
+            padding: 25px 30px 15px 30px;
+            border-style: solid;
+            border-color: rgb(197, 206, 212);
+            border-width: 1px;
+        }
+
+        .checkout-footer {
+            padding: 25px 30px;
+            text-align: right;
+            background: #85878A;
+            -webkit-border-radius: 0 0 6px 6px;
+            -moz-border-radius: 0 0 6px 6px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .checkout-footer .btn.btn-white {
+            border-color: #fff;
+        }
+
+        .headerText {
+            color: white;
+        }
+
+        .displayInlineBlock {
+            display: inline-block;
+        }
+
+        .statusContainer {
+            float: right;
+        }
+
+        .btn.btn-default.resumeBtn {
+            float: left;
+            color: rgb(88, 98, 105);
+        }
+
+        .errorMessage {
+            color: red;
+        }
+    </style>
+}
+<!-- BEGIN #product -->
+<div id="product" class="section-container p-t-20">
+    <!-- BEGIN container -->
+    <div class="container">
+        <div ng-controller="jobPostingController as jpVm">
+            <!-- BEGIN breadcrumb -->
+            <ul class="breadcrumb m-b-10 f-s-12">
+                <li><a href="/home/index">Home</a></li>
+                <li><a href="/jobpostings/index">Job Search</a></li>
+                <li class="active">{{jpVm.breadcrumbText}}</li>
+            </ul>
+            <!-- END breadcrumb -->
+            <!-- BEGIN product -->
+            <!-- BEGIN Application Sidebar -->
+            <div ng-controller="jobApplicationController as appVm">
+                <div class="product col-md-2" id="applications" ng-show="jpVm.id">
+                    <h3>Applications</h3>
+                    <select class="applicationFilter" ng-model="appVm.selectedApplicationFilter" ng-options="filter.name for filter in appVm.applicationFilters track by filter.id" ng-change="appVm.changeApplicationFilter()"></select>
+                    <h5 ng-hide="jpVm.posting.applications.length">No applications yet</h5>
+                    <p ng-show="jpVm.posting.applications.length">{{jpVm.posting.applications.length}} total</p>
+                    <div class="application" tabindex="0" ng-repeat="application in appVm.filteredApplications" ng-click="appVm.viewApplication(application)" ng-style="{'background-color' : application.color}">
+                        <h5>{{application.firstName}} {{application.lastName}}</h5>
+                        <p>{{application.applicationStatus}}</p>
+                    </div>
+                    <uib-pagination ng-model="appVm.currentPage" total-items="jpVm.posting.applications.length" max-size="1" items-per-page="5" boundary-link="true" ng-change="appVm.changePage()" ng-if="jpVm.posting.applications.length > 5"></uib-pagination>
+                </div>
+                <!-- END Application Sidebar -->
+                <!-- BEGIN Application Viewer -->
+                <div class="col-md-10">
+                    <div class="col-md-1"></div>
+                    <div class="checkout col-md-10" ng-show="appVm.selectedApplication">
+                        <div class="checkout-header">
+                            <div class="displayInlineBlock">
+                                <h4 class="headerText">{{appVm.selectedApplication.firstName}} {{appVm.selectedApplication.lastName}}  <small class="headerText">{{appVm.selectedApplication.jobTitle}}</small></h4>
+                            </div>
+                            <div class="statusContainer">
+                                <h5 class="headerText" ng-hide="appVm.statusEdit">
+                                    {{appVm.selectedApplication.selectedStatus.name}}
+                                    <a href="" ng-click="appVm.changeStatus()"><i class="fa fa-pencil" ng-hide="appVm.statusEdit"></i></a>
+                                </h5>
+                                <h5>
+                                    <select class="applicationFilter" ng-model="appVm.selectedApplication.selectedStatus" ng-options="status.name for status in appVm.applicationStatuses track by status.name" ng-change="appVm.changeStatus()" ng-show="appVm.statusEdit"></select>
+                                    <a href="" ng-click="appVm.saveApplication()"><i class="fa fa-floppy-o" ng-show="appVm.statusEdit"></i></a>
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="checkout-body">
+                            <h5>Cover Letter:</h5>
+                            <div ng-bind-html="appVm.sanitize(appVm.selectedApplication.coverLetter)"></div>
+                            <h5>Notes (private): <a href="" ng-click="appVm.editNotes()"><i class="fa fa-pencil" ng-hide="appVm.notesEdit"></i></a><a href="" ng-click="appVm.saveApplication()"><i class="fa fa-floppy-o" ng-show="appVm.notesEdit"></i></a></h5>
+                            <p ng-bind="appVm.selectedApplication.notes" ng-model="appVm.selectedApplication.notes" ng-hide="appVm.notesEdit"></p>
+                            <textarea type="text" rows="5" id="notes" ng-model="appVm.selectedApplication.notes" ng-show="appVm.notesEdit"></textarea>
+                        </div>
+                        <div class="checkout-footer">
+                            <button type="button" class="btn btn-default resumeBtn" ng-click="appVm.viewResume(appVm.selectedApplication.resume)">View Resume</button>
+                            <button type="button" class="btn btn-inverse" ng-click="appVm.closeApplication()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END Application Viewer -->
+            <div class="col-md-12">
+                <h3 ng-show="jpVm.id">Edit Posting</h3>
+                <div class="product">
+                    <!-- begin form -->
+                    <form id="jobPosting" novalidate name="jobPosting">
+                        <div class="form-group">
+                            <label for="companyId">Company Name</label>
+                            <select name="companyId" class="form-control" id="companyName" ng-model="jpVm.selectedCompany" ng-options="company.name for company in jpVm.companies track by company.id" ng-hide="jpVm.id"></select>
+                            <p ng-show="jpVm.id">{{jpVm.posting.companyName}}</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="positionName">Position Name</label>
+                            <a href="" ng-click="jpVm.fieldEdit('positionName')"><i class="fa fa-pencil" ng-hide="jpVm.edit.positionName"></i></a>
+                            <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.positionName && jpVm.id"></i></a>
+                            <p ng-hide="jpVm.edit.positionName">{{jpVm.posting.positionName}}</p>
+                            <span ng-hide="jobPosting.positionName.$valid" class="errorMessage"> (Required)</span>
+                            <input type="text" name="positionName" class="form-control" id="positionName" ng-model="jpVm.posting.positionName" ng-show="jpVm.edit.positionName" required />
+                        </div>
+                        <label ng-show="jpVm.id">Address</label>
+                        <a href="" ng-click="jpVm.fieldEdit('address')"><i class="fa fa-pencil" ng-hide="jpVm.edit.address"></i></a>
+                        <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.address && jpVm.id"></i></a>
+                        <div class="addressRead" ng-hide="jpVm.edit.address">
+                            <p>{{jpVm.posting.streetAddress}}</p>
+                            <p>{{jpVm.posting.city}}<span ng-show="jpVm.selectedStateProvince && jpVm.posting.city">, </span>{{jpVm.selectedStateProvince.name}}</p>
+                            <p>{{jpVm.selectedCountry.name}}</p>
+                        </div>
+                        <div ng-show="jpVm.edit.address">
+                            <div class="form-group">
+                                <label for="countryId">Country</label>
+                                <div>
+                                    <select name="countryId" id="country" ng-model="jpVm.selectedCountry" ng-options="country.name for country in jpVm.countries track by country.id" ng-change="jpVm.countryChange()"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="stateProvinceId">State/Province</label>
+                                <div>
+                                    <select name="stateProvinceId" id="stateProvince" ng-model="jpVm.selectedStateProvince" ng-options="stateProvince.name for stateProvince in jpVm.stateProvinces track by stateProvince.id"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" name="city" class="form-control" id="city" ng-model="jpVm.posting.city" />
+                            </div>
+                            <div class="form-group">
+                                <label for="streetAddress">Street Address</label>
+                                <input type="text" name="streetAddress" class="form-control" id="streetAddress" ng-model="jpVm.posting.streetAddress" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="compensation">Compensation ($)</label>
+                                    <a href="" ng-click="jpVm.fieldEdit('compensation')"><i class="fa fa-pencil" ng-hide="jpVm.edit.compensation"></i></a>
+                                    <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.compensation && jpVm.id"></i></a>
+                                    <p ng-hide="jpVm.edit.compensation">{{jpVm.posting.compensation | currency}}</p>
+                                    <input type="number" name="compensation" class="form-control" id="compensation" ng-model="jpVm.posting.compensation" ng-show="jpVm.edit.compensation" />
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <label for="compensation">Compensation Rate</label>
+                                        <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.compensationRate && jpVm.id"></i></a>
+                                    </div>
+                                    <div class="row">
+                                        <select name="compensationRateId" id="compensationRate" ng-model="jpVm.posting.compensationRateId" ng-change="jpVm.fieldEdit('compensationRate')">
+                                            <option value="0" selected>Select rate</option>
+                                            <option value="1">per hour</option>
+                                            <option value="2">per day</option>
+                                            <option value="3">per year</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="row fullPartContainer">
+                                        <label for="fullPart">Full- or part-time?</label>
+                                        <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.fullPart && jpVm.id"></i></a>
+                                    </div>
+                                    <div class="row fullPartContainer">
+                                        <select name="fullPartId" id="fullPart" ng-model="jpVm.posting.fullPartId" ng-change="jpVm.fieldEdit('fullPart')">
+                                            <option value="0" selected>Select status</option>
+                                            <option value="1">Part-time</option>
+                                            <option value="2">Full-time</option>
+                                            <option value="3">Part-time to full-time</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <label for="contractPermanent">Employment Duration</label>
+                                        <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.contractPermanent && jpVm.id"></i></a>
+                                    </div>
+                                    <div class="row">
+                                        <select name="contractPermanentId" id="contractPermanent" ng-model="jpVm.posting.contractPermanentId" ng-change="jpVm.fieldEdit('contractPermanent')">
+                                            <option value="0" selected>Select duration</option>
+                                            <option value="1">Contract</option>
+                                            <option value="2">Permanent</option>
+                                            <option value="3">Contract-to-hire</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <label for="experienceLevel">Experience Level</label>
+                                        <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.experienceLevel && jpVm.id"></i></a>
+                                    </div>
+                                    <div class="row">
+                                        <select name="experienceLevelId" id="experienceLevel" ng-model="jpVm.posting.experienceLevelId" ng-change="jpVm.fieldEdit('experienceLevel')">
+                                            <option value="0" selected>Select level</option>
+                                            <option value="1">Entry level</option>
+                                            <option value="2">Mid-level</option>
+                                            <option value="3">Senior level</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description of Company</label>
+                            <a href="" ng-click="jpVm.fieldEdit('description')"><i class="fa fa-pencil" ng-hide="jpVm.edit.description"></i></a>
+                            <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.description && jpVm.id"></i></a>
+                            <span ng-bind-html="jpVm.sanitize(jpVm.posting.description)" ng-hide="jpVm.edit.description"></span>
+                            <div ng-show="jpVm.edit.description">
+                                <textarea type="text" name="description" class="form-control ckeditor" id="description" ng-bind-html="jpVm.sanitize(jpVm.posting.description)" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="responsibilities">Position Responsibilities</label>
+                            <a href="" ng-click="jpVm.fieldEdit('responsibilities')"><i class="fa fa-pencil" ng-hide="jpVm.edit.responsibilities"></i></a>
+                            <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.responsibilities && jpVm.id"></i></a>
+                            <span ng-bind-html="jpVm.sanitize(jpVm.posting.responsibilities)" ng-hide="jpVm.edit.responsibilities"></span>
+                            <div ng-show="jpVm.edit.responsibilities">
+                                <textarea type="text" name="responsibilities" class="form-control ckeditor" id="responsibilities" ng-bind-html="jpVm.sanitize(jpVm.posting.responsibilities)" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="requirements">Required Skills and Experience</label>
+                            <a href="" ng-click="jpVm.fieldEdit('requirements')"><i class="fa fa-pencil" ng-hide="jpVm.edit.requirements"></i></a>
+                            <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.requirements && jpVm.id"></i></a>
+                            <span ng-bind-html="jpVm.sanitize(jpVm.posting.requirements)" ng-hide="jpVm.edit.requirements"></span>
+                            <div ng-show="jpVm.edit.requirements">
+                                <textarea type="text" name="requirements" class="form-control ckeditor" id="requirements" ng-bind-html="jpVm.sanitize(jpVm.posting.requirements)" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactInformation">Contact Information</label>
+                            <a href="" ng-click="jpVm.fieldEdit('contactInformation')"><i class="fa fa-pencil" ng-hide="jpVm.edit.contactInformation"></i></a>
+                            <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.contactInformation && jpVm.id"></i></a>
+                            <span ng-bind-html="jpVm.sanitize(jpVm.posting.contactInformation)" ng-hide="jpVm.edit.contactInformation"></span>
+                            <div ng-show="jpVm.edit.contactInformation">
+                                <textarea type="text" name="contactInformation" class="form-control ckeditor" id="contactInformation" ng-bind-html="jpVm.sanitize(jpVm.posting.contactInformation)" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="jobPostingStatusId">Job Posting Status</label>
+                            <select name="jobPostingStatusId" id="jobPostingStatusId" ng-model="jpVm.posting.jobPostingStatusId" ng-change="jpVm.fieldEdit('postingStatus')">
+                                <option value="1">Open</option>
+                                <option value="2">Pending</option>
+                                <option value="3">Closed</option>
+                            </select>
+                            <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.postingStatus && jpVm.id"></i></a>
+                        </div>
+                        <div class="form-group">
+                            <label>Job Tags</label>
+                            <a href="" ng-click="jpVm.save()"><i class="fa fa-floppy-o" ng-show="jpVm.edit.jobTags && jpVm.id"></i></a>
+                            <ui-select multiple="multiple" id="jobTags" theme="bootstrap" ng-model="jpVm.selectedJobTags" ng-change="jpVm.fieldEdit('jobTags')">
+                                <ui-select-match placeholder="Job Tags">{{$item.keyword}}</ui-select-match>
+                                <ui-select-choices repeat="jobTag in jpVm.jobTags">{{jobTag.keyword}}</ui-select-choices>
+                            </ui-select>
+                        </div>
+                        <p class="hidden datePosted">Date Posted: <span id="date"></span></p>
+                        <input name="id" class="hidden" id="id" />
+                        <button type="button" class="btn btn-primary submit" ng-click="jpVm.save()" ng-hide="jpVm.id">Save</button>
+                        <button type="button" class="btn btn-default cancel" ng-click="jpVm.cancel()">Back to Company</button>
+                        <button type="button" class="btn btn-danger delete" ng-click="jpVm.delete()" ng-show="jpVm.id">Delete</button>
+                    </form>
+                    <!-- end form -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end form content -->
+@section pageInitScripts{
+    <script src="~/Scripts/ng/angular-sanitize.js"></script>
+    <script src="~/Assets/Admin/plugins/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ng/angular-ckeditor.min.js"></script>
+    <script src="~/Scripts/select.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("ui.select");
+        sabio.moduleOptions.extraModuleDependencies.push("ngSanitize");
+    </script>
+}
+
+@section scripts {
+    <script src="~/Scripts/sabio.services.geography.js"></script>
+    <script src="~/Scripts/app/services/geography.js"></script>
+    <script src="~/Scripts/sabio.services.jobPosting.js"></script>
+    <script src="~/Scripts/app/services/jobPosting.js"></script>
+    <script src="~/Scripts/sabio.service.jobTag.js"></script>
+    <script src="~/Scripts/app/services/jobTag.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/app/services/sweetAlert.js"></script>
+    <script src="~/Scripts/sabio.services.company.js"></script>
+    <script src="~/Scripts/sabio.services.companyperson.js"></script>
+    <script src="~/Scripts/app/services/companyPerson.js"></script>
+    <script src="~/Scripts/sabio.services.globalevent.js"></script>
+    <script src="~/Scripts/app/services/globalEvent.js"></script>
+    <script src="~/Scripts/sabio.services.jobapplication.js"></script>
+    <script src="~/Scripts/app/services/jobApplication.js"></script>
+
+    <script id="template/pagination/pagination.html" type="text/ng-template">
+        <ul class="pagination">
+            <li ng-if="boundaryLinks" ng-class="{disabled: noPrevious()}"><a href ng-click="selectPage(1)" title="First Page"> <span class="glyphicon glyphicon-fast-backward"></span></a></li>
+            <li ng-if="directionLinks" ng-class="{disabled: noPrevious()}"><a href ng-click="selectPage(page - 1)" title="Previous Page"><span class="glyphicon glyphicon-step-backward"></span></a></li>
+            <li ng-repeat="page in pages track by $index" ng-class="{active: page.active}"><a href ng-click="selectPage(page.number)">{{page.text}}</a></li>
+            <li ng-if="directionLinks" ng-class="{disabled: noNext()}"><a href ng-click="selectPage(page + 1)" title="Next Page"><span class="glyphicon glyphicon-step-forward"></span></a></li>
+            <li ng-if="boundaryLinks" ng-class="{disabled: noNext()}"><a href ng-click="selectPage(totalPages)" title="Last Page"><span class="glyphicon glyphicon-fast-forward"></span> </a></li>
+        </ul>
+    </script>
+
+    <script type="text/javascript">
+
+        sabio.page.personId = @Model.Id;
+        if (@Model.Item) {
+            sabio.page.id = @Model.Item;
+        }
+        sabio.page.awsAddress = {
+            bucket: "@Model.AWSBucket",
+            baseUrl: "@Model.AWSBaseUrl",
+            folder: "@Model.AWSFolder"
+        };
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('jobApplicationController', JobApplicationController);
+
+            JobApplicationController.$inject = ['$baseController', '$scope', '$window', '$sabio', 'jobApplicationService', '$sce'];
+
+            function JobApplicationController($baseController, $scope, $window, $sabio, jobApplicationService, $sce) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$window = $window;
+                $baseController.merge(vm, $baseController);
+                vm.jobApplicationService = jobApplicationService;
+
+                vm.awsAddress = $sabio.awsAddress;
+                vm.indexOfSelectedApplication = -1;
+                vm.selectedApplication = null;
+                vm.applicationFilters = [];
+                vm.selectedApplicationFilter = null;
+                vm.notesEdit = false;
+                vm.statusEdit = false;
+                vm.applicationStatuses = [];
+                vm.currentPage = 1;
+
+                vm.viewApplication = _viewApplication;
+                vm.viewResume = _viewResume;
+                vm.saveApplication = _saveApplication;
+                vm.closeApplication = _closeApplication;
+                vm.changeApplicationFilter = _changeApplicationFilter;
+                vm.editNotes = _editNotes;
+                vm.changeStatus = _changeStatus;
+                vm.sanitize = _sanitize;
+                vm.changePage = _changePage;
+
+                // Start up
+                if (vm.$scope.$parent.jpVm.id) {
+                    vm.jobApplicationService.getAllStatuses(_getStatusesSuccess, _getStatusesError);
+                    _changePage();
+                }
+
+                // Button functions
+                function _saveApplication() {
+                    vm.selectedApplication.statusId = vm.selectedApplication.selectedStatus.id;
+                    vm.jobApplicationService.put(vm.selectedApplication.id, vm.selectedApplication, _saveApplicationSuccess, _saveApplicationError)
+                }
+
+                function _closeApplication() {
+                    _clearApplication();
+                }
+
+                function _changePage() {
+                    var begin = ((vm.currentPage - 1) * 5);
+                    var end = begin + 5;
+                    if (vm.$scope.$parent.jpVm.posting.applications) {
+                        vm.filteredApplications = vm.$scope.$parent.jpVm.posting.applications.slice(begin, end);
+                        for (var i = 0; i < vm.filteredApplications.length; i++) {
+                            vm.filteredApplications[i].color = "white";
+                        }
+                    }
+                }
+
+                // View application functions
+                function _viewApplication(app) {
+                    for (var i = 0; i < vm.filteredApplications.length; i++) {
+                        vm.filteredApplications[i].color = "white";
+                    }
+                    vm.indexOfSelectedApplication = vm.$scope.$parent.jpVm.posting.applications.indexOf(app);
+                    vm.selectedApplication = app;
+                    vm.selectedApplication.color = "rgb(230, 230, 230)";
+                    vm.selectedApplication.selectedStatus = vm.applicationStatuses.find(status => status.name == vm.selectedApplication.applicationStatus);
+                }
+
+                function _clearApplication() {
+                    vm.selectedApplication = null;
+                    for (var i = 0; i < vm.filteredApplications.length; i++) {
+                        vm.filteredApplications[i].color = "white";
+                    }
+                }
+
+                function _viewResume(resumeKey) {
+                    var resumeString = "https://" + vm.awsAddress.bucket + "." + vm.awsAddress.baseUrl + "/" + vm.awsAddress.folder + "/" + resumeKey;
+                    vm.$window.open(resumeString);
+                }
+
+                // Application status functions
+                function _getStatusesSuccess(data) {
+                    for (var i = 0; i < data.items.length; i++) {
+                        vm.applicationStatuses.push(data.items[i]);
+                    }
+                    vm.$scope.$apply(function () {
+                        vm.applicationFilters = data.items;
+                        var getAll = {
+                            id: 0,
+                            name: "View All"
+                        }
+                        vm.applicationFilters.unshift(getAll);
+                        vm.selectedApplicationFilter = vm.applicationFilters[0];
+                    })
+                }
+
+                function _getStatusesError(data) {
+                    toastr.error("Failed to get statuses");
+                }
+
+                function _changeApplicationFilter() {
+                    vm.jobApplicationService.getByStatusId(vm.$scope.$parent.jpVm.posting.id, vm.selectedApplicationFilter.id, _filterApplicationSuccess, _filterApplicationError);
+                }
+
+                function _filterApplicationSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        if (data.items) {
+                            vm.$scope.$parent.jpVm.posting.applications = data.items;
+                        } else {
+                            vm.$scope.$parent.jpVm.posting.applications = [];
+                        }
+                        _changePage();
+                    })
+                }
+
+                function _filterApplicationError(data) {
+                    toastr.error("Failed to get applications");
+                }
+
+                // Application edit functions
+                function _saveApplicationSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        toastr.success("Appplication saved!");
+                        vm.notesEdit = false;
+                        vm.statusEdit = false;
+                        vm.selectedApplication.applicationStatus = vm.selectedApplication.selectedStatus.name;
+                        vm.$scope.$parent.jpVm.posting.applications.splice(vm.indexOfSelectedApplication, 1, vm.selectedApplication);
+                    })
+                }
+
+                function _saveApplicationError(data) {
+                    toastr.error("Failed to save application");
+                }
+
+                function _editNotes() {
+                    vm.notesEdit = true;
+                }
+
+                function _changeStatus() {
+                    vm.statusEdit = true;
+                }
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('jobPostingController', JobPostingController);
+
+            JobPostingController.$inject = ['$baseController', '$scope', '$window', '$sabio', 'jobPostingService', 'jobTagService', 'globalEventService', 'geographyService', 'companyPersonService', 'sweetAlertService', '$sce', '$sanitize'];
+
+            function JobPostingController($baseController, $scope, $window, $sabio, jobPostingService, jobTagService, globalEventService, geographyService, companyPersonService, sweetAlertService, $sce, $sanitize) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$window = $window;
+                $baseController.merge(vm, $baseController);
+                vm.jobPostingService = jobPostingService;
+                vm.jobTagService = jobTagService;
+                vm.globalEventService = globalEventService;
+                vm.geographyService = geographyService;
+                vm.companyPersonService = companyPersonService;
+                vm.sweetAlertService = sweetAlertService;
+
+                vm.breadcrumbText = "Create";
+                vm.posting = {
+                    compensationRateId: "0",
+                    fullPartId: "0",
+                    contractPermanentId: "0",
+                    experienceLevelId: "0"
+                };
+                vm.id = $sabio.id;
+                vm.personId = $sabio.personId;
+                vm.companies = [];
+                vm.jobTags = [];
+                vm.countries = [];
+                vm.stateProvinces = [];
+                vm.selectedCountry = null;
+                vm.selectedStateProvince = null;
+                vm.selectedJobTags = null;
+                vm.selectedCompany = null;
+                if (vm.id) {
+                    vm.edit = {
+                        positionName: false,
+                        address: false,
+                        compensation: false,
+                        compensationRate: false,
+                        fullPart: false,
+                        contractPermanent: false,
+                        experienceLevel: false,
+                        description: false,
+                        responsibilities: false,
+                        requirements: false,
+                        contactInformation: false,
+                        postingStatus: false,
+                        jobTags: false
+                    };
+                } else {
+                    vm.edit = {
+                        positionName: true,
+                        address: true,
+                        compensation: true,
+                        description: true,
+                        responsibilities: true,
+                        requirements: true,
+                        contactInformation: true,
+                    };
+                }
+
+                vm.save = _save;
+                vm.cancel = _cancel;
+                vm.delete = _delete;
+                vm.sanitize = _sanitize;
+                vm.countryChange = _countryChange;
+                vm.fieldEdit = _fieldEdit;
+
+                // Start up functions
+                _getCountries();
+                _getJobTags();
+                if (vm.id) {
+                    vm.breadcrumbText = "Edit";
+                    vm.jobPostingService.getById(vm.id, _getByIdSuccess, _getByIdError);
+                } else {
+                    vm.companyPersonService.getCompanies(vm.personId, _getCompaniesSuccess, _getCompaniesError);
+                }
+
+                function _getCompaniesSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.companies = data.items;
+                        vm.selectedCompany = vm.companies[0];
+                    })
+                }
+
+                function _getCompaniesError(data) {
+                    toastr.error("Failed to get companies");
+                }
+
+                // Button functions
+                function _save() {
+                    if (jobPosting.positionName.validity.valid) {
+                        vm.posting.companyId = vm.selectedCompany.id;
+                        vm.posting.companyName = vm.selectedCompany.name;
+                        if (vm.selectedCountry) {
+                            vm.posting.countryId = vm.selectedCountry.id;
+                        }
+                        if (vm.selectedStateProvince) {
+                            vm.posting.stateProvinceId = vm.selectedStateProvince.id;
+                        }
+                        vm.posting.jobTagIds = [];
+                        if (vm.selectedJobTags) {
+                            for (var i = 0; i < vm.selectedJobTags.length; i++) {
+                                vm.posting.jobTagIds.push(vm.selectedJobTags[i].id);
+                            }
+                        }
+                        vm.posting.description = $sanitize(CKEDITOR.instances.description.getData());
+                        vm.posting.responsibilities = $sanitize(CKEDITOR.instances.responsibilities.getData());
+                        vm.posting.requirements = $sanitize(CKEDITOR.instances.requirements.getData());
+                        vm.posting.contactInformation = $sanitize(CKEDITOR.instances.contactInformation.getData());
+
+                        if (vm.id) {
+                            vm.jobPostingService.put(vm.id, vm.posting, _putSuccess, _putError);
+                        } else {
+                            vm.jobPostingService.post(vm.posting, _postSuccess, _postError);
+                        }
+                    } else {
+                        vm.$window.scrollTo(0, 0);
+                    }
+                }
+
+                function _cancel() {
+                    var returnLocation = "/companies/" + vm.selectedCompany.id + "/edit";
+                    vm.sweetAlertService.cancel(returnLocation);
+                }
+
+                function _delete() {
+                    vm.sweetAlertService.delete(vm.id, vm.jobPostingService.delete, _deleteSuccess, _deleteError);
+                }
+
+                function _fieldEdit(field) {
+                    vm.edit[field] = true;
+                }
+
+                // Post functions
+                function _postSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.id = data.item;
+                        vm.edit = {
+                            positionName: false,
+                            address: false,
+                            compensation: false,
+                            compensationRate: false,
+                            fullPart: false,
+                            contractPermanent: false,
+                            experienceLevel: false,
+                            description: false,
+                            responsibilities: false,
+                            requirements: false,
+                            contactInformation: false,
+                            postingStatus: false,
+                            jobTags: false
+                        };
+                    })
+                    toastr.success("Job posting saved!");
+                }
+
+                function _postError(data) {
+                    toastr.error("Failed to save posting");
+                }
+
+                // Put functions
+                function _putSuccess(data) {
+                    toastr.success("Job posting saved!");
+                    vm.$scope.$apply(function () {
+                        vm.edit = {
+                            positionName: false,
+                            address: false,
+                            compensation: false,
+                            compensationRate: false,
+                            fullPart: false,
+                            contractPermanent: false,
+                            experienceLevel: false,
+                            description: false,
+                            responsibilities: false,
+                            requirements: false,
+                            contactInformation: false,
+                            postingStatus: false,
+                            jobTags: false
+                        };
+                    })
+                }
+
+                function _putError(data) {
+                    toastr.error("Failed to save posting");
+                }
+
+                // Get by Id functions
+                function _getByIdSuccess(data) {
+                    console.log(data);
+                    vm.posting = data.item;
+                    vm.selectedCompany = {
+                        id: data.item.companyId,
+                        name: data.item.name
+                    }
+                    vm.companies.push(vm.selectedCompany);
+                    vm.posting.compensationRateId = vm.posting.compensationRateId.toString();
+                    vm.posting.fullPartId = vm.posting.fullPartId.toString();
+                    vm.posting.contractPermanentId = vm.posting.contractPermanentId.toString();
+                    vm.posting.experienceLevelId = vm.posting.experienceLevelId.toString();
+                    vm.posting.jobPostingStatusId = vm.posting.jobPostingStatusId.toString();
+                    if (vm.posting.countryId) {
+                        vm.selectedCountry = vm.countries.find(cntry => cntry.id == vm.posting.countryId);
+                        _countryChange();
+                    }
+                    if (vm.posting.stateProvinceId) {
+                        vm.selectedStateProvince = vm.stateProvinces.find(stprvnc => stprvnc.id == vm.posting.stateProvinceId);
+                    }
+                    vm.selectedJobTags = data.item.jobTags;
+                }
+
+                function _getByIdError(data) {
+                    toastr.error("Failed to load posting");
+                }
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+
+                // Delete functions
+                function _deleteSuccess(data) {
+                    window.location.href = "/companies/" + vm.selectedCompany.id + "/edit";
+                }
+
+                function _deleteError(data) {
+                    toastr.error("Failed to delete");
+                }
+
+                // Job tags functions
+                function _getJobTags() {
+                    vm.jobTagService.getAll(_getJobTagsSuccess, _getJobTagsError);
+                }
+
+                function _getJobTagsSuccess(data) {
+                    vm.jobTags = data.items;
+                }
+
+                function _getJobTagsError(data) {
+                    toastr.error("Failed to get job tags");
+                }
+
+                // Geography functions
+                function _getCountries() {
+                    vm.geographyService.getAllCountries(_getCountriesSuccess, _getCountriesError);
+                }
+
+                function _getCountriesSuccess(data) {
+                    vm.countries = data.items;
+                }
+
+                function _getCountriesError(data) {
+                    toastr.error("Failed to get countries");
+                }
+
+                function _countryChange() {
+                    vm.geographyService.getStateProvincesByCountryId(vm.selectedCountry.id, _getStateProvincesSuccess, _getStateProvincesError);
+                }
+
+                function _getStateProvincesSuccess(data) {
+                    vm.stateProvinces = data.items;
+                }
+
+                function _getStateProvincesError(data) {
+                    toastr.error("Failed to get states/provinces");
+                }
+            }
+        })();
+
+    </script>
+
+
+
+}

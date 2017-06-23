@@ -1,0 +1,1021 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+@section styles {
+    <link href="~/Assets/Admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/angular-material.min.css" rel="stylesheet" />
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Assets/Admin/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
+    <link href="~/Assets/Admin/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <link href="~/Assets/Admin/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
+
+    <style>
+        .page-line {
+            border-bottom: 1px solid #e2e7eb;
+            margin: 10px 0px;
+        }
+
+        .test-row {
+            padding: 8px;
+            background-color: #e2e7eb;
+        }
+
+        .center-align {
+            text-align: center;
+        }
+
+        .photo-thumb-sm {
+            width: 60px;
+            height: 60px;
+            border-radius: 100%;
+        }
+
+        .photo-thumb-md {
+            width: 100px;
+            height: 100px;
+            border-radius: 100%;
+        }
+
+        /*tr:hover td {
+            cursor: pointer;
+            background-color: #e1e1e1 !important;
+        }*/
+
+        .info-card {
+            border: 1px solid #e2e7eb;
+        }
+
+        html {
+            background-color: #fff;
+        }
+    </style>
+}
+
+
+<div class="content" ng-controller="fullCalendarController as fcc">
+    <div class="container">
+        <!-- begin breadcrumb -->
+        <ol class="breadcrumb">
+            <li><a href="/">Home</a></li>
+            <li><a href="/squads">Squads</a></li>
+            <li class="active">{{fcc.squad.name}}</li>
+        </ol>
+        <!-- end breadcrumb -->
+        <!-- begin page-header -->
+        <h1 class="page-header text-center" ng-bind="fcc.squad.name"></h1>
+        <!-- end page-header -->
+        <!-- begin row -->
+        <div class="row">
+            <!-- begin profile-container -->
+            <div class="profile-container">
+                <!-- begin header div -->
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="col-md-12 m-b-20">
+                            <button id="squadRequestButton" type="button" class="btn btn-sm btn-primary pull-left" ng-bind="fcc.requestButtonText" ng-click="fcc.squadRequest()"></button>
+                        </div>
+                        <div class="col-md-12 panel">
+                            <div class="panel panel-inverse">
+                                <div class="panel-heading">
+                                    <div class="panel-title">
+                                        <h4 class="panel-title">Squad Leaders:</h4>
+                                    </div>
+                                </div>
+                                <!-- begin squad leader panel -->
+                                <div class="panel-body">
+                                    <div ng-repeat="squadLeader in fcc.squad.squadLeaders" class="row">
+                                        <!-- ng repeat squadleaders in fcc.squadleaders an array of squad leaders-->
+                                        <div class="col-md-4">
+                                            <img class="photo-thumb-md" ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{squadLeader.person.photoKey}}" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <h3 ng-bind="squadLeader.person.fullName"></h3>
+                                            <h6 ng-bind="squadLeader.person.email"></h6>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <!--End squad leader panel-->
+                        <div class="col-md-12 panel">
+                            <div class="panel panel-inverse">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">Squad members:</h4>
+                                </div>
+
+                                <div class="panel-body">
+                                    <!-- ng repeat squadMember in fcc.squadMembers an array of squad members-->
+
+                                    <div class="">
+                                        <div class="col-xs-3 col-md-4" ng-repeat="squadMember in fcc.squad.squadMembers">
+                                            <img class="photo-thumb-md" ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{squadMember.person.photoKey}}" /> <!--photo-->
+                                            <div class="caption">
+                                                <h6 class="text-center" ng-bind="squadMember.person.fullName"></h6> <!-- member full name-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--Member panel End-->
+                        </div>
+
+                    </div>
+                    <!--END SQUAD INFO DIV-->
+                    <!-- fullcalendar div -->
+                    <div class="col-xs-12 col-md-5">
+                        <div class="panel panel-heading">
+                            <h4 ng-cloak>Squad event calendar</h4>
+                            <!--fullCalendar controller-->
+                            <div class="panel-body p-0">
+                                <!--Renders fullCalendar plugin to DOM-->
+                                <div ui-calendar="fcc.uiConfig" ng-model="fcc.eventSources" ng-if="fcc.eventSources.length > 0" id="fullCalendarPlugin"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end fullcalendar div -->
+                    <!--Begin side panel-->
+                    <div class="col-md-2 col-xs-12">
+                        <!-- begin section-container -->
+                        <div class="section-container search-box-container">
+                            <label for="search-box">
+                                Enter event name
+                                <br>
+                                or location
+                            </label>
+                            <div class="input-group sidebar-search">
+                                <input type="text" class="form-control searchBar"
+                                       placeholder="Search" ng-model="fcc.searchStr" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-inverse" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <!-- end section-container -->
+                        <!-- begin section-container -->
+                        <div class="section-container">
+                            <h4 class="section-title"><span>Upcoming squad events</span></h4>
+                            <ul ng-repeat="event in fcc.eventSources[0].events | limitTo: 5" class="sidebar-recent-post">
+                                <li>
+                                    <div class="info">
+                                        <h4 class="title">
+                                            <a ng-click="fcc.eventClicked(event)" href="#" ng-bind="event.title"></a>
+                                        </h4>
+                                        <div class="date">
+                                            <p ng-bind="event.start.format('LLLL')"></p>
+                                            <p ng-bind="event.location.format('LLLL')"></p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="recent-post-padding"></li>
+                            </ul>
+                        </div>
+                        <!-- end section-container -->
+                    </div>
+                </div>                <!--End side panel-->
+                <!-- start page line -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Mission</h3>
+                            </div>
+                            <div class="panel-body" ng-bind-html="fcc.sanitize(fcc.squad.mission)">
+                                <div id="mission">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="panel panel-default" data-sortable-id="ui-widget-4">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Notes:</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div id="mission" ng-bind="fcc.squad.notes"></div>
+                                <button class="btn btn-warning pull-right hidden" ng-click="fcc.editMissionNotes">Edit Notes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- end profie-container -->
+            <!-- end row -->
+        </div>
+    </div>
+</div>
+
+@section pageInitScripts {
+    <script src="~/Assets/Admin/plugins/fullcalendar/lib/moment.min.js"></script>
+    <script src="~/Assets/Admin/plugins/fullcalendar/fullcalendar.min.js"></script>
+    <script src="~/Scripts/angular-ui/angular-ui-calendar.js"></script>
+    <script src="~/Scripts/sabio/sabio.module.ui-bootstrap.js"></script>
+    <script src="~/Scripts/angular-ui/ngjs-color-picker.js"></script>
+    <script src="~/Scripts/sabio/sabio.module.ngjs-color-picker.js"></script>
+    <script src="~/Scripts/angular-aria.js"></script>
+    <script src="~/Scripts/angular-material.min.js"></script>
+    <script src="~/Scripts/sabio/sabio.material.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-eonasdan-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/Scripts/angular-eonasdan-datetimepicker.js"></script>
+    <script src="~/Scripts/sabio/sabio.module.ae-datetimepicker.js"></script>
+}
+
+
+@section scripts {
+
+    <!-- Begin Linked Scripts -->
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/app/services/person.js"></script>
+    <script src="~/Scripts/angular-material.js"></script>
+    <script src="~/Scripts/sabio.services.squad.js"></script>
+    <script src="~/Scripts/sabio.services.squadEvent.js"></script>
+    <script src="~/Scripts/sabio.services.squadMember.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-sanitize.js"></script>
+
+
+
+
+    <!--Copied modal from homeng-->
+    <script type="text/ng-template" id="modal-template.html">
+        <div>
+            <div>
+                <div class="modal-header">
+                    <button ng-click="cmic.modalReset()" type="button" id="modalHeaderXBtn" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title"><i class="fa fa-calendar"></i>      Create new event</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- begin modal form -->
+                    <form id="createEventForm" ng-submit="cmic.addEvent(cmic.squadEvent)">
+                        <div class="form-group row">
+                            <div class="form-group">
+                                <label for="eventName">Event title: </label>
+                                <input ng-model="cmic.squadEvent.Name" type="text" class="form-control" name="name" id="eventName" placeholder="Event Title">
+                            </div>
+                            <!-- begin color picker -->
+                            <div class="form-group">
+                                <label class="control-label" for="colorPicker">Choose a color tag: </label>
+                                <div class="form-group">
+
+                                    <ngjs-color-picker options="cmic.colorOptions" selected-color="cmic.squadEvent.color"></ngjs-color-picker>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end color picker -->
+                        <!--Timezone picker-->
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label" for="eventTimezone">Timezone: </label>
+                            <div class="form-group">
+                                <select class="input-group" ng-model="cmic.squadEvent.timezone" ng-options="key as key for (key, value) in cmic.formTimezone"></select>
+                            </div>
+                        </div>
+                        <!--begin START datepicker-->
+
+                        <div class="form-group">
+                            <label for="eventStart">Event start date: </label>
+
+                            <div class="input-group">
+                                <input type="text" datetimepicker
+                                       on-change="cmic.dateRangeRestrict(cmic.squadEvent.eventStart, cmic.squadEvent.eventEnd)"
+                                       ng-model="cmic.squadEvent.eventStart" options="cmic.dateTimeOptionsStart" class="form-control" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+
+                            @*<div datetimepicker ng-model="fcc.event.eventStart" class="form-group date">
+                                    <input class="form-control" placeholder="Select start date and time" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>*@
+
+                        </div>
+
+                        <!--end datepicker-->
+                        <!--begin END datepicker-->
+
+                        <div class="form-group">
+                            <label for="eventEnd">Event end date <small>click on calendar to set a date and time</small> </label>
+
+                            <div class="input-group" datetimepicker
+                                 on-change="cmic.dateRangeRestrict(cmic.squadEvent.eventStart, cmic.squadEvent.eventEnd)"
+                                 ng-model="cmic.squadEvent.eventEnd" options="cmic.dateTimeOptionsEnd">
+                                <input class="form-control" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+
+                            @*<div datetimepicker ng-model="fcc.event.eventEnd" class="form-group date">
+                                    <input class="form-control" placeholder="Select end date and time" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>*@
+
+                        </div>
+                        <!--end datepicker-->
+
+                        <div class="form-group">
+                            <label for="eventDescription">Description of event:</label>
+                            <textarea ng-model="cmic.squadEvent.Description" class="form-control" name="description" id="eventDescription"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventLocation">Location:</label>
+                            <input ng-model="cmic.squadEvent.Location" type="text" class="form-control" name="location" id="eventLocation">
+                        </div>
+                        <fieldset disabled>
+                            <div class="hidden">
+                                <label for="squadId">squadId:</label>
+                                <input ng-bind="cmic.squadEvent.SquadId" type="number" class="form-control" name="squadId" id="modalSquadId" />
+                            </div>
+                        </fieldset>
+                        <div class="modal-footer">
+                            <a ng-click="cmic.modalReset()" class="btn btn-sm btn-white" id="modalCancelBtn" data-dismiss="modal">Cancel</a>
+                            <button type="submit" class="btn btn-sm btn-info">Add event</button>
+                        </div>
+                    </form>
+                    <!-- end modal form -->
+                </div>
+            </div>
+        </div>
+    </script>
+    <!-- end modal template-->
+    <script>
+
+        // --------------------COPY FROM HOMENG SCRIPT -------------//
+
+        sabio.page.activeSquadId = @Model.Item;
+
+        //create and inject services for squad functions
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('squadService', SquadService);
+
+            SquadService.$inject = ['$baseService', '$sabio'];
+
+            function SquadService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.squad;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        //create squadevent service
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory("squadEventService", SquadEventService);
+
+            SquadEventService.$inject = ['$baseService', '$sabio'];
+
+            function SquadEventService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.squadEvent;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        //create squadmember service
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory("squadMemberService", SquadMemberService);
+
+            SquadMemberService.$inject = ['$baseService', '$sabio'];
+
+            function SquadMemberService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.squadMember;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        // Create person service //
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('personService', PersonService);
+
+            PersonService.$inject = ['$baseService', '$sabio'];
+
+            function PersonService ($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.person;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+
+
+        //modalInstanceController
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .controller('calendarModalInstanceController', CalendarModalInstanceController);
+
+            CalendarModalInstanceController.$inject = ['$baseController','$scope', '$uibModalInstance', '$modalInstance', 'squadService', 'squadEventService', 'squadEvent', 'squadMemberService','$sce'];
+
+            function CalendarModalInstanceController ($baseController, $scope, $uibModalInstance, $modalInstance, squadService, squadEventService, squadEvent, squadMemberService,$sce) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$uibModalInstance = $uibModalInstance;
+                vm.squadEvent = squadEvent;
+                vm.squadEvent.SquadId = sabio.page.activeSquadId;
+
+
+                $baseController.merge(vm, $baseController);
+
+                vm.squadService = squadService;
+                vm.squadEventService = squadEventService;
+                vm.addEvent = _addEvent;
+                vm.momentToStringEvent = _momentToStringEvent
+                vm.modalReset = _modalReset;
+
+                vm.formTimezone = {
+                    "" : "",
+                    "(GMT-11:00) Pago Pago": "Pacific/Pago_Pago",
+                    "(GMT-10:00) Hawaii Time": "Pacific/Honolulu",
+                    "(GMT-08:00) Pacific Time": "America/Los_Angeles",
+                    "(GMT-08:00) Pacific Time - Tijuana": "America/Tijuana",
+                    "(GMT-07:00) Mountain Time": "America/Denver",
+                    "(GMT-07:00) Mountain Time - Arizona": "America/Phoenix",
+                    "(GMT-07:00) Mountain Time - Chihuahua, Mazatlan": "America/Mazatlan",
+                    "(GMT-06:00) Central Time": "America/Chicago",
+                    "(GMT-06:00) Central Time - Mexico City": "America/Mexico_City",
+                    "(GMT-06:00) Central Time - Regina": "America/Regina",
+                    "(GMT-06:00) Guatemala": "America/Guatemala",
+                    "(GMT-05:00) Bogota": "America/Bogota",
+                    "(GMT-05:00) Eastern Time": "America/New_York",
+                    "(GMT-05:00) Lima": "America/Lima",
+                    "(GMT-04:30) Caracas": "America/Caracas",
+                    "(GMT-04:00) Atlantic Time - Halifax": "America/Halifax",
+                    "(GMT-04:00) Guyana": "America/Guyana",
+                    "(GMT-04:00) La Paz": "America/La_Paz",
+                    "(GMT-03:00) Buenos Aires": "America/Argentina/Buenos_Aires",
+                    "(GMT-03:00) Godthab": "America/Godthab",
+                    "(GMT-03:00) Montevideo": "America/Montevideo",
+                    "(GMT-03:30) Newfoundland Time - St. Johns": "America/St_Johns",
+                    "(GMT-03:00) Santiago": "America/Santiago",
+                    "(GMT-02:00) Sao Paulo": "America/Sao_Paulo",
+                    "(GMT-02:00) South Georgia": "Atlantic/South_Georgia",
+                    "(GMT-01:00) Azores": "Atlantic/Azores",
+                    "(GMT-01:00) Cape Verde": "Atlantic/Cape_Verde",
+                    "(GMT+00:00) Casablanca": "Africa/Casablanca",
+                    "(GMT+00:00) Dublin": "Europe/Dublin",
+                    "(GMT+00:00) Lisbon": "Europe/Lisbon",
+                    "(GMT+00:00) London": "Europe/London",
+                    "(GMT+00:00) Monrovia": "Africa/Monrovia",
+                    "(GMT+01:00) Algiers": "Africa/Algiers",
+                    "(GMT+01:00) Amsterdam": "Europe/Amsterdam",
+                    "(GMT+01:00) Berlin": "Europe/Berlin",
+                    "(GMT+01:00) Brussels": "Europe/Brussels",
+                    "(GMT+01:00) Budapest": "Europe/Budapest",
+                    "(GMT+01:00) Central European Time - Belgrade": "Europe/Belgrade",
+                    "(GMT+01:00) Central European Time - Prague": "Europe/Prague",
+                    "(GMT+01:00) Copenhagen": "Europe/Copenhagen",
+                    "(GMT+01:00) Madrid": "Europe/Madrid",
+                    "(GMT+01:00) Paris": "Europe/Paris",
+                    "(GMT+01:00) Rome": "Europe/Rome",
+                    "(GMT+01:00) Stockholm": "Europe/Stockholm",
+                    "(GMT+01:00) Vienna": "Europe/Vienna",
+                    "(GMT+01:00) Warsaw": "Europe/Warsaw",
+                    "(GMT+02:00) Athens": "Europe/Athens",
+                    "(GMT+02:00) Bucharest": "Europe/Bucharest",
+                    "(GMT+02:00) Cairo": "Africa/Cairo",
+                    "(GMT+02:00) Jerusalem": "Asia/Jerusalem",
+                    "(GMT+02:00) Johannesburg": "Africa/Johannesburg",
+                    "(GMT+02:00) Helsinki": "Europe/Helsinki",
+                    "(GMT+02:00) Kiev": "Europe/Kiev",
+                    "(GMT+02:00) Moscow-01 - Kaliningrad": "Europe/Kaliningrad",
+                    "(GMT+02:00) Riga": "Europe/Riga",
+                    "(GMT+02:00) Sofia": "Europe/Sofia",
+                    "(GMT+02:00) Tallinn": "Europe/Tallinn",
+                    "(GMT+02:00) Vilnius": "Europe/Vilnius",
+                    "(GMT+03:00) Istanbul": "Europe/Istanbul",
+                    "(GMT+03:00) Baghdad": "Asia/Baghdad",
+                    "(GMT+03:00) Nairobi": "Africa/Nairobi",
+                    "(GMT+03:00) Minsk": "Europe/Minsk",
+                    "(GMT+03:00) Riyadh": "Asia/Riyadh",
+                    "(GMT+03:00) Moscow+00 - Moscow": "Europe/Moscow",
+                    "(GMT+03:30) Tehran": "Asia/Tehran",
+                    "(GMT+04:00) Baku": "Asia/Baku",
+                    "(GMT+04:00) Moscow+01 - Samara": "Europe/Samara",
+                    "(GMT+04:00) Tbilisi": "Asia/Tbilisi",
+                    "(GMT+04:00) Yerevan": "Asia/Yerevan",
+                    "(GMT+04:30) Kabul": "Asia/Kabul",
+                    "(GMT+05:00) Karachi": "Asia/Karachi",
+                    "(GMT+05:00) Moscow+02 - Yekaterinburg": "Asia/Yekaterinburg",
+                    "(GMT+05:00) Tashkent": "Asia/Tashkent",
+                    "(GMT+05:30) Colombo": "Asia/Colombo",
+                    "(GMT+06:00) Almaty": "Asia/Almaty",
+                    "(GMT+06:00) Dhaka": "Asia/Dhaka",
+                    "(GMT+06:30) Rangoon": "Asia/Rangoon",
+                    "(GMT+07:00) Bangkok": "Asia/Bangkok",
+                    "(GMT+07:00) Jakarta": "Asia/Jakarta",
+                    "(GMT+07:00) Moscow+04 - Krasnoyarsk": "Asia/Krasnoyarsk",
+                    "(GMT+08:00) China Time - Beijing": "Asia/Shanghai",
+                    "(GMT+08:00) Hong Kong": "Asia/Hong_Kong",
+                    "(GMT+08:00) Kuala Lumpur": "Asia/Kuala_Lumpur",
+                    "(GMT+08:00) Moscow+05 - Irkutsk": "Asia/Irkutsk",
+                    "(GMT+08:00) Singapore": "Asia/Singapore",
+                    "(GMT+08:00) Taipei": "Asia/Taipei",
+                    "(GMT+08:00) Ulaanbaatar": "Asia/Ulaanbaatar",
+                    "(GMT+08:00) Western Time - Perth": "Australia/Perth",
+                    "(GMT+09:00) Moscow+06 - Yakutsk": "Asia/Yakutsk",
+                    "(GMT+09:00) Seoul": "Asia/Seoul",
+                    "(GMT+09:00) Tokyo": "Asia/Tokyo",
+                    "(GMT+09:30) Central Time - Darwin": "Australia/Darwin",
+                    "(GMT+10:00) Eastern Time - Brisbane": "Australia/Brisbane",
+                    "(GMT+10:00) Guam": "Pacific/Guam",
+                    "(GMT+10:00) Moscow+07 - Magadan": "Asia/Magadan",
+                    "(GMT+10:00) Moscow+07 - Yuzhno-Sakhalinsk": "Asia/Vladivostok",
+                    "(GMT+10:00) Port Moresby": "Pacific/Port_Moresby",
+                    "(GMT+10:30) Central Time - Adelaide": "Australia/Adelaide",
+                    "(GMT+11:00) Eastern Time - Hobart": "Australia/Hobart",
+                    "(GMT+11:00) Eastern Time - Melbourne, Sydney": "Australia/Sydney",
+                    "(GMT+11:00) Guadalcanal": "Pacific/Guadalcanal",
+                    "(GMT+11:00) Noumea": "Pacific/Noumea",
+                    "(GMT+12:00) Majuro": "Pacific/Majuro",
+                    "(GMT+12:00) Moscow+09 - Petropavlovsk-Kamchatskiy": "Asia/Kamchatka",
+                    "(GMT+13:00) Auckland": "Pacific/Auckland",
+                    "(GMT+13:00) Fakaofo": "Pacific/Fakaofo",
+                    "(GMT+13:00) Fiji": "Pacific/Fiji",
+                    "(GMT+13:00) Tongatapu": "Pacific/Tongatapu",
+                    "(GMT+14:00) Apia": "Pacific/Apia"
+                }
+
+                vm.dateTimeOptionsStart = {
+                    format: 'LLLL'
+                    , dayViewHeaderFormat: 'MMMM YYYY'
+                    , stepping: 5 //<--- For minute increments in time picker
+                    , useCurrent: false
+                    , collapse: true
+                    , locale: moment.locale()
+                    , sideBySide: false
+                    , showTodayButton: true
+                    , showClear: true
+                    , showClose: false
+                    , widgetPositioning: {
+                        horizontal: 'right'
+                        , vertical: 'auto'
+                    }
+
+                };
+                vm.dateTimeOptionsEnd = {
+                    format: 'LLLL'
+                    , dayViewHeaderFormat: 'MMMM YYYY'
+                    , stepping: 5 //<--- For minute increments in time picker
+                    , useCurrent: false
+                    , collapse: true
+                    , locale: moment.locale()
+                    , sideBySide: false
+                    , showTodayButton: true
+                    , showClear: true
+                    , showClose: true
+                    , widgetPositioning: {
+                        horizontal: 'right'
+                        , vertical: 'auto'
+                    }
+
+                }
+
+                vm.dateRangeRestrict = function (eventStart) {
+                    vm.dateTimeOptionsEnd.minDate = eventStart;
+                    if (vm.squadEvent.eventEnd < vm.squadEvent.eventStart) {
+                        vm.squadEvent.eventEnd = vm.squadEvent.eventStart;
+                    };
+                }
+
+                function _momentToStringEvent (event) {
+                    if (event.eventStart) {
+                        event.eventStart = event.eventStart.format("LLLL");
+                    }
+                    if (event.eventEnd) {
+                        event.eventEnd = event.eventEnd.format("LLLL");
+                    } else {
+                        event.eventEnd = event.eventStart;
+                    }
+                }
+
+                //ngColorPicker options
+                vm.colorOptions = {
+                    roundCorners: true
+                }
+
+                //fold
+                function _modalReset () {
+                    $uibModalInstance.close();
+                }
+
+
+                function _addEvent (event) {
+                    vm.momentToStringEvent(event);
+
+                    vm.squadEventService.addEvent( event , _onEventAddSuccess, _onEventAddError);
+                }
+
+                function _onEventAddSuccess (data){
+                    console.log(data);
+                    vm.$alertService.success("Event added successfully!")
+                    vm.modalReset();
+                }
+
+                function _onEventAddError (xhr, status, error){
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err);
+                }
+
+            }
+        })();
+
+        //fullCalendar controller
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .controller('fullCalendarController', FullCalendarController);
+
+            FullCalendarController.$inject = ['$rootScope', '$scope', '$window', '$compile', '$uibModal', '$http', '$sce', 'uiCalendarConfig', 'squadService', 'squadEventService', 'squadMemberService', 'personService', '$baseController'];
+
+            function FullCalendarController($rootScope, $scope, $window, $compile, $uibModal, $http, $sce, uiCalendarConfig, squadService, squadEventService, squadMemberService, personService, $baseController) {
+
+                //utilities
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$rootScope = $rootScope;
+                vm.$window = $window;
+                vm.uiCalendarConfig = uiCalendarConfig;
+                vm.squadService = squadService;
+                vm.squadEventService = squadEventService;
+                vm.squadMemberService = squadMemberService;
+                vm.personService = personService;
+                vm.$compile = $compile;
+                vm.$uibModal = $uibModal;
+                vm.$http = $http;
+                vm.sanitize = _sanitize;
+                //========================= CURRENT USER DATA=======///
+                vm.loggedInUserData = vm.$scope.$parent.lVm.model;
+                vm.currentUserPerson = null;
+
+                $baseController.merge(vm, $baseController);
+
+                vm.searchStr = null;
+                vm.eventSources = [];
+                vm.event = {};
+                vm.events = [];
+                vm.eventIndex = -1;
+                vm.squad = {};
+                vm.squad.id = sabio.page.activeSquadId;
+                vm.eventRender = _eventRender; //render tooltip with title//
+                vm.eventClicked = _eventClicked;
+                vm.dayClicked = _dayClicked;
+                vm.openModal = _openModal;
+                vm.addEvent = _addEvent;
+                vm.squadRequest = _squadRequest;
+                vm.loadCurrentUser = _loadCurrentUser;
+                vm.checkCurrentUser = _checkCurrentUser;
+                vm.userBasedRestrictions = _userBasedRestrictions;
+
+                _loadCurrentUser();
+
+                _renderSquad();
+
+                _calendarLoadSquad();
+
+
+                // Fullcalendar options //
+                vm.uiConfig = {
+
+                    height: 450,
+                    editable: false,
+                    customButtons: {
+                        add: {
+                            text: "+",
+                            click: function(){
+                                if (!vm.currentUserPerson.squads.isLeader){
+                                    sabio.ui.sweetalert.logInRequiredForEvents();
+                                }
+                                else {
+                                    vm.openModal(vm.event);
+                                }
+                            }
+                        }
+                    },
+                    header: {
+                        left: 'title',
+                        center: '',
+                        right: 'add, prev,today,next'
+                    },
+                    eventClick: vm.eventClicked,
+                    dayClick: function(date, jsEvent, view){
+                        if (vm.currentUserPerson.squads.isLeader){
+                            vm.event.eventStart = date.format("LLLL");
+                            vm.openModal(vm.event);
+                            //vm.dayClicked;
+                        } else {
+                            sabio.ui.sweetalert.logInRequiredForEvents();
+                        }
+                    },
+                    eventRender: vm.eventRender, //renders tooltip with event title//
+                    eventLimit: true
+                };
+
+
+                /// $uibModal options
+                function _openModal() {
+                    var uibModalInstance = vm.$uibModal.open({
+                        animation: true,
+                        templateUrl: 'modal-template.html',       //  this tells it what html template to use. it must exist in a script tag OR external file
+                        controller: 'calendarModalInstanceController as cmic',    //  this controller must exist and be registered with angular for this to work
+                        size: 'md',
+                        resolve: {  //  anything passed to resolve can be injected into the modal controller as shown below
+                            squadEvent: function () {
+                                return vm.event;
+                            }
+                        }
+                    });
+
+                    //  when the modal closes it returns a promise
+                    uibModalInstance.result.then(function (selectedItem) {
+                        vm.modalSelected = selectedItem;    //  if the user closed the modal by clicking Save
+                    }, function () {
+                        console.log('Modal dismissed at: ' + new Date());   //  if the user closed the modal by clicking cancel
+                    });
+                }
+
+                // Sanitizer Code added  by Ishwor
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+                //sanitizer Ends Here
+
+                //fold
+                function _loadCurrentUser () {
+                    //================CHECKS IF ANY USER IS LOGGED IN ========
+                    if (!vm.loggedInUserData.isLoggedIn){
+                        vm.currentUserPerson = {};
+                        vm.currentUserPerson.squads = [];
+                        vm.currentUserPerson.squads.isMember = false;
+                        vm.currentUserPerson.squads.isLeader = false;
+                        vm.userBasedRestrictions();
+                        return vm.currentUserPerson;
+                    }
+                    else if (vm.loggedInUserData.id) {
+                        var userPersonId = vm.loggedInUserData.id;
+                        vm.personService.getById(userPersonId, _onLoadUserSuccess, _onLoadUserError);
+                    }
+                }
+
+                function _onLoadUserSuccess(data) {
+                    vm.$scope.$apply(function(){
+                        vm.currentUserPerson = data.item;
+                    });
+                    //==========CHECKS IF CURRENT USER IS MEMBER============
+                    vm.checkCurrentUser();
+                };
+
+                function _onLoadUserError(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err);
+                }
+
+                function _checkCurrentUser(){
+                    if (vm.currentUserPerson.squads) {
+                        for (var i = 0; i < vm.currentUserPerson.squads.length; i++) {
+                            if (vm.currentUserPerson.squads[i].id == vm.squad.id) {
+                                vm.currentUserPerson.squads.isMember = true;
+                                vm.currentUserPerson.squads.memberId = vm.currentUserPerson.squads[i].memberId;
+                                vm.currentUserPerson.squads.memberStatusId = vm.currentUserPerson.squads[i].memberStatusId;
+                                vm.currentUserPerson.squads.squadId = vm.currentUserPerson.squads[i].id;
+                                if (vm.currentUserPerson.squads[i].isLeader){
+                                    vm.currentUserPerson.squads.isLeader = true;
+                                }
+                                if (vm.currentUserPerson.squads.memberStatusId == 4){
+                                    vm.currentUserPerson.squads.isMember = false;
+                                    vm.currentUserPerson.squads.isLeader = false;
+
+                                }
+                                break;
+                            }
+                            else {
+                                vm.currentUserPerson.squads.isMember = false;
+                                vm.currentUserPerson.squads.isLeader = false;
+                            };
+                        };
+                    }
+                    else {
+                        vm.currentUserPerson.squads.isMember = false;
+                        vm.currentUserPerson.squads.isLeader = false;
+                    };
+                    vm.userBasedRestrictions();
+                    return vm.currentUserPerson;
+                }
+
+                function _userBasedRestrictions () {
+                    //====================IF NO USER LOGGED IN==========
+                    if (!vm.loggedInUserData.isLoggedIn){
+
+                        vm.requestButtonText = "Join this squad";
+
+                    }
+                        //=============IF LOGGED IN USER IS NOT MEMBER
+                    else if (!vm.currentUserPerson.squads.isMember) {
+                        vm.requestButtonText = "Join this squad";
+                    }
+                        //=============IF LOGGED IN USER IS MEMBER
+                    else if (vm.currentUserPerson.squads.isMember && !vm.currentUserPerson.squads.isLeader) {
+                        if (vm.currentUserPerson.squads.memberStatusId == 1 || vm.currentUserPerson.squads.memberStatusId == 2) {
+                            vm.requestButtonText = "Remove request";
+                        }
+                        else {
+                            vm.requestButtonText = "Leave this squad";
+                        }
+                    }
+                        //=============IF LOGGED IN USER IS LEADER
+                    else if (vm.currentUserPerson.squads.isLeader) {
+
+                        vm.requestButtonText = "Manage squad members";
+
+                    }
+                }
+
+                function _squadRequest() {
+                    //====================IF NO USER LOGGED IN==========
+                    if (!vm.loggedInUserData.isLoggedIn){
+
+                        vm.$window.location.href = "/users/login"
+
+                    }
+                        //=============IF LOGGED IN USER IS NOT MEMBER
+                    else if (!vm.currentUserPerson.squads.isMember && vm.loggedInUserData.isLoggedIn) {
+                        if (vm.currentUserPerson.squads.memberStatusId == 4){
+                            var data = {
+                                squadId: vm.currentUserPerson.squads.squadId
+                                , personId: vm.currentUserPerson.id
+                                , memberStatusId: 1
+                                , isLeader: false
+                               
+                                , id: vm.currentUserPerson.squads.memberId
+                            };
+                            vm.squadMemberService.putJson (data.id, data , _onRequestAddSuccess , _onRequestAddError);
+                        } else {
+                            var data = {
+                                squadId: vm.squad.id
+                                , personId: vm.currentUserPerson.id
+                                , memberStatusId: 1
+                            };
+                            vm.squadMemberService.postJson(data , _onRequestAddSuccess, _onRequestAddError);
+                        }
+                    }
+                        //=============IF LOGGED IN USER IS MEMBER
+                    else if (vm.currentUserPerson.squads.isMember && !vm.currentUserPerson.squads.isLeader) {
+                        var data = {
+                            squadId: vm.currentUserPerson.squads.squadId
+                            , personId: vm.currentUserPerson.id
+                            , memberStatusId: 4
+                            , isLeader: false
+                            , leaderComments: null
+                            , id: vm.currentUserPerson.squads.memberId
+                        };
+                        vm.squadMemberService.putJson (data.id, data , _onRequestRemoveSuccess , _onRequestRemoveError);
+                    }
+                        //=============IF LOGGED IN USER IS LEADER
+                    else if (vm.currentUserPerson.squads.isLeader) {
+
+                        vm.$window.location.href = "/squads/" + vm.squad.id + "/manage";
+
+                    }
+                }
+
+                function _onRequestAddSuccess (data) {
+                    vm.$alertService.success("Request to join squad sent!");
+                    vm.loadCurrentUser();
+                }
+
+                function _onRequestAddError (xhr, status, error){
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err);
+                }
+
+                function _onRequestRemoveSuccess (data) {
+                    vm.$alertService.success("Removed from this squad!")
+                    vm.loadCurrentUser();
+                }
+
+                function _onRequestRemoveError (xhr, status, error){
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err);
+                }
+
+                function _addEvent (event) {
+                    vm.momentToStringEvent(event);
+                    vm.squadEventService.addEvent( event , _onEventAddSuccess, _onEventAddError);
+                }
+
+                function _onEventAddSuccess (data){
+                    vm.$alertService.success("Event added successfully!")
+                    vm.modalReset();
+                }
+
+                function _onEventAddError (xhr, status, error){
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err);
+                }
+
+
+                function _eventClicked(calEvent, jsEvent, view) {
+                    vm.$window.open("/SquadEvents/EventDetails/" + calEvent.id, '_blank');
+                }
+
+                function _dayClicked (date, jsEvent, view) {
+                    vm.event.eventStart = date.format("LLLL");
+                    vm.openModal(vm.event);
+                }
+
+                function _eventRender (event, element) {
+                    element.popover(
+                        {
+                            container: 'body',
+                            title: "<strong>" + "Event: " + "</strong>" + event.title,
+                            content: "<div>" + "<strong>" + "Timezone: " + "</strong>" + event.timezone + "</div>" + "<div>" + "<strong>" + "Start: " + "</strong>" + moment(event.start).format("LLLL") + "</div>" + "<div>" + "<strong>" + "Description: " + "</strong>" + event.description + "</div>" + "<div>" + "<strong>",
+                            trigger: "hover",
+                            html: true,
+                            placement: "auto bottom"
+                        });
+                }
+
+                function _calendarLoadSquad() {
+                    vm.squadEventService.getBySquadId(sabio.page.activeSquadId, _onCalendarLoadSquadSuccess, _onCalendarLoadSquadError);
+                }
+
+                function _onCalendarLoadSquadSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.events = data.items.map(function (item) {
+                            return {
+                                id: item.id
+                                , title: item.name
+                                , timezone: item.timezone
+                                , start: item.eventStart
+                                , end: item.eventEnd
+                                , description: item.description
+                                , location: item.location
+                                , color: item.color
+                            };
+                        });
+                        vm.eventSources.push({ events: vm.events });
+                    })
+                }
+
+                function _onCalendarLoadSquadError (xhr, status, error){
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err);
+                }
+
+                function _renderSquad() {
+                    if (vm.squad.id) {
+                        vm.squadService.getById(vm.squad.id , _onSquadGetSuccess, _onSquadGetError);
+                    }
+                }
+
+                function _onSquadGetSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.squad = data.item;
+                    });
+                    vm.squad.squadMembers = [];
+                    vm.squad.squadLeaders = [];
+                    for (var i = 0; i < vm.squad.squadMember.length; i++) {
+                        if (vm.squad.squadMember[i].isLeader && vm.squad.squadMember[i].status.id == 3) {
+                            vm.squad.squadLeaders.push(vm.squad.squadMember[i]);
+                        }
+                        if (!vm.squad.squadMember[i].isLeader && vm.squad.squadMember[i].status.id == 3) {
+                            vm.squad.squadMembers.push(vm.squad.squadMember[i]);
+                        }
+                    }
+                    vm.$alertService.success("Get squad successful!");
+                }
+
+                function _onSquadGetError(xhr, status, error){
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err);
+                }
+            }
+        })();
+    </script>
+}
+
+
+
+
+
+

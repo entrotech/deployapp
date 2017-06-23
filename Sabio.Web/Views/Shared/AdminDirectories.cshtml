@@ -1,0 +1,43 @@
+﻿<div class="col-md-6">
+    <input type="text" class="form-control input-white m-b-15" placeholder="Search" ng-keyup="dVm.search(searchText)" ng-model="searchText" />
+    <div class="panel panel-inverse">
+        <div class="panel-heading">
+            <button type="button" class="btn btn-primary btn-xs pull-right " data-ng-click="dVm.add()"><small>Add New</small></button>
+            <h4 class="panel-title">{{dVm.type}}</h4>
+
+        </div>
+        <div class="panel-body">
+            <div class="data-list" data-ng-repeat="item in dVm.filteredItems" data-ng-click="dVm.select(item)">
+                <a data-ng-click="dVm.select(item)">{{item.name}}</a>
+                <span></span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="panel panel-inverse" data-ng-show="dVm.item">
+        <div class="panel-heading">
+            <h4 class="panel-title">Create/Edit</h4>
+        </div>
+        <div class="panel-body">
+            <form name="editForm" ng-submit="dVm.submitForm(editForm.$valid)" novalidate>
+                <div class="form-group hidden">
+                    <label>Id: </label><span ng-bind="dVm.item.id"></span>
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" class="form-control" ng-model="dVm.item.name" ng-class="{'form-validate': editForm.name.$invalid && dVm.submitted}" required />
+                    <p ng-show="editForm.name.$invalid && dVm.submitted" class="error-msg">name is required</p>
+                </div>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-primary btn-sm .ng-invalid.ng-dirty" ng-click="dVm.submitted = true; dVm.submitForm(editForm.$valid)">Save</button>
+                    <button type="button" class="btn btn-default btn-sm" ng-click="dVm.cancel()">Cancel</button>
+                    <button type="button" class="btn btn-danger btn-sm" ng-click="dVm.delete()">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="col-lg-12 text-center clearfix">
+    <ul uib-pagination ng-model="dVm.currentPage" max-size="5" total-items="dVm.totalItems" boundary-link="true" ng-change="dVm.pageChanged() " items-per-page="dVm.itemsPerPage"></ul>
+</div>

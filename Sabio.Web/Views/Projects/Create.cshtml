@@ -1,0 +1,202 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+
+@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+@section styles {
+    <style>
+        .currencyinput {
+            border: 1px inset #ccc;
+        }
+
+            .currencyinput input {
+                border: 0;
+            }
+    </style>
+
+}
+
+<h2 id="edSwap">Create</h2>
+
+<div id="discTxt">* indicates a required field</div>
+<form id="formData">
+    <div class="form-group">
+        <label for="projectName">Project Name*</label>
+        <input type="text" class="form-control" id="projectName" name="projectName" placeholder="Enter Project Name (Required)" />
+    </div>
+    <div class="form-group">
+        <label for="description">Description*</label>
+        <textarea class="form-control" id="description" name="description" rows="5" placeholder="Description (Required)"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="budget">Budget</label>
+        <span>$</span><input type="number" class="form-control" id="budget" name="budget" placeholder="Budget" />
+    </div>
+    <div class="form-group">
+        <label for="deadline">Deadline</label>
+        <input type="date" class="form-control" id="deadline" name="deadline" />
+    </div>
+    <div class="form-group">
+        <label for="companyId">Company ID</label>
+        <input type="number" class="form-control" id="companyId" name="companyId" placeholder="Company ID (Required)" />
+    </div>
+    <button type="button" class="btn btn-primary" id="submitBtn">Submit</button>
+    <button type="button" class="btn btn-danger" id="deleteBtn">Delete</button>
+    <button type="button" class="btn btn-default" id="listBtn">Project List</button>
+    
+
+</form>
+<div id="confirmMsg"></div>
+
+
+@section scripts {
+
+    <script src="~/Scripts/sabio.services.project.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script type="text/javascript">
+        
+        sabio.page.startUp = function () {
+            $("#submitBtn").on("click", sabio.page.handlers.submitForm);
+            $("#listBtn").on("click", sabio.page.handlers.gotoIndex);
+            $("#deleteBtn").on("click", sabio.page.handlers.deleteRecord)
+            sabio.page.initializeValidation();
+
+            id = @Model.Item;
+            if (id > 0) {
+
+                sabio.services.project.getById(id, sabio.page.handlers.getByIdSuccess, sabio.page.onError);
+
+                $("#submitBtn").removeClass("btn-primary").addClass("btn-warning");
+                $("#submitBtn").text("Update");
+            }
+        }
+
+        sabio.page.initializeValidation = function () {
+
+            jQuery.validator.setDefaults({
+                debug: true
+            });
+
+            $('#formData').validate({
+                rules: {
+                    "projectName": {
+                        required: true
+                        , maxlength: 50
+                    },
+                    "description": {
+                        required: true
+                        , maxlength: 1000
+                    },
+                   
+                },
+
+                messages: {
+                    "projectName": {
+                        required: "Please enter a name for your project.",
+                    },
+                    "description": {
+                        required: "Please enter a description for your project.",
+                    },
+                }
+            });
+
+        }       
+
+        sabio.page.handlers.submitForm = function () {
+
+            if ($("#formData").valid()) {
+                var data = $("#formData").serialize();
+
+                if (id) {
+                    var data = data + "&id=" + id;
+
+                    sabio.services.project.put(id, data, sabio.page.handlers.putSuccess, sabio.page.onError);
+
+
+                } else {
+
+                    sabio.services.project.post(data, sabio.page.handlers.postSuccess, sabio.page.onError)
+                }
+            }
+
+        }
+
+        sabio.page.handlers.deleteRecord = function () {
+            if (id > 0) {
+
+                var url = "/api/projects/" + id;
+                var settings = {
+                    cache: false
+                    , dataType: "json"
+                    , success: sabio.page.handlers.deleteSuccess
+                    , error: sabio.page.onError
+                    , type: "DELETE"
+                };
+                $.ajax(url, settings);
+            }
+
+        }
+
+        sabio.page.handlers.gotoIndex = function () {
+            window.location.href = "/projects/index"
+        }
+
+        sabio.page.handlers.postSuccess = function (data) {
+            console.log("Project Added.");
+            id = data.item;
+
+
+            $("#submitBtn").text("Update");
+            $("#confirmMsg").text("Project Added!").fadeOut(2000);
+
+
+        }
+
+        sabio.page.handlers.putSuccess = function (data) {
+            console.log("Table Updated.")
+            $("#confirmMsg").text("Project Updated.").fadeOut(2000);
+        }
+
+        sabio.page.handlers.getByIdSuccess = function (data) {
+            console.log("Get Successful.");
+            console.log(data);
+
+            var d = data.item.deadline;
+            var b = data.item.budget;
+            if (data.item.deadline !== "0001-01-01T00:00:00") {
+
+                d = d.split('T')[0];
+                $("#deadline").val(d);
+
+            }
+
+            if (data.item.budget !== 0) {
+                $("#budget").val(data.item.budget);
+            }
+
+            $("#projectName").val(data.item.projectName);
+            $("#description").val(data.item.description);
+            $("#companyId").val(data.item.companyId);
+
+        }
+
+
+
+        sabio.page.handlers.deleteSuccess = function () {
+            id = 0;
+            console.log("Record deleted.");
+            $("#formData")[0].reset();
+
+            window.location = "/projects/create"
+
+
+
+        }
+        sabio.page.onError = function (data) {
+            console.log("Something went wrong...");
+            console.log(data);
+        }        
+    </script>
+
+}
+

@@ -1,0 +1,214 @@
+﻿@{
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+@section Styles {
+    <link href="~/Assets/Admin/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
+    <style>
+        /* event categories */
+        .event {
+            height: 10px;
+            width: 20px;
+            display: inline-block;
+            box-shadow: 2px 2px 1px rgba(0,0,0,0.2);
+            margin-right: .3em;
+        }
+
+        .global {
+            background: #3A87AD;
+        }
+
+        .squad {
+            background: #FFA500;
+        }
+
+        .squad-container {
+            margin-bottom: .3em;
+        }
+
+        /* content */
+        .content {
+            margin-top: 50px;
+        }
+
+        /* calendar */
+        .is-canceled {
+            text-decoration: line-through;
+            border: 2px solid #3A87AD;
+        }
+
+            .is-canceled:hover {
+                background: red;
+                text-decoration: line-through;
+            }
+    </style>
+}
+
+<div ng-controller="calendarController as main">
+    <!-- BEGIN content -->
+    <div class="content">
+        <div class="container">
+            <div class="global-container">
+                <div class="event global"></div>
+                <span>Global Event</span>
+            </div>
+            <div class="squad-container">
+                <div class="event squad"></div>
+                <span>Squad Event</span>
+            </div>
+            <div ui-calendar="main.calOptions" ng-model="main.calendarItems">
+
+            </div>
+        </div>
+    </div>
+    <!-- END content-->
+</div>
+
+@section pageInitScripts{
+    <script src="~/Assets/Admin/plugins/fullcalendar/lib/moment.min.js"></script>
+    <script src="~/Assets/Admin/plugins/fullcalendar/fullcalendar.min.js"></script>
+    <script src="~/Scripts/angular-ui/angular-ui-calendar.js"></script>
+    <script src="~/Scripts/bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("ui.calendar", "ui.bootstrap.tpls")
+    </script>
+}
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.globalEvent.js"></script>
+    <script src="~/Scripts/app/services/globalEvent.js"></script>
+    <script src="~/Scripts/sabio.services.calendar.js"></script>
+    <script src="~/Scripts/app/services/calendar.js"></script>
+    <script>
+        (function () {
+            "use strict"
+            angular.module(APPNAME)
+                .controller("calendarController", CalendarController);
+
+            CalendarController.$inject = ["$scope", "$window", "$baseController", "globalEventService", "calendarService"];
+
+            function CalendarController($scope, $window, $baseController, globalEventService, calendarService) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.globalEventService = globalEventService;
+                vm.calendarService = calendarService;
+                vm.$window = $window;
+
+                // viewmodel
+                vm.globalEvents = [];
+                vm.squadEvents = [];
+                vm.calendarItems = [];
+
+                _setCalendarOptions();
+                _render();
+
+                function _render() {
+                    //vm.globalEventService.calendarGetAll(_globalEventGetAllSuccess, _globalEventGetAllError);
+
+                    var url = "/api/globalevents/c";
+
+                    var settings = {
+                        cache: false,
+                        success: _globalEventGetAllSuccess,
+                        dataType: "json",
+                        type: "GET"
+                    };
+
+                    $.ajax(url, settings);
+                }
+
+                function _globalEventGetAllSuccess(data) {
+                    if (data.items) {
+                        vm.$scope.$apply(function () {
+                            vm.globalEvents = data.items;
+                            _fillCalendarGlobalEvents();
+                            vm.calendarService.squadEventGetAll(_squadEventGetAllSuccess, _squadEventGetAllError);
+                        });
+                    }
+                    else {
+                        vm.$alertService.error("No global events!");
+                    }
+                }
+
+                function _globalEventGetAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load global events!");
+                }
+
+                function _squadEventGetAllSuccess(data) {
+                    if (data.items) {
+                        vm.$scope.$apply(function () {
+                            vm.squadEvents = data.items;
+                            _fillCalendarSquadEvents();
+                        });
+                    }
+                    else {
+                        vm.$alertService.error("No squad events!");
+                    }
+                }
+
+                function _squadEventGetAllError(jqXHR) {
+                    console.log(jqXHR.responseText);
+                }
+
+                function _setCalendarOptions() {
+                    vm.calOptions = {
+                        editable: false,
+                        header: {
+                            left: "month basicWeek basicDay",
+                            center: "title",
+                            right: "today prev,next",
+                        },
+                        eventRender: function (event, element) {
+                            element.popover(
+                                {
+                                    container: 'body',
+                                    title: "<strong>" + "Event: " + "</strong>" + event.title,
+                                    content: "<div>" + "<strong>" + "Start: " + "</strong>" + moment(event.start).format("LLLL") + "</div>" + "<div>" + "<strong>" + "End: " + "</strong>" + moment(event.end).format("LLLL") + "</div>" + "<div>" + "<strong>" + "Description: " + "</strong>" + event.description + "</div>" + "<div>" + "<strong>",
+                                    trigger: "hover",
+                                    html: true,
+                                    placement: "auto bottom"
+                                });
+                        }
+                    };
+                }
+
+                function _fillCalendarGlobalEvents() {
+                    for (var i = 0; i < vm.globalEvents.length; i++) {
+                        var eventClass = "";
+                        var canceledNotice = "";
+                        if (vm.globalEvents[i].isCanceled) {
+                            eventClass = "is-canceled";
+                            canceledNotice = " CANCELED";
+                        }
+                        vm.calendarItems.push({
+                            events: [{
+                                title: vm.globalEvents[i].name,
+                                start: vm.globalEvents[i].dateStart.slice(0, 10) + "T" + vm.globalEvents[i].startTime,
+                                end: vm.globalEvents[i].dateEnd.slice(0, 10) + "T" + vm.globalEvents[i].endTime,
+                                description: vm.globalEvents[i].description + "<b>" + canceledNotice + "</b>",
+                                className: eventClass,
+                                url: "/globalEvents/" + vm.globalEvents[i].id
+                            }]
+                        });
+                    }
+                }
+
+                function _fillCalendarSquadEvents() {
+                    for (var i = 0; i < vm.squadEvents.length; i++) {
+                        vm.calendarItems.push({
+                            events: [{
+                                title: vm.squadEvents[i].squadEventName,
+                                start: vm.squadEvents[i].squadEventStart,
+                                end: vm.squadEvents[i].squadEventEnd,
+                                description: vm.squadEvents[i].squadEventDescription,
+                                url: "squadEvents/eventDetails/" + vm.squadEvents[i].squadEventId
+                            }],
+                            color: "orange"
+                        });
+                    }
+                }
+            }
+        })();
+    </script>
+}

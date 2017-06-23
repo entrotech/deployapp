@@ -1,0 +1,406 @@
+﻿@model Sabio.Web.Models.ViewModels.BaseViewModel
+
+@{
+
+//SabioRazor: line #1 demonstrates how a Layout file, like any View file
+//              has the capability to be stronly typed.
+
+//SabioRazor: this is a Razor code block. It starts at the "@{" and ends where the closing
+//"}" is found
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deploy - Built By Vets</title>
+    @*@Styles.Render("~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")*@
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    <link href="/assets/admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
+    <link href="/assets/admin/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/animate.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/style.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/style-responsive.min.css" rel="stylesheet" />
+    <link href="/assets/admin/css/theme/default.css" rel="stylesheet" id="theme" />
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <link href="~/Content/deployAdmin.css" rel="stylesheet" />
+    <link href="~/Content/angular-toastr.css" rel="stylesheet" />
+
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="/assets/admin/plugins/pace/pace.min.js"></script>
+    <!-- ================== END BASE JS ================== -->
+    @RenderSection("styles", required: false)
+</head>
+<body data-ng-app="SabioApp" data-ng-controller="layoutController as lVm">
+
+    <!-- begin #page-loader -->
+    <div id="page-loader" class="fade in"><span class="spinner"></span></div>
+    <!-- end #page-loader -->
+
+    <div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+        <!-- begin #header -->
+        <div id="header" class="container-fluid header navbar navbar-default navbar-fixed-top">
+            <!-- begin container-fluid -->
+            <div>
+                <!-- begin mobile sidebar expand / collapse button -->
+                <div class="navbar-header">
+                    <a href="/" class="navbar-brand">
+                        <div><img src="/Content/Images/DeployLogo.png" width="100"></div>
+                        <span class="brand-text">
+                            <span class="text-theme"></span>
+                        </span>
+                    </a>
+                    <button type="button" class="navbar-toggle" data-click="sidebar-toggled">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <!-- end mobile sidebar expand / collapse button -->
+                <!-- begin header navigation right -->
+                <ul class="nav navbar-nav navbar-right">
+                    @* begin user nav bar on top right of window*@
+                    <li class="hidden-xs"><a href="/squads/index">MENTORSHIP</a></li>
+                    <li class="dropdown hidden-xs">
+                        <a href="/squads" class="dropdown-toggle" data-toggle="dropdown">
+                            JOBS<b class="caret m-l-5"></b>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                            <li class="arrow"></li>
+                            <li><a href="/jobpostings">Job Search</a></li>
+                            <li><a href="/companies">Companies</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown hidden-xs">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                            PROJECTS<b class="caret m-l-5"></b>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                            <li class="arrow"></li>
+                            <li><a href="/proposals/create">Submit Proposals</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown hidden-xs">
+                        <a href="/globalevents/index" class="dropdown-toggle" data-toggle="dropdown">
+                            EVENTS<b class="caret m-l-5"></b>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                            <li class="arrow"></li>
+                            <li><a href="/globalevents">Upcoming Events</a></li>
+                            <li><a href="/resources/index">Resources</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown hidden-xs">
+                        <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                            ABOUT US<b class="caret m-l-5"></b>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                            <li class="arrow"></li>
+                            <li><a href="/blogs">Blogs</a></li>
+                            <li><a href="/announcements">Announcements</a></li>
+                            <li><a href="/testimonials">Testimonials</a></li>
+                            <li><a href="/faqs">FAQ</a></li>
+                            <li class="contact-us"><a href="/#/#contact">Contact Us</a></li>
+                        </ul>
+                    </li>
+                    <li id="menu" class="dropdown navbar-user visible-xs">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-target="#menu">
+                            <span>MENU</span> <b class="caret m-1-10"></b>
+                        </a>
+                        <ul class="navbar-home dropdown-menu animated fadeInLeft multi-level">
+                            <li class="entity"><a href="/squads">MENTORSHIP</a></li>
+                            <li id="jobs" class="entity dropdown dropdown-submenu has-sub">
+                                <a href="" class="dropdown-toggle" data-toggle="dropdown" data-target="#jobs">
+                                    JOBS<b class="caret m-l-10"></b>
+                                </a>
+                                <ul class="dropdown-submenu sub-menu animated fadeInDown">
+                                    <li><a href="/jobpostings">Job Listings</a></li>
+                                    <li><a href="/companies">Companies</a></li>
+                                </ul>
+                            </li>
+                            <li id="projects" class="entity dropdown dropdown-submenu has-sub">
+                                <a href="" class="dropdown-toggle" data-toggle="dropdown" data-target="#projects">
+                                    PROJECTS<b class="caret m-l-10"></b>
+                                </a>
+                                <ul class="dropdown-submenu animated fadeInDown">
+                                    <li><a href="/proposals/ngindex">Proposals</a></li>
+                                </ul>
+                            </li>
+                            <li id="events" class="entity dropdown dropdown-submenu has-sub">
+                                <a href="" class="dropdown-toggle" data-toggle="dropdown" data-target="#events">
+                                    EVENTS<b class="caret m-l-10"></b>
+                                </a>
+                                <ul class="dropdown-submenu animated fadeInDown">
+                                    <li><a href="/globalevents">Upcoming Events</a></li>
+                                    <li><a href="/opportunities">Opportunities</a></li>
+                                </ul>
+                            </li>
+                            <li id="about" class="entity dropdown dropdown-submenu has-sub">
+                                <a href="" class="dropdown-toggle" data-toggle="dropdown" data-target="#about">
+                                    ABOUT US<i class="caret m-l-10"></i>
+                                </a>
+                                <ul class="dropdown-submenu animated fadeInDown">
+                                    <li><a href="/blogs">Blogs</a></li>
+                                    <li><a href="/announcements">Announcements</a></li>
+                                    <li><a href="/testimonials">Testimonials</a></li>
+                                    <li><a href="/faqs">FAQ</a></li>
+                                    <li><a href="#contact" data-click="scroll-to-target">Contact Us</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a>|</a></li>
+                    <li data-ng-hide="{{lVm.model.isLoggedIn}}"><a href="/users/login" id="login" style="font-weight:bold; color:ActiveCaption"><span>LOG IN</span></a></li>
+                    <li id="userDropDown" class="dropdown" data-ng-show="{{lVm.model.isLoggedIn}}">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                            <span id="username" class="visible" style="font-weight:bold">{{lVm.model.fullName}}</span> <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-left animated fadeInDown">
+                            <li class="arrow"></li>
+                            <li data-ng-show="{{lVm.model.isAdmin}}"><a href="/languages">Admin Home</a></li>
+                            <li><a href="/users/home">My Home Page</a></li>
+                            <li><a href="/person/0/edit">My Profile</a></li>
+                            <li><a href="/calendar">Calendar</a></li>
+                            <li><a href="" data-ng-click="lVm.logout()">Log Out</a></li>
+                        </ul>
+                    </li>
+                    @* end user nav bar on top right of window*@
+                </ul>
+                <!-- end header navigation right -->
+            </div>
+            <!-- end container-fluid -->
+        </div>
+        <!-- end #header -->
+        <!-- begin #sidebar -->
+        <div id="sidebar" class="sidebar">
+            <!-- begin sidebar scrollbar -->
+            <div data-scrollbar="true" data-height="100%">
+                <!-- begin sidebar user -->
+                <ul class="nav">
+                    <li class="nav-profile">
+                        <div class="image">
+                            <a href="javascript:;"><img src="/assets/admin/img/user-13.jpg" alt="" /></a>
+                        </div>
+                        <div id="usernameNav" class="info m-t-10 m-l-10">
+                            {{lVm.model.fullName}}
+                        </div>
+                    </li>
+                </ul>
+                <!-- end sidebar user -->
+                <!-- begin sidebar nav -->
+                <ul class="nav">
+                    <li class="nav-header">Admin Navigation</li>
+
+
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-user"></i>
+                            <span>Resources</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/resources/index">Index</a></li>
+                            <li><a href="/resources/index/admin">Manage</a></li>
+                        </ul>
+                    </li>
+
+
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-user"></i>
+                            <span>Users</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/aspnetuserroles">User Roles</a></li>
+                            <li><a href="/person">Members</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-bullhorn"></i>
+                            <span>Announcements</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/announcements/create">Create</a></li>
+                            <li><a href="/announcements/index/admin">Manage</a></li>
+                            <li><a href="/announcements">Preview</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-question-circle"></i>
+                            <span>FAQs</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/faqs/create">Create</a></li>
+                            <li><a href="/faqs/index/admin">Manage</a></li>
+                            <li><a href="/faqs">Preview</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-calendar"></i>
+                            <span>Events</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/globalevents/create">Create</a></li>
+                            <li><a href="/globalevents/index/admin">Manage</a></li>
+                            <li><a href="/globalevents">Preview</a></li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="/testimonials/index/admin">
+                            <i class="fa fa-comments"></i>
+                            <span>Testimonials</span>
+                        </a>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-tasks"></i>
+                            <span>Projects</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/projects/create">Create</a></li>
+                            <li><a href="/projects/admin">Projects</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-pencil-square-o"></i>
+                            <span>Proposals</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/proposals/ngindex">Review</a></li>
+                            <li><a href="/proposals/create">Add New</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-tags"></i>
+                            <span>Directories</span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="/blogtags">Blog Tags</a></li>
+                            <li><a href="/educationlevels">Education Levels</a></li>
+                            <li><a href="/jobtags">Job Tags</a></li>
+                            <li><a href="/languages">Languages</a></li>
+                            <li><a href="/militarybases">Military Bases</a></li>
+                            @*<li><a href="/servicebranches">Service Branches</a></li>*@
+                            <li><a href="/skills">Skills</a></li>
+                            <li><a href="/squadtags">Squad Tags</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/homestatistics">
+                            <i class="fa fa-table"></i>
+                            <span>Home Statistics</span>
+                        </a>
+                    </li>
+                    <li class="has-sub">
+                        <a href="javascript:;">
+                            <b class="caret pull-right"></b>
+                            <i class="fa fa-envelope"></i>
+                            <span>Contact Users</span>
+                        </a>
+                        <ul class="sub-menu">                            
+                            <li><a href="/contactusers">Contact Users</a></li>
+                            <li><a href="/contactrequests">User Contact Requests</a></li>
+                        </ul>                        
+                    </li>
+                    <li>
+                        <a href="/exceptions/index">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            <span>Exception Log</span>
+                        </a>
+                    </li>
+                    <!-- begin sidebar buttons -->
+                    <li><a href="javascript:;" class="sidebar-minify-btn hidden-xs" data-click="sidebar-minify"><i class="fa fa-angle-double-left"></i></a></li>
+                    <li><a href="javascript:;" class="sidebar-minify-btn navbar-toggle visible-xs" data-click="sidebar-toggled"><i class="fa fa-angle-double-left"></i></a></li>
+                    <!-- end sidebar buttons -->
+                </ul>
+                <!-- end sidebar nav -->
+            </div>
+            <!-- end sidebar scrollbar -->
+        </div>
+        @*<div class="sidebar-bg"></div>*@
+        <!-- end #sidebar -->
+        <!-- begin #content -->
+        <div id="content" class="content">
+            @RenderBody()
+        </div>
+        <!-- end #content -->
+        <!-- begin scroll to top btn -->
+        <a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+        <!-- end scroll to top btn -->
+        <div id="footer" class="footer">
+            <div @*class="container"*@>
+                <div class="footer-brand pull-right">
+                    <img src="/Content/Images/DeployLogo.png" width="60" />
+                    <span>© Copyright Color Admin 2017 @*An admin &amp; front end theme with serious impact. Created by <a href="#">Sabio Team</a>*@</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Begin footer-->
+    <!--End footer-->
+    <!-- ================== BEGIN BASE JS ================== -->
+    <script src="/assets/admin/plugins/jquery/jquery-1.9.1.min.js"></script>
+    <script src="/assets/admin/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+    <script src="/assets/admin/plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+    <script src="/assets/admin/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <!--[if lt IE 9]>
+        <script src="/assets/admin/crossbrowserjs/html5shiv.js"></script>
+        <script src="/assets/admin/crossbrowserjs/respond.min.js"></script>
+        <script src="/assets/admin/crossbrowserjs/excanvas.min.js"></script>
+    <![endif]-->
+    <script src="/assets/admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="/assets/admin/plugins/jquery-cookie/jquery.cookie.js"></script>
+    <!-- ================== END BASE JS ================== -->
+    <!-- ================== BEGIN PAGE LEVEL JS ================== -->
+    <script src="/assets/admin/js/apps.js"></script>
+    <!-- ================== END PAGE LEVEL JS ================== -->
+    <script type="text/javascript">
+        var APPNAME = 'SabioApp';
+    </script>
+    <script src="~/Scripts/sabio.js"></script>
+
+    @Scripts.Render("~/bower/angular")
+
+    <script src="~/Assets/Admin/plugins/moment/moment.min.js"></script>
+
+    @RenderSection("pageInitScripts", required: false)
+
+    <script src="~/Scripts/sabio.ng.app.js"></script>
+    <script src="~/Scripts/toastr.js"></script>
+    <script src="~/Scripts/sabio.services.user.js"></script>
+    <script src="~/Scripts/sabio.services.timecardEntry.js"></script>
+
+    <!--
+        SabioRazor: notice that this script is not required and that it will be
+        rendered at the
+        very bottom of the rendered HTML file
+        -->
+
+    @Scripts.Render("~/sabio/core")
+    <script src="~/Scripts/app/controllers/LayoutController.js"></script>
+    <script src="~/Scripts/app/services/TimecardEntry.js"></script>
+
+    @RenderSection("scripts", required: false)
+
+    <script>
+        sabio.page.model = @Html.RawJson(Model);
+    </script>
+
+</body>
+</html>

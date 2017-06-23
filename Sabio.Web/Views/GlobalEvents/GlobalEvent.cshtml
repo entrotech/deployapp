@@ -1,0 +1,257 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+@section Styles{
+    <style>
+        #content {
+            margin-top: 20px;
+        }
+
+        .recent-post-container {
+            margin-top: 63px;
+        }
+
+        .recent-post-padding {
+            padding: 0px !important;
+        }
+
+        .post-desc {
+            height: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+            background-color: grey;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .cancel-color {
+            color: red;
+        }
+
+        .title-cancel {
+            text-decoration: line-through;
+        }
+
+        a:focus, a:hover {
+            text-decoration: none;
+        }
+    </style>
+}
+
+<div ng-controller="globalEventController as main">
+    <!-- begin #content -->
+    <div id="content" class="content">
+        <!-- begin container -->
+        <div class="container">
+            <h1 class="text-center page-header">Event Details</h1>
+            <!-- begin row -->
+            <div class="row row-space-30">
+                <!-- begin col-9 -->
+                <div class="col-md-9">
+                    <!-- begin post-detail -->
+                    <div class="post-detail section-container">
+                        <h4 class="post-title lead">
+                            <span ng-class="(main.item.isCanceled) ? 'title-cancel' : ''">{{main.item.name}}</span> <span ng-show="main.item.isCanceled" class="cancel-color"><b>CANCELED</b></span>
+                        </h4>
+                        <div class="post-by">
+                            Posted By
+                            <a href="#" class="author">
+                                {{main.item.personFirstName}} {{main.item.personLastName}}
+                            </a>
+                            <span class="divider">|</span>
+                            <span class="dateCreated">
+                                {{main.item.dateStart | date : "MMMM d, y"}} @@ {{main.item.startTime.slice(0, 5)}} Local <span ng-if="main.item.dateStart != main.item.dateEnd">- {{main.item.dateEnd | date : "MMMM d, y"}} @@ {{main.item.endTime.slice(0, 5)}} Local</span>
+                            </span>
+                            <span class="divider">|</span>
+                            <span class="category">
+                                Directions:
+                                <a ng-click="main.goToDirections()" href="#">
+                                    {{main.item.address}}, {{main.item.city}}, {{main.item.state}} {{main.item.zipCode}}
+                                </a>
+                            </span>
+                            <span class="divider">|</span>
+                            <span>
+                                Global Event
+                            </span>
+                        </div>
+                        <!-- begin map -->
+                        <div id="map">
+
+                        </div>
+                        <hr />
+                        <!-- end map -->
+                        <!-- begin post-desc -->
+                        <div class="post-desc">
+                            <p>
+                                {{main.item.description}}
+                            </p>
+                            <p>
+                                <a href="/globalevents">« Back to Index</a>
+                            </p>
+                        </div>
+                        <!-- end post-desc -->
+                    </div>
+                    <!-- end post-detail -->
+                </div>
+                <!-- end col-9 -->
+                <!-- begin col-3 -->
+                <div class="col-md-3">
+                    <!-- begin section-container -->
+                    <div class="section-container recent-post-container">
+                        <h4 class="section-title"><span>Upcoming Events</span></h4>
+                        <ul ng-repeat="item in main.items | limitTo: 3" class="sidebar-recent-post">
+                            <li>
+                                <div class="info">
+                                    <h4 class="title">
+                                        <a ng-click="main.viewEvent(item)" href="#">
+                                            <span ng-class="(item.isCanceled) ? 'title-cancel' : ''">{{item.name}}</span>
+                                        </a>
+                                    </h4>
+                                    <div class="date">
+                                        <div ng-show="item.isCanceled"><b>Canceled</b></div>
+                                        {{item.dateStart | date : "MMMM d, y"}}<br />
+                                        {{item.city}}, {{item.state}}
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="recent-post-padding">
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- end section-container -->
+                </div>
+                <!-- end col-3 -->
+            </div>
+            <!-- end row -->
+        </div>
+        <!-- end container -->
+    </div>
+</div>
+@section Scripts{
+    <script src="~/Scripts/sabio.services.globalEvent.js"></script>
+    <script>
+        sabio.page.eventId = @Model.Item;
+
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .factory("globalEventService", GlobalEventService);
+
+            GlobalEventService.$inject = ["$baseService", "$sabio"];
+
+            function GlobalEventService($baseService, $sabio) {
+                var globalEventSvcObj = sabio.services.globalEvent;
+                var globalEventService = $baseService.merge(true, {}, globalEventSvcObj, $baseService);
+                return globalEventService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller("globalEventController", GlobalEventController);
+
+            GlobalEventController.$inject = ["$scope", "$window", "$baseController", "globalEventService", "$sabio"];
+
+            function GlobalEventController($scope, $window, $baseController, globalEventService, $sabio) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.globalEventService = globalEventService;
+                vm.$window = $window;
+
+                // viewmodel
+                vm.eventId = $sabio.eventId;
+                vm.items = [];
+                vm.item = [];
+                vm.eventLat = null;
+                vm.eventLng = null;
+                vm.goToDirections = _goToDirections;
+                vm.viewEvent = _viewEvent;
+
+                _loadEvent();
+
+                function _loadEvent() {
+                    vm.globalEventService.getById(vm.eventId, _getByIdSuccess, _getByIdError);
+                }
+
+                function _getByIdSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.item = data.item;
+                    });
+
+                    vm.eventLat = vm.item.latitude;
+                    vm.eventLng = vm.item.longitude;
+
+                    _loadUpcomingEvents();
+                    _initMap();
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load event!");
+                }
+
+                function _loadUpcomingEvents() {
+                    vm.globalEventService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                    });
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load upcoming events!");
+                }
+
+                function _viewEvent(item) {
+                    vm.$window.location.href = "/globalevents/" + item.id;
+                }
+
+                function _goToDirections() {
+                    vm.$window.open(
+                        "https://www.google.com/maps/place/"
+                        + vm.item.address
+                        + " " + vm.item.city
+                        + " " + vm.item.state
+                        + " " + vm.item.zipCode
+                        + "/@@" + vm.eventLat
+                        + "," + vm.eventLng
+                    );
+                }
+
+                function _initMap() {
+                    var event = { lat: vm.eventLat, lng: vm.eventLng };
+                    var contentString = "<h5>" + vm.item.name + "</h5>";
+
+                    var map = new google.maps.Map($("#map")[0], {
+                        zoom: 10,
+                        center: event
+                    });
+
+                    var marker = new google.maps.Marker({
+                        position: event,
+                        map: map
+                    });
+
+                    var infoWindow = new google.maps.InfoWindow({
+                        content: contentString
+                    });
+
+                    marker.addListener("click", function() {
+                        infoWindow.open(map, marker);
+                    });
+                }
+            }
+        })();
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI">
+    </script>
+}

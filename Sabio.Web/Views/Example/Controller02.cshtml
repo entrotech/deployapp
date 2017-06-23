@@ -1,0 +1,54 @@
+﻿
+@{
+    ViewBag.Title = "Controller01";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+
+<h2>Simple Spicy Controller</h2>
+<ul>
+    <li>Use &quot;controller as&quot; syntax.</li>
+    <li>Use vm capture variable, so don&apos;t need explicit $scope dependency.</li>
+</ul>
+
+<div ng-app="spicyApp" ng-controller="SpicyController as spicyVm">
+    <input ng-model="spicyVm.customSpice">
+    <button ng-click="spicyVm.spicy('chili')">Chili</button>
+    <button ng-click="spicyVm.spicy(spicyVm.customSpice)">Custom spice</button>
+    <p>The food is {{spicyVm.spice}} spicy!</p>
+</div>
+
+
+@section scripts{
+
+    <script src="~/Scripts/angular.js"></script>
+
+    <script>
+        (function () {
+            "use strict";
+
+            angular.module('spicyApp', []);
+
+            angular.module('spicyApp')
+                .controller('SpicyController', SpicyController);
+
+            function SpicyController() {
+                var vm = this;
+
+                vm.customSpice = 'wasabi';
+                vm.spice = 'very';
+                vm.spicy =  _spicy;
+                
+                function _spicy(spice) {
+                    vm.spice = spice;
+                };
+                   
+            }
+
+        })();
+
+
+    </script>
+
+
+}
+

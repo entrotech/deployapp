@@ -1,0 +1,430 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+
+@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section Styles {
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-bottom: .5%;
+       }
+
+        .rounded {
+            border-radius: 5px;
+        }
+    </style>
+}
+
+<!-- begin breadcrumb -->
+<ol class="breadcrumb pull-right">
+    <li><a href="/globalevents">Index</a></li>
+    <li><a href="/globalevents/admin">Manage</a></li>
+    <li class="active">Create</li>
+</ol>
+<!-- end breadcrumb -->
+<!-- begin page-header -->
+<h1 class="page-header">Event <small>Create new event</small></h1>
+<!-- end page-header -->
+<!-- begin form content -->
+<div class="row">
+    <!-- begin col-12 -->
+    <div class="col-md-8">
+        <!-- begin panel -->
+        <div class="panel panel-inverse" data-sortable-id="form-stuff-1">
+            <div class="panel-heading">
+                <div class="panel-heading-btn">
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                </div>
+                <h4 class="panel-title"></h4>
+            </div>
+            <div class="panel-body">
+                <form id="event-form">
+                    <div class="form-group">
+                        <input type="text" class="hidden form-control" id="event-id" name="id">
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Event Name</label>
+                        <input type="text" class="form-control" id="event-name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="event-address" name="address">
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="event-city" name="city">
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <select class="form-control required" id="event-state" name="state">
+                            <option value="">- Select State -</option> 
+                            <option value="AL">Alabama</option>
+                            <option value="AK">Alaska</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="AR">Arkansas</option>
+                            <option value="CA">California</option>
+                            <option value="CO">Colorado</option>
+                            <option value="CT">Connecticut</option>
+                            <option value="DE">Delaware</option>
+                            <option value="DC">District Of Columbia</option>
+                            <option value="FL">Florida</option>
+                            <option value="GA">Georgia</option>
+                            <option value="HI">Hawaii</option>
+                            <option value="ID">Idaho</option>
+                            <option value="IL">Illinois</option>
+                            <option value="IN">Indiana</option>
+                            <option value="IA">Iowa</option>
+                            <option value="KS">Kansas</option>
+                            <option value="KY">Kentucky</option>
+                            <option value="LA">Louisiana</option>
+                            <option value="ME">Maine</option>
+                            <option value="MD">Maryland</option>
+                            <option value="MA">Massachusetts</option>
+                            <option value="MI">Michigan</option>
+                            <option value="MN">Minnesota</option>
+                            <option value="MS">Mississippi</option>
+                            <option value="MO">Missouri</option>
+                            <option value="MT">Montana</option>
+                            <option value="NE">Nebraska</option>
+                            <option value="NV">Nevada</option>
+                            <option value="NH">New Hampshire</option>
+                            <option value="NJ">New Jersey</option>
+                            <option value="NM">New Mexico</option>
+                            <option value="NY">New York</option>
+                            <option value="NC">North Carolina</option>
+                            <option value="ND">North Dakota</option>
+                            <option value="OH">Ohio</option>
+                            <option value="OK">Oklahoma</option>
+                            <option value="OR">Oregon</option>
+                            <option value="PA">Pennsylvania</option>
+                            <option value="RI">Rhode Island</option>
+                            <option value="SC">South Carolina</option>
+                            <option value="SD">South Dakota</option>
+                            <option value="TN">Tennessee</option>
+                            <option value="TX">Texas</option>
+                            <option value="UT">Utah</option>
+                            <option value="VT">Vermont</option>
+                            <option value="VA">Virginia</option>
+                            <option value="WA">Washington</option>
+                            <option value="WV">West Virginia</option>
+                            <option value="WI">Wisconsin</option>
+                            <option value="WY">Wyoming</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="zip">Zip Code</label>
+                        <input type="number" class="form-control" id="event-zip" name="zipCode">
+                    </div>
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <select class="form-control" id="event-country" name="country">
+                            <option value="US">United States of America</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Start Date</label>
+                        <input type="date" class="form-control" id="start-date" name="dateStart">
+                    </div>
+                    <div class="form-group">
+                        <label for="date">End Date</label>
+                        <input type="date" class="form-control" id="end-date" name="dateEnd">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Start Time</label>
+                        <input type="time" class="form-control" id="start-time" name="startTime">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">End Time</label>
+                        <input type="time" class="form-control" id="end-time" name="endTime">
+                    </div>
+                    <div class="form-group">
+                        <label for="body">Description</label>
+                        <textarea type="text" class="form-control" id="event-desc" name="description" rows="3"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-success" id="event-btn"></button>
+                    <a class="btn btn-default" href="/globalevents/index/admin">Cancel</a>
+                    <button type="button" class="btn btn-danger pull-right hidden" id="cancel-event">Cancel Event</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <div id="map" class="hidden rounded">
+
+        </div>
+    </div>
+</div>
+<!-- end form content -->
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval");
+    <script src="~/Scripts/sabio.services.globalEvent.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script type="text/javascript">
+        sabio.page.startUp = function () {
+            sabio.page.loadCreateEditMode();
+            sabio.page.initializeValidation();
+            $("#add-event").on("click", sabio.page.handlers.addMapMarker);
+            $("#edit-event").on("click", sabio.page.handlers.addMapMarker);
+            $("#cancel-event").on("click", sabio.page.handlers.cancelEvent);
+        };
+
+        sabio.page.loadCreateEditMode = function () {
+            sabio.page.id = @Model.Item;
+
+            if (sabio.page.id > 0) {
+                $("#event-btn").text("Save").attr("id", "edit-event");
+                $("#cancel-event").removeClass("hidden");
+                $(".panel-title").text("Edit");
+                sabio.page.fillEditForm();
+            } else {
+                $(".panel-title").text("Create");
+                $("#event-btn").text("Submit").attr("id", "add-event");
+            }
+        };
+
+        sabio.page.fillEditForm = function () {
+            sabio.services.globalEvent.getById(sabio.page.id, 
+                sabio.page.handlers.fillEditFormSuccess, 
+                sabio.page.handlers.fillEditFormError
+            );
+        };
+
+        sabio.page.handlers.fillEditFormSuccess = function (data, status, xhr) {
+            $("#event-id").val(data.item.id);
+            $("#event-name").val(data.item.name);
+            $("#event-address").val(data.item.address);
+            $("#event-city").val(data.item.city);
+            $("#event-state").val(data.item.state);
+            $("#event-zip").val(data.item.zipCode);
+            $("#event-country").val(data.item.country);
+            var dateStart = data.item.dateStart;
+            var formattedStartDate = dateStart.slice(0, 10);
+            $("#start-date").val(formattedStartDate);
+            var dateEnd = data.item.dateEnd;
+            var formattedEndDate = dateEnd.slice(0, 10);
+            $("#end-date").val(formattedEndDate);
+            $("#start-time").val(data.item.startTime);
+            $("#end-time").val(data.item.endTime);
+            $("#event-desc").val(data.item.description);
+        };
+
+        sabio.page.initializeValidation = function () {
+            jQuery.validator.setDefaults({
+                debug: true
+            });
+
+            $("#event-form").validate({
+                highlight: function (element) {
+                    $(element).addClass("form-validate");
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass("form-validate");
+                },
+                errorPlacement: function (label, element) {
+                    element.parent().append(label);
+                },
+                errorClass: "error-msg",
+                errorElement: "span",
+                rules: {
+                    "name": {
+                        required: true,
+                        maxlength: 50
+                    },
+                    "address": {
+                        required: true
+                    },
+                    "city": {
+                        required: true
+                    },
+                    "state": {
+                        required: true
+                    },
+                    "zipCode": {
+                        required: true,
+                        digits: true
+                    },
+                    "dateStart": {
+                        required: true
+                    },
+                    "dateEnd": {
+                        required: true
+                    },
+                    "startTime": {
+                        required: true
+                    },
+                    "endTime": {
+                        required: true
+                    },
+                    "description": {
+                        maxlength: 1000
+                    }
+                }
+            });
+        };
+
+        // google maps start up function
+        sabio.page.handlers.initMap = function () {
+            sabio.page.map = new google.maps.Map($("#map")[0], {
+                center: { lat: 33.9885, lng: -118.3869007 },
+                zoom: 8
+            });
+
+            google.maps.event.addDomListener(sabio.page.map, "idle", function () {
+                center = sabio.page.map.getCenter();
+            });
+
+            $(window).resize(function () {
+                sabio.page.map.setCenter(center);
+            });
+        };
+
+        // event handlers
+        sabio.page.handlers.captureAddress = function () {
+            var formData = {
+                address: $("#event-address").val(),
+                city: $("#event-city").val(),
+                state: $("#event-state").val(),
+                zip: $("#event-zip").val()
+            };
+
+            var address = formData.address + " "
+                + formData.city + " "
+                + formData.state + " "
+                + formData.zip;
+
+            var googleAddress = address.replace(/\s+/g, "+");
+
+            return googleAddress;
+        };
+
+        sabio.page.handlers.addMapMarker = function () {
+            if ($("#event-form").valid()) {
+                var googleAddress = sabio.page.handlers.captureAddress();
+
+                sabio.services.globalEvent.getLatLng(
+                    googleAddress,
+                    sabio.page.handlers.addMapMarkerSuccess,
+                    sabio.page.handlers.addMapMarkerError
+                );
+            }
+            else {
+                return;
+            }
+        };
+
+        sabio.page.handlers.addMapMarkerSuccess = function (data, status, xhr) {
+            if (data.status !== "ZERO_RESULTS") {
+                var lat = data.results[0].geometry.location.lat;
+                var lng = data.results[0].geometry.location.lng;
+                var latLng = new google.maps.LatLng(lat, lng);
+
+                var infowindow = new google.maps.InfoWindow({
+                    content: $("#event-desc").val()
+                });
+
+                var marker = new google.maps.Marker({
+                    position: latLng,
+                    map: sabio.page.map,
+                    title: $("#event-title").val(),
+                    animation: google.maps.Animation.DROP
+                });
+
+                marker.addListener('click', function () {
+                    infowindow.open(sabio.page.map, marker);
+                });
+
+                $("#map").removeClass("hidden");
+                google.maps.event.trigger(sabio.page.map, "resize");
+
+                $("html, body").animate({
+                    scrollTop: $("#map").offset().top
+                }, 800);
+
+                sabio.page.map.panTo(latLng);
+
+                sabio.page.handlers.submitForm(lat, lng);
+                console.log(data);
+            }
+            else {
+                toastr.error("Failed to create event!");
+            }
+        };
+
+        sabio.page.handlers.addMapMarkerError = function (jqXHR, textStatus, errorThrown) {
+            toastr.error("Failed to create event!");
+        };
+
+        sabio.page.handlers.submitForm = function (lat, lng) {
+            var formData = $("#event-form").serialize();
+            formData += "&latitude=" + lat + "&longitude=" + lng;
+            console.log(formData);
+            // edit mode
+            if (sabio.page.id > 0) {
+                sabio.services.globalEvent.put(
+                    sabio.page.id, 
+                    formData, 
+                    sabio.page.handlers.updateSuccess, 
+                    sabio.page.handlers.updateError
+                );
+            }
+            // create mode
+            else {
+                sabio.services.globalEvent.post(formData,
+                    sabio.page.handlers.submitFormSuccess,
+                    sabio.page.handlers.submitFormError
+                );
+            }
+        };
+
+        sabio.page.handlers.submitFormSuccess = function (data, status, xhr) {
+            toastr.success("Created!");
+            setTimeout ("window.location='/globalevents/map'", 2000);
+        };
+
+        sabio.page.handlers.submitFormError = function (jqXHR, textStatus, errorThrown) {
+            toastr.error("Failed to create event!");
+        };
+
+        sabio.page.handlers.updateSuccess = function (data, status, xhr) {
+            toastr.success("Updated!");
+            setTimeout ("window.location='/globalevents/map'", 2000);
+        };
+
+        sabio.page.handlers.updateError = function (jqXHR, textStatus, errorThrown) {
+            toastr.error("Failed to create event!");
+        };
+
+        sabio.page.handlers.cancelEvent = function () {
+            sabio.services.globalEvent.cancelById(
+                sabio.page.id,
+                sabio.page.handlers.onCancelSuccess,
+                sabio.page.handlers.onCancelError
+            );
+        };
+
+        sabio.page.handlers.onCancelSuccess = function (data, status, xhr) {
+            toastr.success("Canceled!");
+            setTimeout ("window.location='/globalevents/index/admin'", 1000);
+        };
+
+        sabio.page.handlers.onCancelError = function (jqXHR, textStatus, errorThrown) {
+            toastr.error("Failed!", errorThrown);
+        };
+    </script>
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI&callback=sabio.page.handlers.initMap">
+    </script>    
+}
+

@@ -1,0 +1,203 @@
+﻿
+
+@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+
+
+@section styles {
+    <style>
+        #date-sort {
+            margin-left: 10px;
+        }
+    </style>
+
+}
+
+<div ng-controller="projectsController as pjVm">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li><a href="/projects">Index</a></li>
+        <li><a href="/projects/create">Create</a></li>
+        <li class="active">Manage</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page header -->
+    <h1 class="page-header">Projects</h1>
+    <!-- end page header -->
+    <!-- begin row -->
+    <div class="row">
+        <!-- begin col-12 -->
+        <div class="col-md-12">
+            <div class="result-container">
+                <div class="input-group m-b-20 col-md-12">
+                    <input type="text" class="form-control input-white" placeholder="Enter keywords" ng-model="pjVm.searchStr" />
+                </div>
+                <div class="row filter-sort-wrapper">
+                    <div class="dropdown pull-left" id="date-sort">
+                        <a ng-click="pjVm.sortReverse = !pjVm.sortReverse" href="javascript:;"
+                           class="btn btn-white btn-white-without-border dropdown-toggle m-b-15" data-toggle="dropdown">
+                            Date Added
+                            <span ng-show="!pjVm.sortReverse" class="fa fa-caret-down"></span>
+                            <span ng-show="pjVm.sortReverse" class="fa fa-caret-up"></span>
+                        </a>
+                    </div>
+                </div>
+                <div id="projects-container">
+                    <!-- begin panel -->
+                    <div ng-repeat="item in pjVm.items | filter: pjVm.filterByTitleOrDesc | orderBy: pjVm.items.dateCreated: pjVm.sortReverse | paginate: pjVm.currentPage : pjVm.itemsPerPage" class="project panel panel-inverse" data-sortable-id="ui-media-object-4">
+                        <div class="panel-heading">
+                            <div class="panel-heading-btn">
+                                <span class="label label-info person"></span>
+                                <span class="label label-danger collapse-btn"></span>
+
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning"
+                                   data-click="panel-collapse">
+                                    <i class="fa fa-minus"></i>
+                                </a>
+                            </div>
+                            <h4 class="panel-title title">
+                                <a href="javascript:;">
+                                    {{item.projectName}}
+                                </a>
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="media media-sm">
+                                <div class="media-body">
+                                    <p class="small">{{item.dateCreated | date : "MMMM d, y"}}</p>
+                                    <p class="desc" ng-bind-html="pjVm.sanitize(item.description)"></p>
+                                    <p>
+                                        <a ng-click="pjVm.edit(item)" href="javascript:;" class="edit-project btn btn-sm btn-info m-t-5">
+                                            Edit <i class="fa fa-edit m-1-3"></i>
+                                        </a>
+                                        <a ng-click="pjVm.goToDashboard(item)" href="javascript:;" class="edit-project btn btn-sm btn-warning m-t-5">
+                                            View In Dashboard <i class="fa fa-rocket m-1-3"></i>
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end panel -->
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <ul uib-pagination ng-model="pjVm.currentPage" total-items="pjVm.totalItems" boundary-link="true" ng-change="pjVm.pageChanged()" items-per-page="pjVm.itemsPerPage"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end col-12-->
+    </div>
+    <!-- end row -->
+</div>
+
+
+
+
+@section pageInitScripts{
+
+}
+
+
+@section scripts {
+
+
+    <!-- Begin Linked Scripts -->
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/sabio.services.project.js"></script>
+    <script src="~/Scripts/app/services/project.js"></script>
+    <script src="~/Scripts/app/filters/paginate.js"></script>
+
+    <!-- End Linked Scripts -->
+
+    <script type="text/javascript">
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+            .controller('projectsController', ProjectsController); // creating controller and naming it, assigning it to a variable.
+
+            ProjectsController.$inject = ['$scope', '$window', '$baseController', 'projectsService', '$sce']; //
+
+            function ProjectsController($scope, $window, $baseController, projectsService, $sce) {
+
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.projectsService = projectsService;
+                vm.$window = $window;
+
+                vm.currentPage = 1;
+                vm.itemsPerPage = 10;
+                vm.totalItems = 0;
+                vm.sortReverse = false;
+                vm.filter = "";
+                vm.searchStr = "";
+                vm.items = [];
+                vm.pageChanged = _pageChanged;
+                vm.edit = _edit;
+                vm.sanitize = _sanitize;
+                vm.goToDashboard = _goToDashboard;
+                vm.filterByTitleOrDesc = _filterByTitleOrDesc;
+
+                vm.notify = vm.projectsService.getNotifier($scope);
+
+                _render();
+
+                function _render() {
+                    vm.projectsService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _sanitize(data) {
+                    return $sce.trustAsHtml(data);
+                }
+
+                function _getAllSuccess(data) {
+                    console.log(data);
+                    if (data.items.length >= 1) {
+                        vm.$scope.$apply(function () {
+                            vm.items = data.items;
+                            vm.totalItems = vm.items.length;                   
+                        });
+                    } else {
+                        vm.$alertService.success("No projects exist...yet.");
+                    }
+
+
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load projects.");
+                }
+
+                function _edit(items) {
+                    vm.$window.location.href = "/projects/" + items.id + "/edit";
+                }
+
+                function _goToDashboard(items) {
+                    vm.$window.location.href = "/projects/" + items.id + "/dashboard";
+                }
+
+                function _pageChanged() {
+                    //var begin = ((vm.currentPage - 1) * vm.itemsPerPage);
+                    //var end = begin + vm.itemsPerPage;
+                    //vm.paginatedItems = vm.items.slice(begin, end);
+                }
+
+                function _filterByTitleOrDesc(items, compare) {
+                    return items.projectName.toLowerCase().indexOf(vm.searchStr.toLowerCase()) > -1
+                    || items.description.toLowerCase().indexOf(vm.searchStr.toLowerCase()) > -1;
+                }
+
+
+
+            }
+        })();
+
+    </script>
+
+}

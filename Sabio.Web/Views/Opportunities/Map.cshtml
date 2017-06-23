@@ -1,0 +1,126 @@
+﻿
+@{
+    ViewBag.Title = "Map";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<style>
+    #map {
+        height: 550px;
+        width: 100%;
+        margin-bottom: .5%;
+    }
+
+    .rounded {
+        margin-top: 3%;
+        border-radius: 10px;
+    }
+</style>
+
+<h2>Map</h2>
+<div class="row">
+    <div class="col-md-12">
+        <div class="rounded" id="map">
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+   @* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI"></script>*@
+    <script src="~/Scripts/sabio.services.opportunity.js"></script>
+
+    <script type="text/javascript">
+        sabio.page.startUp = function () {
+            sabio.services.opportunity.getAll(
+                sabio.page.handlers.getAllSuccess,
+                sabio.page.handlers.getAllError
+            );
+        };
+
+        // start up functions
+        sabio.page.handlers.getAllSuccess = function (data) {
+            console.log(data);
+            var largeInfowindow = new google.maps.InfoWindow();
+            var bounds = new google.maps.LatLngBounds();
+
+            for (var i = 0; i < data.item.length; i++) {
+                var lat = data.item[i].geometry.latitude;
+                console.log(lat);
+                var lng = data.item[i].geometry.longitude;
+                var latLng = new google.maps.LatLng(lat, lng);
+                var date = data.item[i].eventDate;
+                //var formattedDate = date.slice(0, 10);
+                //var time = data.item[i].time;
+                //var formattedTime = time.slice(0, 5);
+
+                var marker = new google.maps.Marker({
+                    map: sabio.page.map,
+                    position: latLng,
+                    title: data.item[i].name,
+                    desc: data.item[i].description,
+                    //eventDate: formattedDate,
+                    //time: formattedTime,
+                    address: data.item[i].address,
+                    city: data.item[i].city,
+                    state: data.item[i].state,
+                    zip: data.item[i].zipCode,
+                    animation: google.maps.Animation.DROP,
+                    eventId: data.item[i].id
+                });
+
+                sabio.page.markers.push(marker);
+
+                marker.addListener("click", function () {
+                    sabio.page.handlers.populateInfoWindow(this, largeInfowindow);
+                });
+
+                bounds.extend(sabio.page.markers[i].position);
+            }
+            if (sabio.page.markers.length > 1) {
+                sabio.page.map.fitBounds(bounds);
+            }
+            else {
+                sabio.page.map.setCenter(latLng);
+            }
+        }
+
+        sabio.page.handlers.getAllError = function (jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+
+
+        // google maps start up function
+        sabio.page.handlers.initMap = function () {
+            sabio.page.markers = [];
+
+            sabio.page.map = new google.maps.Map($("#map")[0], {
+                center: { lat: 33.9885, lng: -118.3869007 },
+                zoom: 8
+            });
+
+            google.maps.event.addDomListener(sabio.page.map, "idle", function () {
+                center = sabio.page.map.getCenter();
+            });
+
+            $(window).resize(function () {
+                sabio.page.map.setCenter(center);
+            });
+        };
+
+
+
+
+        //sabio.page.map = new google.maps.Map($("#map")[0], {
+        //    center: { lat: 33.9885, lng: -118.3869007 },
+        //    zoom: 12
+        //});
+
+
+    </script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI&callback=sabio.page.handlers.initMap">
+</script>
+
+
+}

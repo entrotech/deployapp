@@ -1,0 +1,187 @@
+﻿@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@{
+    <style>
+        #date-sort {
+            margin-left: 10px;
+            margin-bottom: 10px;
+        }
+
+        span.category {
+            margin-left: 5px;
+        }
+
+        .category {
+            margin-right: 5px;
+        }
+    </style>
+}
+
+<div ng-controller="globalEventController as main">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li><a href="/globalevents/Create">Create</a></li>
+        <li class="active">Manage</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Global Events</h1>
+    <!-- end page-header -->
+    <!-- begin row -->
+    <div class="row">
+        <!-- begin col-12 -->
+        <div class="col-md-12">
+            <div class="result-container">
+                <div class="input-group m-b-20 col-md-12">
+                    <input type="text" class="form-control input-white"
+                           placeholder="Enter keywords" ng-model="main.searchString">
+                </div>
+                <div class="row">
+                    <div class="dropdown pull-left" id="date-sort">
+                        <a ng-click="main.sortReverse = !main.sortReverse" href="javascript:;"
+                           class="btn btn-white btn-white-without-border dropdown-toggle" data-toggle="dropdown">
+                            Date
+                            <span ng-show="!main.sortReverse" class="fa fa-caret-down"></span>
+                            <span ng-show="main.sortReverse" class="fa fa-caret-up"></span>
+                        </a>
+                    </div>
+                </div>
+                <div id="announcements-container">
+                    <!-- begin panel -->
+                    <div dir-paginate="item in main.items
+                        | filter: main.searchString
+                        | orderBy: main.items.dateCreated: main.sortReverse | itemsPerPage:5"
+                         class="announcement panel panel-inverse" data-sortable-id="ui-media-object-4">
+                        <div class="panel-heading">
+                            <div class="panel-heading-btn">
+                                <span class="label label-danger category">
+                                    {{item.dateCreated | date: "MM/dd/yyyy"}}
+                                </span>
+                                <span class="label label-info person">
+                                    {{item.personFirstName}} {{item.personLastName}}
+                                </span>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning"
+                                   data-click="panel-collapse">
+                                    <i class="fa fa-minus"></i>
+                                </a>
+                            </div>
+                            <h4 class="panel-title title">
+                                <a href="javascript:;">
+                                    {{item.name}}
+                                </a>
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="media media-sm">
+                                <div class="media-body">
+                                    <p class="body desc">
+                                        {{item.description}}
+                                    </p>
+                                    <hr />
+                                    <p class="body desc">
+                                        <small>{{item.address}}, {{item.city}}, {{item.state}} {{item.zipCode}}</small>
+                                    </p>
+                                    <p class="body desc">
+                                        <small>Start: {{item.dateStart | date : "MMMM d, y"}} @@ {{item.startTime.slice(0, 5)}} Local <br /> 
+                                            End: {{item.dateEnd | date : "MMMM d, y"}} @@ {{item.endTime.slice(0, 5)}} Local</small>
+                                    </p>
+                                    <p>
+                                        <a ng-click="main.edit(item)" href="javascript:;"
+                                           class="edit-announcement btn btn-sm btn-info m-r-5">
+                                            Edit <i class="fa fa-edit m-r-5"></i>
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end panel -->
+                </div>
+                <div class="row">
+                    <dir-pagination-controls max-size="5"
+                                             direction-links="true"
+                                             boundary-links="true">
+                    </dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <!-- end col-12 -->
+    </div>
+    <!-- end row -->
+</div>
+
+@section pageInitScripts{
+    <script src="~/Scripts/dirPagination.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("angularUtils.directives.dirPagination")
+    </script>
+}
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.globalEvent.js"></script>
+    <script>
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .factory("globalEventService", GlobalEventService);
+
+            GlobalEventService.$inject = ["$baseService", "$sabio"];
+
+            function GlobalEventService($baseService, $sabio) {
+                var globalEventSvcObj = sabio.services.globalEvent;
+                var globalEventService = $baseService.merge(true, {}, globalEventSvcObj, $baseService);
+                return globalEventService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller("globalEventController", GlobalEventController);
+
+            GlobalEventController.$inject = ["$scope", "$window", "$baseController", "globalEventService"];
+
+            function GlobalEventController($scope, $window, $baseController, globalEventService) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.globalEventService = globalEventService;
+                vm.$window = $window;
+
+                // view model
+                vm.sortReverse = false;
+                vm.searchString = "";
+                vm.items = [];
+                vm.edit = _edit;
+
+                _render();
+
+                function _render() {
+                    vm.globalEventService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _getAllSuccess(data) {
+                    console.log(data);
+                    if (data.items) {
+                        vm.$scope.$apply(function () {
+                            vm.items = data.items;
+                        });
+                    }
+                    else {
+                        vm.$alertService.success("No events exist!");
+                    }
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load events!");
+                }
+
+                function _edit(item) {
+                    vm.$window.location.href = "/globalevents/" + item.id + "/edit";
+                }
+            }
+        })();
+    </script>
+}

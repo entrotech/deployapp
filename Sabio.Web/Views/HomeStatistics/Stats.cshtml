@@ -1,0 +1,166 @@
+﻿
+@{
+    ViewBag.Title = "Stats";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section Styles {
+    <style>
+        .statColumn {
+            border-right: 1px solid white;
+        }
+    </style>
+}
+
+<h1 class="page-header">Stats</h1>
+<hr />
+<div ng-controller="statsController as sVm">
+    <div class="row">
+        <div class="col-md-3 statColumn">
+            <input type="checkbox" ng-model="sVm.submit.autoPopulate1" ng-change="sVm.checkAuto()" />
+            <label>Autopopulate Number of Members</label>
+            <hr />
+            <label>Title</label>
+            <input type="text" ng-model="sVm.submit.title1" class="form-control" ng-disabled="sVm.submit.autoPopulate1" />
+            <label>Number</label>
+            <input type="text" ng-model="sVm.submit.number1" class="form-control" ng-disabled="sVm.submit.autoPopulate1" />
+        </div>
+        <div class="col-md-3 statColumn">
+            <input type="checkbox" ng-model="sVm.submit.autoPopulate2" ng-change="sVm.checkAuto()" />
+            <label>Autopopulate Number of Job Postings</label>
+            <hr />
+            <label>Title</label>
+            <input type="text" ng-model="sVm.submit.title2" class="form-control" ng-disabled="sVm.submit.autoPopulate2" />
+            <label>Number</label>
+            <input type="text" ng-model="sVm.submit.number2" class="form-control" ng-disabled="sVm.submit.autoPopulate2" />
+        </div>
+        <div class="col-md-3 statColumn">
+            <input type="checkbox" ng-model="sVm.submit.autoPopulate3" ng-change="sVm.checkAuto()" />
+            <label>Autopopulate Number of Squads</label>
+            <hr />
+            <label>Title</label>
+            <input type="text" ng-model="sVm.submit.title3" class="form-control" ng-disabled="sVm.submit.autoPopulate3" />
+            <label>Number</label>
+            <input type="text" ng-model="sVm.submit.number3" class="form-control" ng-disabled="sVm.submit.autoPopulate3" />
+        </div>
+        <div class="col-md-3">
+            <input type="checkbox" ng-model="sVm.submit.autoPopulate4" ng-change="sVm.checkAuto()" />
+            <label>Autopopulate Number of Events</label>
+            <hr />
+            <label>Title</label>
+            <input type="text" ng-model="sVm.submit.title4" class="form-control" ng-disabled="sVm.submit.autoPopulate4" />
+            <label>Number</label>
+            <input type="text" ng-model="sVm.submit.number4" class="form-control" ng-disabled="sVm.submit.autoPopulate4" />
+        </div>
+    </div>
+    <hr />
+    <button type="button" class="btn btn-primary" ng-click="sVm.save()">Save</button>
+</div>
+
+
+@section PageInitScripts {
+
+}
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.homeStatistics.js"></script>
+
+    <script>
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('homeStatisticsService', HomeStatisticsService);
+
+            function HomeStatisticsService() {
+                var aSabioServiceObject = sabio.services.homeStatistics;
+                return aSabioServiceObject;
+            }
+        })();
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .controller('statsController', StatsController);
+
+            StatsController.$inject = ['$scope', '$sabio', '$baseController', 'homeStatisticsService'];
+
+            function StatsController($scope, $sabio, $baseController, homeStatisticsService) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.homeStatisticsService = homeStatisticsService;
+
+                vm.submit = {
+                    autoPopulate1: false,
+                    autoPopulate2: false,
+                    autoPopulate3: false,
+                    autoPopulate4: false,
+                    title1: "",
+                    title2: "",
+                    title3: "",
+                    title4: "",
+                    number1: "",
+                    number2: "",
+                    number3: "",
+                    number4: ""
+                };
+
+                vm.save = _save;
+                vm.checkAuto = _checkAuto;
+
+                _getAll();
+
+                function _getAll() {
+                    vm.homeStatisticsService.getAll(_onGetSuccess, _onGetError);
+                }
+
+                function _onGetSuccess(data) {
+                    if (data.items) {
+                        vm.$scope.$apply(function () {
+                            for (var i = 0; i < data.items.length; i++) {
+                                var titleString = "title" + (i + 1);
+                                var numberString = "number" + (i + 1);
+                                var autoPopulateString = "autoPopulate" + (i + 1);
+                                vm.submit[titleString] = data.items[i].title;
+                                vm.submit[numberString] = data.items[i].number;
+                                vm.submit[autoPopulateString] = data.items[i].autoPopulate;
+                            }
+                            _checkAuto();
+                        })
+                    }
+                }
+
+                function _onGetError(data) {
+                    vm.$alertService.error("Failed to get stats");
+                }
+
+                function _save() {
+                    vm.homeStatisticsService.update(vm.submit, _onUpdateSuccess, _onUpdateError);
+                }
+
+                function _onUpdateSuccess(data) {
+                    vm.$alertService.success("Stats Updated");
+                }
+
+                function _onUpdateError(data) {
+                    vm.$alertService.error("Stats failed to update");
+                }
+
+                function _checkAuto() {
+                    if (vm.submit.autoPopulate1) {
+                        vm.submit.title1 = "Members";
+                    }
+                    if (vm.submit.autoPopulate2) {
+                        vm.submit.title2 = "Job Postings";
+                    }
+                    if (vm.submit.autoPopulate3) {
+                        vm.submit.title3 = "Squads";
+                    }
+                    if (vm.submit.autoPopulate4) {
+                        vm.submit.title4 = "Events";
+                    }
+                }
+            }
+        })();
+    </script>
+}

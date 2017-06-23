@@ -1,0 +1,203 @@
+﻿@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        /*#F4F6F7*/
+        body {
+            background: #fff;
+        }
+
+        .cat-container {
+            border-top: 1px solid #e2e7eb;
+        }
+
+        .cat-container:hover {
+            background: rgba(224, 224, 224, 0.2);
+        }
+
+        a:hover, a:focus {
+            text-decoration: none;
+        }
+
+        a:focus {
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+            color: #008a8a;
+            font-weight: bold;
+        }
+
+        .cat-item {
+            padding: 10px;
+            margin-bottom: 0;
+        }
+
+        .panel {
+            padding-bottom: 5px;
+        }
+
+        .panel-default > .panel-heading {
+            background: #fff;
+        }
+
+        .panel-default {
+            border-color: rgba(112, 116, 120, 0.4);
+        }
+
+        .fa {
+            margin-right: 15px;
+        }
+
+        .cat-wrapper, .panel-shadow {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        }
+
+        .panel-shadow:hover {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07), 0 3px 3px rgba(0,0,0,0.11);
+        }
+
+        .cat-wrapper:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.14), 0 6px 6px rgba(0,0,0,0.16);
+        }
+
+        .faq-header {
+            background: #fff;
+            padding: 50px 0 20px 0;
+        }
+
+        #content {
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .content{
+            padding-top: 40px;
+        }
+        .page-header>h1{
+            font-size: 36px;
+            font-family: 'Open Sans', "Helvetica Neue",Helvetica,Arial,sans-serif;
+            color: #707478;
+            font-weight: 500;
+        }
+    </style>
+}
+
+<div class="content" ng-controller="faqController as main">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="text-center ">FAQs</h1>
+        </div>
+    </div>
+    <div class="content">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-md-offset-1">
+                    <!-- begin categories -->
+                    <div class="panel panel-default panel-body cat-wrapper">
+                        <h6 class="text-center lead">Categories</h6>
+                        <div class="cat-container">
+                            <h5 class="cat-item"><a id="focusAnchor" href="#" ng-click="main.filter = 'General'"><i class="fa fa-question-circle fa-fw"></i> General</a></h5>
+                        </div>
+                        <div class="cat-container">
+                            <h5 class="cat-item"><a href="#" ng-click="main.filter = 'Employment'"><i class="fa fa-suitcase fa-fw"></i> Employment</a></h5>
+                        </div>
+                        <div class="cat-container">
+                            <h5 class="cat-item"><a href="#" ng-click="main.filter = 'Deploy'"><i class="fa fa-terminal fa-fw"></i> Deploy</a></h5>
+                        </div>
+                        <div class="cat-container">
+                            <h5 class="cat-item"><a href="#" ng-click="main.filter = 'Donations'"><i class="fa fa-usd fa-fw"></i> Donations</a></h5>
+                        </div>
+                        <div class="cat-container">
+                            <h5 class="cat-item"><a href="#" ng-click="main.filter = 'Squads'"><i class="fa fa-group fa-fw"></i> Squads</a></h5>
+                        </div>
+                        <div class="cat-container">
+                            <h5 class="cat-item"><a href="#" ng-click="main.filter = 'Education'"><i class="fa fa-file-code-o fa-fw"></i> Education</a></h5>
+                        </div>
+                    </div>
+                    <!-- end categories -->
+                </div>
+                <!-- begin accordions-->
+                <div class="col-md-7">
+                    <div class="panel-group m-b-0" id="accordion">
+                        <!-- begin panel -->
+                        <div class="panel panel-default panel-shadow" ng-repeat="faq in main.faqs | filter: {faqCategory: {name: main.filter}}">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#{{faq.id}}" aria-expanded="false" class="collapsed">{{faq.question}}</a>
+                                </h4>
+                            </div>
+                            <div id="{{faq.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                <div class="panel-body">
+                                    <p>{{faq.answer}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end panel-->
+                    </div>
+                </div>
+                <!-- end accordions -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.faq.js"></script>
+    <script>
+        (function () {
+            "use strict";
+
+            document.getElementById("focusAnchor").focus();
+
+            angular.module(APPNAME)
+                .factory("faqService", FaqService);
+
+            FaqService.$inject = ["$baseService", "$sabio"];
+
+            function FaqService($baseService, $sabio) {
+                var faqServiceSvcObj = sabio.services.faq;
+                var faqService = $baseService.merge(true, {}, faqServiceSvcObj, $baseService);
+                return faqService;
+            }
+        })();
+
+        (function () {
+            "use strict";
+
+            angular.module(APPNAME)
+                .controller("faqController", FaqController);
+
+            FaqController.$inject = ["$scope", "$window", "$baseController", "faqService"];
+
+            function FaqController($scope, $window, $baseController, faqService) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.faqService = faqService;
+                vm.$window = $window;
+
+                // viewmodel
+                vm.faqs = [];
+                vm.filter = "General";
+
+                _render();
+
+                function _render() {
+                    vm.faqService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.faqs = data.items;
+                    });
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load FAQs!");
+                }
+            }
+        })();
+    </script>
+}
+

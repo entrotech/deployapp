@@ -1,0 +1,6 @@
+﻿<div class="p-10">
+    <div><strong>{{person.fullName}}</strong></div>
+    <div><em>{{person.jobTitle}}</em></div>
+    <div ng-show="person.phoneNumber"><span class="fa fa-phone m-r-4"></span>{{person.phoneNumber | tel}}</div>
+    <div ng-show="person.email"><span class="fa fa-envelope m-r-4"></span>{{person.email}}</div>
+</div>

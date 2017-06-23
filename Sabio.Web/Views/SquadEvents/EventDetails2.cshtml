@@ -1,0 +1,216 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+@section Styles{
+    <style>
+        #content {
+            margin-top: 20px;
+        }
+
+        .recent-post-container {
+            margin-top: 83px;
+        }
+
+        .recent-post-padding {
+            padding: 0px !important;
+        }
+
+        .post-desc {
+            height: 100%;
+        }
+
+        /*#map {
+            width: 100%;
+            height: 400px;
+            background-color: grey;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }*/
+
+        .post-detail {
+            margin-top: 20px;
+        }
+
+        .cancel-color {
+            color: red;
+        }
+
+        .title-cancel {
+            text-decoration: line-through;
+        }
+    </style>
+}
+
+<div ng-controller="squadEventController as main">
+    <div class="page-header">
+        <div class="container">
+            <h1 class="text-center lead">Event Details</h1>
+        </div>
+    </div>
+    <!-- begin #content -->
+    <div id="content" class="content">
+        <!-- begin container -->
+        <div class="container">
+            <!-- begin row -->
+            <div class="row row-space-30">
+                <!-- begin col-9 -->
+                <div class="col-md-9">
+                    <!-- begin post-detail -->
+                    <div class="post-detail section-container">
+                        <h4 class="post-title lead">
+                            {{main.event.name}}
+                        </h4>
+                        <div class="post-by">
+                            @*Posted By
+                            <a href="#" class="author">
+                                {{main.item.userIdCreated}}
+                            </a>
+                            <span class="divider">|</span>*@
+                            <span class="dateCreated">
+                                {{main.event.eventStart | date : "MMMM d, y"}} @@ {{main.event.eventStart.slice(11, 16)}} {{main.event.timezone}}
+                            </span>
+                            <span class="divider">|</span>
+                            <span class="category">
+                                {{main.event.location}}
+                                @*Directions:
+                                <a href="#">
+                                    {{main.item.location}}
+                                </a>*@
+                            </span>
+                            <span class="divider">|</span>
+                            <span>
+                                Squad Event
+                            </span>
+                        </div>
+                        @*<!-- begin map -->
+                        <div id="map">
+
+                        </div>
+                        <hr />
+                        <!-- end map -->*@
+                        <div class="post-image">
+                            <img src="https://deploy.dev/Content/Images/blog/post1.jpg" />
+                        </div>
+                        <!-- begin post-desc -->
+                        <div class="post-desc">
+                            <p>
+                                {{main.event.description}}
+                            </p>
+                            <p>
+                                <a href="/squadevents">« Back to Index</a>
+                            </p>
+                        </div>
+                        <!-- end post-desc -->
+                    </div>
+                    <!-- end post-detail -->
+                </div>
+                <!-- end col-9 -->
+                <!-- begin col-3 -->
+                <div class="col-md-3">
+                    <!-- begin section-container -->
+                    <div class="section-container recent-post-container">
+                        <h4 class="section-title"><span>Upcoming Events</span></h4>
+                        <ul ng-repeat="event in main.events | limitTo: 3 | orderBy: event.eventStart" class="sidebar-recent-post">
+                            <li>
+                                <div class="info">
+                                    <h4 class="title">
+                                        <a ng-click="main.viewEvent(event)" href="#">
+                                            {{event.name}}
+                                        </a>
+                                    </h4>
+                                    <div class="date">{{event.eventStart | date : "MMMM d, y"}}</div>
+                                </div>
+                            </li>
+                            <li class="recent-post-padding">
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- end section-container -->
+                </div>
+                <!-- end col-3 -->
+            </div>
+            <!-- end row -->
+        </div>
+        <!-- end container -->
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/sabio.services.squadEvent.js"></script>
+    <script>
+
+        sabio.page.activeEventId = @Model.Item;
+
+        //squad event service//
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('squadEventService', SquadEventService);
+
+            SquadEventService.$inject = ["$baseService", "$sabio"];
+
+            function SquadEventService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.squadEvent;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        }
+        )();
+
+
+
+        //squad event controller
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .controller('squadEventController', SquadEventController);
+
+            SquadEventController.$inject = ['squadEventService', '$scope', '$window'];
+
+            function SquadEventController(squadEventService, $scope, $window) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$window = $window;
+                vm.squadEventService = squadEventService;
+
+                vm.event = null;
+                vm.events = [];
+                vm.viewEvent = _viewEvent;
+
+                _loadActiveEvent();
+
+                function _loadActiveEvent () {
+                    vm.squadEventService.getById(sabio.page.activeEventId, _onEventLoadSuccess, _onEventLoadError);
+                    vm.squadEventService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _onEventLoadSuccess (data) {
+                    vm.$scope.$apply(function () {
+                        vm.event = data.item;
+                    });
+                }
+
+                function _onEventLoadError (data) {
+                    console.log(data);
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.events = data.items;
+                    });
+                }
+
+                function _getAllError(jqXHR) {
+                    console.log(jqXHR.responseText);
+                }
+                
+                function _viewEvent(item) {
+                    vm.$window.location.href = "/squadevents/eventdetails/" + item.id;
+                }
+            }
+        })();
+    </script>
+}
+

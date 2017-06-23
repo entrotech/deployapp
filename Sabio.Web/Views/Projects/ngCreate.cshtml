@@ -1,0 +1,303 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+
+@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section styles {
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <style>
+        .currencyinput {
+            border: 1px inset #ccc;
+        }
+
+            .currencyinput input {
+                border: 0;
+            }
+    </style>
+}
+
+<div data-ng-controller="exController as exVm">
+    <ol class="breadcrumb pull-right">
+        <li><a href="/">Home</a></li>
+        <li><a href="/Projects/Index">Project</a></li>
+        <li class="active">Create Project</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Project</h1>
+    <!-- end page-header -->
+    <!-- begin form content -->
+    <div class="row">
+        <!-- begin col-6 -->
+        <div class="col-md-8">
+            <!-- begin panel -->
+            <div class="panel panel-inverse" data-sortable-id="form-stuff-1">
+                <div class="panel-heading">
+                    <div class="panel-heading-btn">
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                        <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                    </div>
+                    <h4 class="panel-title" id="edSwap">{{exVm.id > 0 ? 'Edit' : 'Create'}}</h4>
+                </div>
+
+                <div class="panel-body">
+                    <div id="discTxt"><p class="pull-right"><small>* indicates a required field</small></p></div>
+                    <form name="formData" id="formData" ng-submit="exVm.submitForm(formData.$valid)" novalidate>
+                        <div class="form-group" ng-class="{ 'has-error' : formData.projectName.$invalid && !formData.projectName.$pristine }">
+                            <label for="projectName">Project Name*</label>
+                            <input type="text" class="form-control" name="projectName" ng-model="exVm.item.projectName" ng-maxlength="50" placeholder="Enter Project Name (Required)" required>
+                            <p ng-show="formData.projectName.$invalid && !formData.projectName.$pristine" class="help-block">A project name is required.</p>
+                            <p ng-show="formData.projectName.$error.maxlength" class="help-block">Project name is too long.</p>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has error': formData.ckeditor.$invalid && !formData.ckeditor.$pristine }">
+                            <label for="description">Description*</label>
+                            <textarea class="form-control ckeditor" id="ckeditor" name="ckeditor" data-ng-bind-html="exVm.sanitize(exVm.item.description)" rows="5" placeholder="Description (Required)" required></textarea>
+                            <p ng-show="formData.ckeditor.$invalid && !formData.ckeditor.$pristine" class="help-block">A description is required.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="budget">Budget</label>
+                            <input type="number" class="form-control" ng-model="exVm.item.budget" placeholder="Budget" />
+                        </div>
+                        <div class="form-group">
+                            <label for="deadline">Deadline</label>
+                            <input type="date" class="form-control" ng-model="exVm.item.deadline" />
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : formData.companyId.$invalid && !formData.companyId.$pristine }">
+                            <label for="company">Company*</label>
+                            <select ng-model="exVm.item.companyId" ng-options="company.id as company.name for company in exVm.companies | orderBy: 'name'"></select>
+                        </div>
+                        <button type="button" class="btn" ng-class="exVm.id > 0 ? 'btn-warning' : 'btn-primary'" ng-click="exVm.save()" ng-disabled="formData.$invalid">{{exVm.id > 0 ? 'Update' : 'Submit'}}</button>
+                        <button type="button" class="btn btn-danger" ng-click="exVm.delete()">Delete</button>
+                        <button type="button" class="btn btn-default" ng-click="exVm.goHome()">Project List</button>
+                        <input type="text" id="boardName" placeholder="Enter the name of your new board" />
+                        <button type="button" class="btn btn-default" id="trelloBoard">Create Trello Board</button>
+
+                    </form>
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+<!-- end form content -->
+@section pageInitScripts{
+    <script src="~/Assets/Admin/plugins/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ng/angular-ckeditor.min.js"></script>
+
+
+}
+
+
+@section scripts {
+    @*Ian Armstrong's Trello Auth Key for testing; To be replaced by CurrentUser's*@
+    @{string key = "e80a9933c3ae90cce5448460161351bf";}
+    <script src=@String.Format("https://api.trello.com/1/client.js?key=" + key)></script>
+
+    <!-- Begin Linked Scripts -->
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/app/services/project.js"></script>
+    <script src="~/Scripts/sabio.services.project.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/app/services/company.js"></script>
+    <script src="~/Scripts/sabio.services.company.js"></script>
+
+
+    <script type="text/javascript">
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+            .controller('exController', ExController); // creating controller and naming it, then controller function name
+
+            ExController.$inject = ['$scope', '$window', '$baseController', 'projectsService', '$sce', 'companyService']; //
+
+            function ExController($scope, $window, $baseController, projectsService, $sce, companyService) {
+
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.projectsService = projectsService;
+                vm.companyService = companyService;
+                vm.$window = $window;
+
+                vm.notify = vm.projectsService.getNotifier($scope);
+
+                // View Model
+                vm.goHome = _goHome
+                vm.sanitize = _sanitize;
+                vm.item = {};
+                vm.items = [];
+                vm.id = @Model.Item;
+                vm.save = _save;
+                vm.delete = _delete;
+                vm.submitForm = _submitForm;
+                vm.companies = [];
+
+                _render();
+
+                // Defining Functions
+
+
+
+                function _render() {
+                    if (vm.id) {
+                        vm.projectsService.getById (vm.id, _getSuccess, _getError);
+                        
+                    }
+
+                    getAllCompnanies();
+                }
+
+                function _submitForm(isValid) {
+                    if (isValid) {
+                        console.log("Data valid. Object will POST/PUT.");
+                    } else {
+                        console.log("Data is invalid.");
+                    }
+                }
+
+                function _sanitize (data) {
+                    return $sce.trustAsHtml(data);
+                }
+
+                function _goHome() {
+                    vm.$window.location.href = "/projects/admin";
+                }
+
+                function _save() {
+                    vm.item.description = CKEDITOR.instances.ckeditor.getData();
+                    if (vm.id) {
+
+                        vm.projectsService.putJson(vm.id, vm.item, _putSuccess, _onError);
+                    } else {
+
+                        vm.projectsService.postJson(vm.item, _postSuccess, _onError);
+
+                    };
+                }
+
+                function _delete() {
+                    if (vm.id > 0) {
+                        sabio.ui.sweetalert.delete(vm.id, vm.projectsService.delete, _deleteSuccess, _onError);
+                    }
+                }
+
+                function _deleteSuccess() {
+                    vm.notify(function () {
+                        vm.id = 0;
+                        console.log("Record deleted.");
+                        CKEDITOR.instances.ckeditor.setData('');
+                        vm.item = null;
+                    });
+                }
+
+                function _putSuccess(data) {
+                    console.log("Put Successful.")
+                }
+
+                function _postSuccess(data) {
+                    vm.notify(function () {
+                        vm.id = data.item;
+                        vm.$window.location.href = "/projects/" + vm.id + "/dashboard"
+                    });
+
+
+                    console.log("Post Successful.")
+
+                }
+
+                function _onError(data) {
+                    console.log(data);
+                    console.log("Hey, something went wrong. Try again.")
+                }
+
+                function _getSuccess(data){
+                    vm.notify(function () {
+                        vm.item = data.item;
+                        if (vm.item.deadline) {
+                            var d = vm.item.deadline;
+
+                            //d = d.split('T')[0];
+                            d = new Date(d);
+                            vm.item.deadline = d
+                        }
+                    });
+                }
+
+                function _getError(jqXHR){
+                    console.log(jqXHR);
+                }
+
+                // ------- COMPANY FUNCTIONS -------- //
+
+                function getAllCompnanies(){
+                    vm.companyService.selectAll(_getCompaniesSuccess, _getCompaniesError)
+                }
+
+                function _getCompaniesSuccess(data){
+                    
+                    vm.$scope.$apply(function () {
+                        vm.companies = data.items;
+                    });
+                    console.log(vm.companies);
+                }
+
+                function _getCompaniesError() {
+                    console.log("Didn't work.")
+                }
+
+            }
+
+           
+
+
+        })();
+
+        //Trello functions Start
+        sabio.page.handlers.createBoard = function () {
+            Trello.authorize({
+                type: 'popup',
+                name: 'Getting Started Application',
+                scope: {
+                    read: 'true',
+                    write: 'true'
+                },
+                expiration: 'never',
+                success: sabio.page.authenticationSuccess,
+                error: sabio.page.authenticationFailure
+            });
+        }
+
+        sabio.page.authenticationSuccess = function () {
+            console.log('Successful authentication');
+            sabio.page.createBoard()
+        };
+
+        sabio.page.authenticationFailure = function () { console.log(data); };
+
+        sabio.page.createBoard = function () {
+            var creationSuccess = function (data) {
+                console.log('Board created successfully. Data returned:' + JSON.stringify(data));
+            };
+            var failure = function (data) {
+                console.log(data)
+            }
+            var newBoard = {
+                name: $("#boardName").val(),
+            };
+            Trello.post('/boards', newBoard, creationSuccess, failure);
+        }
+        //Trello functions End
+    </script>
+
+}

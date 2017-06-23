@@ -1,0 +1,798 @@
+﻿@{
+    //Sabio:
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+@section styles {
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <style>
+        #content {
+            padding: 0px 0px 0px 0px;
+        }
+        .m-50{
+            margin: 50px;
+        }
+    </style>
+}
+
+<!-- begin #home -->
+<div id="home" class="content has-bg home">
+    <!-- begin content-bg -->
+    <div class="content-bg">
+        <img src="~/assets/admin/img/login-bg/bg-8.jpg" alt="Home">
+    </div>
+    <!-- end content-bg -->
+    <!-- begin container -->
+    <div class="container home-content">
+        <h1>BUILD YOUR PROJECTS WITH AMERICA'S BEST AND BRIGHTEST</h1>
+        <p>
+            We help our vets learn how to code through software mentorship by applying our knowledge to real world projects.
+        </p>
+        <a href="/users/register" class="btn btn-theme">Join Us!</a><br>
+     
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #home -->
+<!-- begin #about -->
+<div id="about" class="content" data-scrollview="true">
+    <!-- begin container -->
+    <div class="container" data-animation="true" data-animation-type="fadeInDown">
+        <h2 class="content-title">About Us</h2>
+        <p class="content-desc">
+            Our mission is to empower the military community to learn software development,<br /> enter the tech industry, and code the future.
+        </p>
+        <!-- begin row -->
+        <div class="row">
+            <!-- begin col-4 -->
+            <div class="col-sm-6">
+                <!-- begin about -->
+                <div class="about">
+                    <h3>Our Story</h3>
+                    <p>
+                        Our founder and retired U.S. Army Captain David Molina attends his first hackathon in New York City. After a weekend learning at AngelHack he is inspired to pursue software craftsmanship as a post-military occupation. He submits his application to The Flatiron School while on active-duty only to discover that the program does not accept the New GI Bill as payment.
+                        Molina exits military serve in early 2013 and begins to self-learn Ruby on Rails, a full-stack web development platform for building comprehensive web applications attending Bmore on Rails meetups and taking One Month Rails online.
+                    </p>
+                    <p>
+                        "I enlisted in the Marine Corps Infantry to serve and win our country's wars. After my service, I searched for a new career. I knew I wanted to be part of the tip of the spear in an industry and I realized the tech industry is leading from the front. I Googled around and found Operation Code, a non-profit which helps veterans like me break into the tech industry. A couple weeks later they found a way to get me into GitHub's CodeConf LA. There, I found Sabio, a local code school which accepts the New GI Bill. Today, I am in the middle of a hackathon sponsored by Sabio in an effort to build a website to help folks in the military be successful by the time they get out. Operation Code not only paved a route for me, they also showed me what I can build with my imagination. Imagine what it can do for other veterans."
+                        - Jameel Matin, US Marine Corps veteran
+                    </p>
+                </div>
+                <!-- end about -->
+            </div>
+            <!-- end col-4 -->
+            <!-- begin col-4 -->
+            <div class="col-sm-6">
+                <h3>Our Philosophy</h3>
+                <!-- begin about-author -->
+                <div class="about-author">
+                    <div class="quote bg-silver">
+                        <i class="fa fa-quote-left"></i>
+                        <h3>Those who've served shouldn't learn to code alone. Our software mentorship program in a peer-to-peer, safe learning environment gets you coding today.</h3>
+                        <h3>We work harder,<br /><span>to let our user keep simple</span></h3>
+                        <i class="fa fa-quote-right"></i>
+                    </div>
+                    <div class="author">
+                        <div class="image">
+                            <img src="/assets/parallax/img/user-1.jpg" alt="Sean Ngu" />
+                        </div>
+                        <div class="info">
+                            Operation Code
+                            <small></small>
+                        </div>
+                    </div>
+                </div>
+                <!-- end about-author -->
+            </div>
+            <!-- end col-4 -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #about -->
+<!-- begin #milestone -->
+<div id="milestone" class="content bg-black-darker has-bg" data-scrollview="true">
+    <!-- begin content-bg -->
+    <div class="content-bg">
+        <img src="/assets/parallax/img/milestone-bg.jpg" alt="Milestone" />
+    </div>
+    <!-- end content-bg -->
+    <!-- begin container -->
+    <div class="container">
+        <!-- begin row -->
+        <div class="row">
+            <!-- begin col-3 -->
+            <div class="col-md-3 col-sm-3 milestone-col">
+                <div class="milestone">
+                    <div class="number" id="number1">0</div>
+                    <div class="title" id="title1">Squad Events</div>
+                </div>
+            </div>
+            <!-- end col-3 -->
+            <!-- begin col-3 -->
+            <div class="col-md-3 col-sm-3 milestone-col">
+                <div class="milestone">
+                    <div class="number" id="number2">0</div>
+                    <div class="title" id="title2">Members</div>
+                </div>
+            </div>
+            <!-- end col-3 -->
+            <!-- begin col-3 -->
+            <div class="col-md-3 col-sm-3 milestone-col">
+                <div class="milestone">
+                    <div class="number" id="number3">0</div>
+                    <div class="title" id="title3">Jobs</div>
+                </div>
+            </div>
+            <!-- end col-3 -->
+            <!-- begin col-3 -->
+            <div class="col-md-3 col-sm-3 milestone-col">
+                <div class="milestone">
+                    <div class="number" id="number4">0</div>
+                    <div class="title" id="title4">Events</div>
+                </div>
+            </div>
+            <!-- end col-3 -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #milestone -->
+<!-- begin #team -->
+<div id="team" class="content" data-scrollview="true">
+    <!-- begin container -->
+    <div class="container">
+        <h2 class="content-title">Our Team</h2>
+        <p class="content-desc">
+            We run fast and we run lean. When our operating environment changes, and new challenges emerge, we're ready to respond.<br /> We communicate as early and as often as possible, and default to overcommunication in all of our interactions.<br /> We always look for a better, more effective, and more efficient way to run our operations.
+
+        </p>
+        <!-- begin row -->
+        <div class="row">
+            <!-- begin col-4 -->
+            <div class="col-sm-6">
+                <!-- begin team -->
+                <div class="team">
+                    <div class="image" data-animation="true" data-animation-type="flipInX">
+                        <img src="~/Content/Images/David-Molina-199x300.jpg" alt="David Molina" />
+                    </div>
+                    <div class="info">
+                        <h3 class="name">U.S Army Captain<br /> David Molina</h3>
+                        <div class="title text-theme">FOUNDER</div>
+                        <p>Retired U.S. Army Captain David Molina attends his first hackathon in New York City.</p>
+                        <div class="social">
+                            <a href="#"><i class="fa fa-facebook fa-lg fa-fw"></i></a>
+                            <a href="#"><i class="fa fa-twitter fa-lg fa-fw"></i></a>
+                            <a href="#"><i class="fa fa-google-plus fa-lg fa-fw"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- end team -->
+            </div>
+            <!-- end col-4 -->
+            <!-- begin col-4 -->
+            <div class="col-sm-6">
+                <!-- begin team -->
+                <div class="team">
+                    <div class="image m-50" data-animation="true" data-animation-type="flipInX">
+
+                        <img src="/Content/Images/sabio-la-logo.png" />
+                    </div>
+                    <div class="info">
+                        <h3 class="name">Sabio</h3>
+                        <div class="title text-theme">WEB DEVELOPER</div>
+                        <div class="social">
+                            <a href="#"><i class="fa fa-facebook fa-lg fa-fw"></i></a>
+                            <a href="#"><i class="fa fa-twitter fa-lg fa-fw"></i></a>
+                            <a href="#"><i class="fa fa-google-plus fa-lg fa-fw"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- end team -->
+            </div>
+            <!-- end col-4 -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #team -->
+<!-- begin #quote -->
+<div id="quote" class="content bg-black-darker has-bg hidden" data-scrollview="true">
+    <!-- begin content-bg -->
+    <div class="content-bg">
+        <img src="/assets/parallax/img/quote-bg.jpg" alt="Quote" />
+    </div>
+    <!-- end content-bg -->
+    <!-- begin container -->
+    <div class="container" data-animation="true" data-animation-type="fadeInLeft" hidden>
+        <!-- begin row -->
+        <div class="row">
+            <!-- begin col-12 -->
+            <div class="col-md-12 quote">
+                <i class="fa fa-quote-left"></i>More and more veterans who leave the military <br/>
+                are becoming coders, and the mission of Operation Code is to help military veterans make that transition.
+                <i class="fa fa-quote-right"></i>
+                <small>Jeff Meyerson, Software Engineering Daily</small>
+            </div>
+            <!-- end col-12 -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #quote -->
+<!-- beign #service -->
+<div id="service" class="content hidden" data-scrollview="true" >
+    <!-- begin container -->
+    <div class="container">
+        <h2 class="content-title">Our Services</h2>
+        <p class="content-desc">
+            We ensure all service members, veterans and their families are ready for new career paths in software development through our uniquely tailored programs & services.
+        </p>
+        <!-- begin row -->
+        <div class="row">
+            <!-- begin col-4 -->
+            <div class="col-md-4 col-sm-4">
+                <div class="service">
+                    <div class="icon bg-theme" data-animation="true" data-animation-type="bounceIn"><i class="fa fa-cog"></i></div>
+                    <div class="info">
+                        <h4 class="title">Easy to Customize</h4>
+                        <p class="desc">Duis in lorem placerat, iaculis nisi vitae, ultrices tortor. Vestibulum molestie ipsum nulla. Maecenas nec hendrerit eros, sit amet maximus leo.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- end col-4 -->
+            <!-- begin col-4 -->
+            <div class="col-md-4 col-sm-4">
+                <div class="service">
+                    <div class="icon bg-theme" data-animation="true" data-animation-type="bounceIn"><i class="fa fa-paint-brush"></i></div>
+                    <div class="info">
+                        <h4 class="title">Clean & Careful Design</h4>
+                        <p class="desc">Etiam nulla turpis, gravida et orci ac, viverra commodo ipsum. Donec nec mauris faucibus, congue nisi sit amet, lobortis arcu.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- end col-4 -->
+            <!-- begin col-4 -->
+            <div class="col-md-4 col-sm-4">
+                <div class="service">
+                    <div class="icon bg-theme" data-animation="true" data-animation-type="bounceIn"><i class="fa fa-file"></i></div>
+                    <div class="info">
+                        <h4 class="title">Well Documented</h4>
+                        <p class="desc">Ut vel laoreet tortor. Donec venenatis ex velit, eget bibendum purus accumsan cursus. Curabitur pulvinar iaculis diam.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- end col-4 -->
+        </div>
+        <!-- end row -->
+        <!-- begin row -->
+        <div class="row">
+            <!-- begin col-4 -->
+            <div class="col-md-4 col-sm-4">
+                <div class="service">
+                    <div class="icon bg-theme" data-animation="true" data-animation-type="bounceIn"><i class="fa fa-code"></i></div>
+                    <div class="info">
+                        <h4 class="title">Re-usable Code</h4>
+                        <p class="desc">Aenean et elementum dui. Aenean massa enim, suscipit ut molestie quis, pretium sed orci. Ut faucibus egestas mattis.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- end col-4 -->
+            <!-- begin col-4 -->
+            <div class="col-md-4 col-sm-4">
+                <div class="service">
+                    <div class="icon bg-theme" data-animation="true" data-animation-type="bounceIn"><i class="fa fa-shopping-cart"></i></div>
+                    <div class="info">
+                        <h4 class="title">Online Shop</h4>
+                        <p class="desc">Quisque gravida metus in sollicitudin feugiat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- end col-4 -->
+            <!-- begin col-4 -->
+            <div class="col-md-4 col-sm-4">
+                <div class="service">
+                    <div class="icon bg-theme" data-animation="true" data-animation-type="bounceIn"><i class="fa fa-heart"></i></div>
+                    <div class="info">
+                        <h4 class="title">Free Support</h4>
+                        <p class="desc">Integer consectetur, massa id mattis tincidunt, sapien erat malesuada turpis, nec vehicula lacus felis nec libero. Fusce non lorem nisl.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- end col-4 -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #about -->
+<!-- begin #action-box -->
+<div id="action-box" class="content has-bg" data-scrollview="true">
+    <!-- begin content-bg -->
+    <div class="content-bg">
+        <img src="/assets/parallax/img/action-bg.jpg" alt="Action" />
+    </div>
+    <!-- end content-bg -->
+    <!-- begin container -->
+    <div class="container" data-animation="true" data-animation-type="fadeInRight">
+        <!-- begin row -->
+        <div class="row action-box">
+            <!-- begin col-9 -->
+            <div class="col-md-9 col-sm-9">
+                <div class="icon-large text-theme">
+                    <i class="fa fa-binoculars"></i>
+                </div>
+                <h3>CHECK OUT OPERATION CODE HOME PAGE</h3>
+                <p>
+                    Operation Code's Software Mentorship Program connects transitioning military, citizen-soldiers,veterans and their families with professional software developers for life-long learning and understanding.
+                </p>
+            </div>
+            <!-- end col-9 -->
+            <!-- begin col-3 -->
+            <div class="col-md-3 col-sm-3">
+                <a href="https://operationcode.org/" class="btn btn-outline btn-block">OPERATION CODE</a>
+            </div>
+            <!-- end col-3 -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #action-box -->
+<!--  BEGIN SQUADS -->
+<div id="work" class="content" data-scrollview="true">
+    <!-- begin container -->
+    <div class="container" data-animation="true" data-animation-type="fadeInDown">
+        <h2 class="content-title">Squads</h2>
+        <div class="row squadContainer wrapper panel-group">
+
+        </div>
+        <!-- end row -->
+
+
+    </div>
+    <div class="title-link">
+        <a href="/squads/index"><p>SEE MORE SQUADS<i class="fa fa-caret-right m-l-10"></i></p></a>
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #work -->
+<!-- begin #client -->
+<div id="client" class="content has-bg bg-green" data-scrollview="true">
+    <!-- begin content-bg -->
+    <div class="content-bg">
+        @*<img src="~/Assets/Parallax/img/client-bg.jpg" />*@
+    </div>
+    <!-- end content-bg -->
+    <!-- begin container -->
+    <div class="container" data-animation="true" data-animation-type="fadeInUp">
+        <h2 class="content-title">Testimonials</h2>
+        <!-- begin carousel -->
+        <div class="carousel testimonials slide" data-ride="carousel" id="testimonials">
+            <!-- begin carousel-inner -->
+            <div class="carousel-inner text-center">
+
+            </div>
+            <!-- end carousel-inner -->
+            <!-- begin carousel-indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#testimonials" data-slide-to="0" class="active"></li>
+                <li data-target="#testimonials" data-slide-to="1" class=""></li>
+                <li data-target="#testimonials" data-slide-to="2" class=""></li>
+            </ol>
+            <!-- end carousel-indicators -->
+        </div>
+        <!-- end carousel -->
+    </div>
+    <!-- end containter -->
+</div>
+<!-- end #client -->
+<!-- begin #pricing -->
+<div id="pricing" class="content" data-scrollview="true">
+    <!-- begin container -->
+    <div class="container" data-animation="true" data-animation-type="fadeInDown">
+        <h2 class="content-title">Job Listings</h2>
+        <div class="row jobContainer wrapper panel-group"></div>
+
+    </div>
+    <div class="title-link">
+        <a href="/jobpostings/index"><p>SEE MORE JOBS<i class="fa fa-caret-right m-l-10"></i></p></a>
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #pricing -->
+<!-- begin #contact -->
+<div id="contact" class="content bg-silver-lighter" data-scrollview="true">
+    <!-- begin container -->
+    <div class="container">
+        <h2 class="content-title">Contact Us</h2>
+        <p class="content-desc">
+            Operation Code is a tax-exempt 501(c)(3) nonprofit organization. Donor Privacy Policy and Refund Policy.<br />
+            Deploy is built on ASP.net and AngularJs.  This website was built by the Cake Cohort and is currently being maintained by Bobby.
+        </p>
+        <!-- begin row -->
+        <div class="row">
+            <!-- begin col-6 -->
+            <div class="col-md-6" data-animation="true" data-animation-type="fadeInLeft">
+                <h4>If you have any questions or comments, feel free to Contact Us.</h4>
+
+                <p>
+                    <strong>Operation Code</strong><br />
+                    1220 SW Morrison St<br />
+                    Suite 437<br />
+                    Portland, OR 97205<br />
+
+                </p>
+                <p>
+                    <i class="fa fa-phone fa-3x sr-contact" data-sr-id="8" style="; visibility: visible;  -webkit-transform: scale(1); opacity: 1;transform: scale(1); opacity: 1;-webkit-transition: -webkit-transform 0.6s cubic-bezier(0.6, 0.2, 0.1, 1) 0s, opacity 0.6s cubic-bezier(0.6, 0.2, 0.1, 1) 0s; transition: transform 0.6s cubic-bezier(0.6, 0.2, 0.1, 1) 0s, opacity 0.6s cubic-bezier(0.6, 0.2, 0.1, 1) 0s; "></i>
+                    <span class="phone">1-800-468-5865</span><br />
+                    <i class="fa fa-envelope-o fa-3x sr-contact" data-sr-id="9" style="; visibility: visible;  -webkit-transform: scale(1); opacity: 1;transform: scale(1); opacity: 1;-webkit-transition: -webkit-transform 0.6s cubic-bezier(0.6, 0.2, 0.1, 1) 0s, opacity 0.6s cubic-bezier(0.6, 0.2, 0.1, 1) 0s; transition: transform 0.6s cubic-bezier(0.6, 0.2, 0.1, 1) 0s, opacity 0.6s cubic-bezier(0.6, 0.2, 0.1, 1) 0s; "></i>
+                    <a href="mailto:krystyna@operationcode.org">staff@deployio.com</a>
+
+                </p>
+            </div>
+            <!-- end col-6 -->
+            <!-- Email Form-->
+            <!-- begin col-6 -->
+            <div class="col-md-6 form-col" data-animation="true" data-animation-type="fadeInRight">
+                <form class="form-horizontal" id="emailForm">
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Name <span class="text-theme">*</span></label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="name" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Email <span class="text-theme">*</span></label>
+                        <div class="col-md-9">
+                            <input type="email" class="form-control" name="email" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Message <span class="text-theme">*</span></label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="10" name="message"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3"></label>
+                        <div class="col-md-9 text-left">
+                            <button type="button" id="btnSubmit" class="btn btn-theme btn-block">Send Message</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Email Form-->
+            <!-- end col-6 -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container -->
+</div>
+<!-- end #contact -->
+@*<a href="javascript:;" class="btn btn-icon btn-circle btn-theme btn-scroll-to-top fade" data-click="scroll-to-top"><i class="fa fa-angle-up"></i></a>*@
+<!-- begin theme-panel -->
+<!-- end theme-panel -->
+<!-- end #page-container -->
+@section scripts {
+    <script src="~/Scripts/jquery.tmpl.js"></script>
+    <script src="~/Scripts/sabio.services.testimonial.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <script src="~/Scripts/sabio.services.user.js"></script>
+    @* -----------------Testimonial Template BEGIN--------------- *@
+    <script type="text/x-jquery-tmpl" id="testimonialTemplate">
+
+        <div class="item">
+            <blockquote>
+                <i class="fa fa-quote-left"></i>
+                ${content}
+                <i class="fa fa-quote-right"></i>
+            </blockquote>
+            <div class="name"> — <span class="text-theme">${person.firstName} ${person.lastName}</span>, ${person.jobTitle}</div>
+        </div>
+    </script>
+
+    @*------------------SQUAD Template BEGIN--------------------*@
+    @*<link href="~/Assets/Admin/css/SquadEventMT.css" rel="stylesheet" />*@
+    <script src="~/Scripts/sabio.services.squad.js"></script>
+    <script src="~/Scripts/sabio.services.homeStatistics.js"></script>
+    <script type="/text/x-jquery-tmpl" id="squadTemplate">
+        <!-- begin panel -->
+        <div class="wrapper col-sm-6">
+            <div class="panel panel-inverse data-list">
+                <div class="panel-heading">
+                    <h4 class="panel-title"><a href="/squads/${id}/homeng1">${name}</a></h4>
+                </div>
+                <div id="squads" class="panel-body">
+                    <div class="desc-info">
+                        <span><strong>Mission: </strong></span>
+                        <p class="mission">{{html mission}}</p>
+                    </div>
+                    <div class="desc-info">
+                        <span><strong>Description: </strong></span>
+                        <p class="notes">${notes}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- end panel -->
+    </script>
+    @*------------------SQUAD Template END-------------------*@
+    @* ---------------JobPosting Template BEGIN--------------- *@
+    <script src="~/Scripts/sabio.services.jobPosting.js"></script>
+    <script src="~/Scripts/jquery.tmpl.js"></script>
+    @*<link href="~/Assets/Admin/css/JobPostingMT.css" rel="stylesheet" />*@
+    <link href="~/Content/select2.css" rel="stylesheet" />
+    <script type="text/x-jquery-tmpl" id="jobPostingTemplate">
+        <div class="wrapper col-sm-6">
+            <div class="panel panel-inverse data-list">
+                <div class="panel-heading">
+                    <h4 class="panel-title"><a href="/jobpostings/${id}">${positionName}</a></h4>
+                    <span class="days-ago"><small>Posted ${daysAgo}</small></span>
+                </div>
+                <div id="faq-1" class="panel-body">
+                    <p><i class="fa fa-building m-r-20"></i><strong>${companyName}</strong></p>
+                    <p><i class="fa fa-map-pin m-r-20"></i>${location}</p>
+                    <p><i class="fa fa-dollar m-r-20"></i>${compensationString}</p>
+                    <p><i class="fa fa-tasks m-r-20"></i>${experienceLevel}</p>
+                    <p><i class="fa fa-clock-o m-r-20"></i>${duration}</p>
+
+                </div>
+            </div>
+        </div>
+
+    </script>
+    @*----------------JobPosting Template END------------------ *@
+
+    @*---------------Testimonial BEGIN-------------*@
+    <script type="text/javascript">
+
+        sabio.page.handlers.getTestimonialsSuccess = function (data) {
+            sabio.page.postTestimonials(data.items);
+        }
+
+        sabio.page.handlers.getTestimonialsError = function (data) {
+            console.log(data);
+        }
+
+        sabio.page.postTestimonials = function (testimonialArray) {
+            //var postingArray = [];
+            var testimonialArray = testimonialArray.splice(0, 3);
+            for (var i = 0; i < testimonialArray.length; i++) {
+                testimonialArray[i].content = $(testimonialArray[i].content).text();
+            }
+
+            $("#testimonialTemplate").tmpl(testimonialArray).appendTo(".carousel-inner");
+            $("#client .item:first").addClass("active");
+            $(".carousel").carousel();
+        }
+        //---------------Testimonial END-------------
+
+        //---------------Email BEGIN-------------
+        sabio.page.handlers.btnEmailSubmit = function () {
+            var data = $("#emailForm").serialize();
+            sabio.page.addEmail(data);
+        }
+
+        sabio.page.addEmail = function () {
+            var data = $("#emailForm").serialize();
+            var settings = {
+                cache: false
+        , success: sabio.page.onSuccess
+        , error: sabio.page.onError
+        , contentType: "application/x-www-form-urlencoded; charset=UTF-8"
+        , dataType: "json"
+        , data: data
+        , type: "POST"
+            };
+            $.ajax("/api/emails/send", settings);
+        }
+
+        sabio.page.onSuccess = function (data, status, xhr) {
+            toastr.info("Email Sent");
+            $("#emailForm")[0].reset();
+        }
+
+        sabio.page.onError = function (data, status, xhr) {
+            toastr.error("errors messages");
+        }
+        //---------------Email END-------------
+
+        //---------------SQUAD BEGIN-------------
+        sabio.page.handlers.getSquadsSuccess = function (data) {
+            sabio.page.postSquads(data.items);
+        }
+        sabio.page.handlers.getSquadsError = function (data) {
+            console.log(data);
+        }
+
+        sabio.page.postSquads = function (squadArray) {
+            var postingSquadArray1 = [];
+            var postingSquadArray2 = [];
+
+            for (i = 6; i < 12; i++) {
+                if (i > 3) {
+                    postingSquadArray1.push(squadArray[i])
+                } else {
+                    postingSquadArray2.push(squadArray[i])
+                }
+
+                //postingSquadArray.push(squadArray[i]);
+            }
+
+            $("#squadTemplate").tmpl(postingSquadArray1).appendTo(".squadContainer")
+            $("#squadTemplate").tmpl(postingSquadArray2).appendTo(".squadContainer")
+
+        }
+
+        //----------------SQUAD END--------------
+
+        //----------------JobPosting BEGIN-------------
+
+        sabio.page.handlers.getJobPostingsSuccess = function (data) {
+            sabio.page.postJobPostings(data.items);
+
+        }
+        sabio.page.handlers.getJobPostingsError = function (data) {
+            console.log(data);
+        }
+        sabio.page.postJobPostings = function (ajaxCall) {//template
+            var postJobPostingArray = ajaxCall.splice(0, 4);
+            for (var i = 0; i < postJobPostingArray.length; i++) {
+                var jp = postJobPostingArray[i];
+
+                //location
+                var locationArray = [];
+
+                locationArray.push(jp.city);
+
+                locationArray.push(jp.stateProvinceName);
+
+                locationArray.push(jp.countryName);
+
+                var locationString = locationArray.join(" ");
+                jp.location = locationString;
+
+                //compensation
+                jp.compensationString = sabio.page.compensationStringBuilder(jp.compensation, jp.compensationRateId);
+
+                //experience
+                jp.experienceLevel = sabio.page.convertExperienceLevelId(jp.experienceLevelId);
+
+                // duration
+
+                jp.duration = sabio.page.durationStringBuilder(jp.fullPartId, jp.contractPermanentId);
+
+
+                //date posted
+                var t = jp.dateCreated.split(/[- : T]/);
+                var d = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5]));
+                var today = new Date();
+                var daysAgo = parseInt((today - d) / 86400000);
+                if (daysAgo == 1) {
+                    daysAgo = daysAgo + " day ago";
+                } else {
+                    daysAgo = daysAgo + " days ago";
+                }
+                jp.daysAgo = daysAgo;
+            }
+            $("#jobPostingTemplate").tmpl(postJobPostingArray).appendTo(".jobContainer")
+        }
+
+        //compensationString
+
+        sabio.page.compensationStringBuilder = function (amt, rate) {
+            var formattedAmt = amt.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+            var formattedRate = "";
+            if (rate) {
+                switch (rate) {
+                    case 1:
+                        formattedRate = " per hour";
+                        break;
+                    case 2:
+                        formattedRate = " per day";
+                        formattedAmt = formattedAmt.slice(0, -3);
+                        break;
+                    case 3:
+                        formattedRate = " per year";
+                        formattedAmt = formattedAmt.slice(0, -3);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return "$" + formattedAmt + formattedRate;
+        }
+
+        //ExperienceConvertion
+        sabio.page.convertExperienceLevelId = function (id) {
+            var string = "";
+            switch (id) {
+                case 1:
+                    string = "Entry level";
+                    break;
+                case 2:
+                    string = "Mid-level";
+                    break;
+                case 3:
+                    string = "Senior level";
+                    break;
+                default:
+                    break;
+            }
+            return string;
+        }
+        //DurationString
+        sabio.page.durationStringBuilder = function (fullPartId, contractPermanentId) {
+            var stringArray = [];
+            if (fullPartId) {
+                switch (fullPartId) {
+                    case 1:
+                        stringArray.push("Part-time");
+                        break;
+                    case 2:
+                        stringArray.push("Full-time");
+                        break;
+                    case 3:
+                        stringArray.push("Part-time to full-time");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (contractPermanentId) {
+                switch (contractPermanentId) {
+                    case 1:
+                        stringArray.push("Contract");
+                        break;
+                    case 2:
+                        stringArray.push("Permanent");
+                        break;
+                    case 3:
+                        stringArray.push("Contract-to-hire");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            var string = stringArray.join(", ");
+            return string;
+        }
+
+        //----------------JobPostings END------------
+
+        //----------------Statistics Bar START-------
+
+        sabio.page.handlers.getHomeStatisticsSuccess = function (data) {
+            console.log(data);
+            for (var i = 0; i < data.items.length; i++) {
+                var titleString = "title" + (i + 1);
+                var numberString = "number" + (i + 1);
+                $("#" + titleString).text(data.items[i].title);
+                $("#" + numberString).text(data.items[i].number);
+            }
+        }
+
+        sabio.page.handlers.getHomeStatisticsError = function (data) {
+            console.log(data);
+        }
+
+        //----------------Statistics Bar END---------
+
+        sabio.page.startUp = function () {
+            sabio.services.testimonial.getAll(sabio.page.handlers.getTestimonialsSuccess, sabio.page.handlers.getTestimonialsError);
+            $("#btnSubmit").on("click", sabio.page.handlers.btnEmailSubmit);
+            sabio.services.squad.getAll(sabio.page.handlers.getSquadsSuccess, sabio.page.handlers.getSquadsError);
+            sabio.services.jobPosting.searchByKeyword('?searchstring=""&currentPage=1&itemsPerPage=4', sabio.page.handlers.getJobPostingsSuccess, sabio.page.handlers.getJobPostingsError);
+            sabio.services.homeStatistics.getAll(sabio.page.handlers.getHomeStatisticsSuccess, sabio.page.handlers.getHomeStatisticsError);
+        }
+    </script>
+
+}

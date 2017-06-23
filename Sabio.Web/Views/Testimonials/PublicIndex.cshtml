@@ -1,0 +1,194 @@
+﻿@{
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+@section Styles{
+    <style>
+        .photo {
+            border-radius: 200px;
+            border-color: aliceblue;
+            margin-bottom: 10px;
+            margin-left: 60px;
+        }
+
+        .item-list {
+            height: 400px;
+            border: 2px solid #f2f2f2;
+            border-radius: 15px;
+            padding: 10px 10px 10px 10px;
+            margin: 5px;
+            border-width: 4px;
+            background-color: #f2f2f2;
+        }
+
+        .desc {
+            text-align: left;
+            height: 100px;
+        }
+
+        .title {
+            margin-bottom: 60px;
+        }
+        /*Ipad*/
+        @@media (max-width: 1030px) {
+            .photo {
+                border-radius: 200px;
+                border-color: aliceblue;
+                margin-bottom: 10px;
+                margin-left: 15px;
+                width: 150px;
+                height: 150px;
+            }
+
+            .desc {
+                text-align: left;
+                height: 150px;
+            }
+        }
+        /*Mobile View*/
+        @@media (max-width: 767px) {
+            .photo {
+                border-radius: 200px;
+                border-color: aliceblue;
+                /*margin:0 auto !important;*/
+                margin-bottom: 15px;
+                margin-left: 22%;
+                width: 150px;
+                height: 150px;
+            }
+
+            .desc {
+                text-align: left;
+                height: 150px;
+            }
+        }
+    </style>
+
+}
+
+<div id="page-title" class="page-title has-bg">
+    <div class="bg-cover"><img src="~/Assets/Admin/img/about-us-cover.jpg" height="600" width="1500" alt="" /></div>
+    <div class="container">
+        <h1>Testimonials</h1>
+    </div>
+</div>
+<!-- END cover-bg -->
+<!-- BEGIN container -->
+<div class="container" data-ng-controller='mainController as mVm'>
+    <ul class="breadcrumb m-b-10 f-s-12">
+        <li><a href="#">Home</a></li>
+        <li class="active">Testimonials</li>
+    </ul>
+    <!-- BEGIN #about-us-content -->
+    <div id="about-us-content" class="section-container bg-white">
+        <!-- BEGIN container -->
+        <div class="container">
+            <!-- BEGIN about-us-content -->
+            <div class="about-us-content">
+                <h2 class="title text-center">
+                    Success Stories From Our Community
+                </h2>
+                <!-- BEGIN row -->
+                <div class="row">
+                    <div data-ng-repeat="item in mVm.items">
+                        <div class="clearfix" data-ng-if="$index % 3 == 0"></div>
+                        <div class="col-sm-4">
+                            <div class="item-list">
+                                <img data-ng-src={{item.person.profilePicture}} class="photo" width="200" height="200">
+
+                                <div class="desc">
+                                    <small data-ng-bind-html="mVm.sanitize(item.content)">
+                                        {{item.content}}
+                                    </small>
+                                </div>
+                                <a data-ng-click="vmP.selectOne(item)" class="name" id="name1"><strong>&nbsp;- {{item.person.firstName}} {{item.person.lastName}}<br />&nbsp;</strong></a>
+                            </div>
+                        </div>
+                        <!-- end col-4 -->
+                    </div>
+                    <!-- END row -->
+                </div>
+                <!-- END container -->
+            </div>
+            <!-- END #about-us-content -->
+        </div>
+    </div>
+</div>
+@section pageInitScripts{
+
+}
+
+@section scripts{
+    <script src="~/Scripts/sabio.services.testimonial.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('testimonialService', TestimonialService);
+
+            TestimonialService.$inject = ['$baseService', '$sabio'];
+
+            function TestimonialService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.testimonial;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('mainController', MainController);
+
+            MainController.$inject = ['$scope', '$window', '$baseController', 'testimonialService', '$sce'];
+
+            function MainController($scope, $window, $baseController, testimonialService, $sce) {
+                // Administrative stuff
+                var vm = this;
+                vm.$scope = $scope;
+
+                $baseController.merge(vm, $baseController);
+                vm.testimonialService = testimonialService;
+                vm.$window = $window;
+
+                // ViewModel
+                vm.goHome = _goHome;
+                vm.items = [];
+                vm.item = null;
+                vm.sanitize = _sanitize;
+                vm.itemIndex = -1;
+
+                // "The fold"
+
+                _render();
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+
+                function _render() {
+                    var inactive = false;
+                    vm.testimonialService.search(inactive, _getAllSuccess, _getAllError);
+                }
+
+                function _goHome() {
+                    vm.$window.location.href = '/';
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                    });
+                    //vm.$alertService.success("Retrieved all");
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+                }
+            }
+        })();
+    </script>
+}

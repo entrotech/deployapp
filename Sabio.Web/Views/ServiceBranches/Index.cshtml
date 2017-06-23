@@ -1,0 +1,96 @@
+﻿ @{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<!-- begin #content -->
+<!-- begin breadcrumb -->
+
+<div class="row">
+    <div class="col-md-4">
+        <ul class="result-list"></ul>
+    </div>
+    </div>
+
+    @section styles {
+
+        <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+        <link href="~/Content/toastr.css" rel="stylesheet" />
+    }
+    @section Scripts{
+
+        <script src="~/Scripts/toastr.js"></script>
+        <script src="~/Scripts/sabio.ui.toastr.js"></script>
+
+        <script src="~/Scripts/sabio.services.servicebranch.js"></script>
+        <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.js"></script>
+        <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+        <script>
+
+            sabio.page.startUp = function () {
+
+                sabio.services.servicebranch.getAll(sabio.page.onGetSuccess, sabio.page.OnGetError);
+                $(".result-list").on("click", ".delete", sabio.page.handlers.deleteBtn);
+                $(".result-list").on("click", ".edit", sabio.page.handlers.editBtn);
+                $(".toCreate").on("click", function () { window.location.href = "servicebranches/create"; })
+
+            }
+
+            sabio.page.handlers.editBtn = function () {
+                var id = $(this).closest(".result-info").find(".id").text();
+                document.location = "/serviceBranches/" + id + "/edit";
+            }
+
+            sabio.page.handlers.deleteBtn = function () {
+                var id = $(this).closest(".result-info").find(".id").text();
+                sabio.ui.sweetalert.delete(id, sabio.services.servicebranch.delete, sabio.page.onDeleteSuccess, sabio.page.onDeleteError);
+
+            }
+            sabio.page.onDeleteSuccess = function () {
+
+                toastr.warning("Error Encountered!!");
+                //document.location = "/serviceBranches/";
+            }
+
+            sabio.page.onDeleteError = function () {
+
+                toastr.warning("failed");
+            }
+            sabio.page.onGetSuccess = function (data) {
+ 
+                $.each(data.items, function (k, v) {
+                    var template = sabio.page.loadTemplate();
+                    $(".sname span", template).text(v.name);
+                   // $(".scode span", template).text(v.code);
+                    $(".id", template).text(v.id);
+                    if (v.inactive == true) {
+                        $(".badge", template).text("INACTIVE").addClass("badge-in");
+                    }
+                    $(".result-list").append(template);
+                });
+               
+            }
+
+            sabio.page.OnGetError = function (e) {
+              //  console.log("Error Encountered" + e);
+                toastr.warning("Error Encountered!!");
+            }
+            sabio.page.loadTemplate = function () {
+                return $($("#template").html());
+            }
+        </script>
+        <script type="text/html" id="template">
+            <li>
+                <div class="result-info">
+                    <h4 class="sname"><span>Army</span> </h4>
+                    @*<span class="badge">ACTIVE</span>
+                      <span class="scode">Code: <span>A</span></span>*@
+                    <input type="button" class="btn  btn-warning edit " value="Edit" />
+                    <input type="button" class="btn btn-danger delete " value="Delete" />
+
+                    <span class="hidden id"></span>
+                </div>
+            </li>
+        </script>
+
+    }

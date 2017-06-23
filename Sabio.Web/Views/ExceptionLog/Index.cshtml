@@ -1,0 +1,301 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section Styles {
+    <link href="~/Assets/Admin/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <link href="~/Assets/Admin/plugins/bootstrap-eonasdan-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <style>
+        .exception {
+            display: inline-block;
+            width: 100%;
+            float: left;
+        }
+
+        .inline-block {
+            display: inline-block;
+        }
+
+        .float-right {
+            float: right;
+        }
+    </style>
+}
+
+<h1 class="page-header">Exception Log</h1>
+
+<div ng-controller="exceptionController as exVm">
+    <hr />
+    <h5>Search By...</h5>
+
+    <div class="row">
+        <form ng-submit="exVm.search()">
+            <div class="col-md-2">
+                <input type="text" placeholder="Exception Type" ng-model="exVm.searchParameters.type" />
+            </div>
+            <div class="col-md-2">
+                <input type="text" placeholder="Exception Message" ng-model="exVm.searchParameters.message" />
+            </div>
+            <div class="col-md-2">
+                <input type="text" placeholder="Stack Trace String" ng-model="exVm.searchParameters.stackTrace" />
+            </div>
+            <div class="col-md-2">
+                <input type="text" placeholder="Request URL" ng-model="exVm.searchParameters.url" />
+            </div>
+            <div class="col-md-2">
+                <input type="text" placeholder="User Name, Email or ID" ng-model="exVm.searchParameters.person" />
+            </div>
+        </form>
+        <div class="col-md-2">
+            <button class="btn btn-primary" ng-click="exVm.search()">Search</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                <label>Start Date</label>
+                <div class="input-group" datetimepicker
+                     ng-change="exVm.update(exVm.startDate, exVm.endDate)"
+                     ng-model="exVm.startDate" options="exVm.optionsFrom">
+                    <input class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label>End Date</label>
+                <div class="input-group" datetimepicker
+                     ng-change="exVm.update(exVm.startDate, exVm.endDate)"
+                     ng-model="exVm.endDate" options="exVm.optionsTo">
+                    <input class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    <div class="row">
+        <div ng-repeat="exception in exVm.exceptions" class="col-md-12">
+            <div class="panel panel-inverse exception">
+                <div class="panel-heading">
+                    <div class="inline-block"><h4 class="panel-title">{{exception.type}} | ID: {{exception.id}}</h4></div>
+                    <div class="float-right">
+                        <h3 class="panel-title">{{exception.dateString}} | UTC Time: {{exception.utcTimeString}} | Local Time: {{exception.localTimeString}}</h3>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label ng-if="exception.apiUrl">Api URL</label>
+                            <a ng-hide="exception.fullApiUrl" ng-click="exVm.showApiUrl(exception)"><p>{{exception.truncatedApiUrl}}</p></a>
+                            <p ng-if="exception.fullApiUrl" ng-bind-html="exVm.sanitize(exception.apiUrl)"></p>
+                            <label ng-if="exception.viewUrl">View URL</label>
+                            <p>{{exception.viewUrl}}</p>
+                            <label ng-if="exception.requestBody">Request Body and Method</label>
+                            <a ng-hide="exception.fullRequestBody" ng-click="exVm.showRequestBody(exception)"><p>{{exception.truncatedRequestBody}}</p></a>
+                            <p ng-if="exception.fullRequestBody" ng-bind-html="exVm.sanitize(exception.requestBody)"></p>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Message</label>
+                            <p>{{exception.message}}</p>
+                        </div>
+                        <div class="col-md-4" ng-if="exception.fullStackTrace == false">
+                            <label>Stack Trace</label>
+                            <a ng-click="exVm.showStackTrace(exception)" ng-hide="exception.fullStackTrace"><p>{{exception.truncatedStackTrace}}</p></a>
+                        </div>
+                    </div>
+                    <div class="row" ng-if="exception.fullStackTrace">
+                        <div class="col-md-12">
+                            <label>Stack Trace</label>
+                            <p ng-bind-html="exVm.sanitize(exception.stackTrace)"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4" ng-if="exception.aspNetUserId">
+                            <label>User</label>
+                            <p>{{exception.person.email}} ({{exception.person.fullName}})</p>
+                        </div>
+                        <div class="col-md-8" ng-if="exception.aspNetUserId">
+                            <label>User ID</label>
+                            <p>{{exception.aspNetUserId}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <uib-pagination ng-model="exVm.searchParameters.currentPage" total-items="exVm.totalResults" max-size="10" items-per-page="20" boundary-link="true" ng-change="exVm.search()"></uib-pagination>
+</div>
+
+@section PageInitScripts {
+    <script src="~/Assets/Admin/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-eonasdan-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/Scripts/angular-eonasdan-datetimepicker.js"></script>
+    <script src="~/Scripts/sabio/sabio.module.ae-datetimepicker.js"></script>
+}
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.exception.js"></script>
+    <script src="~/Scripts/app/services/exception.js"></script>
+    <script>
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('exceptionController', ExceptionController);
+
+            ExceptionController.$inject = ['$scope', '$sabio', 'exceptionService', '$sce', '$window'];
+
+            function ExceptionController($scope, $sabio, exceptionService, $sce, $window) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$sabio = $sabio;
+                vm.$window = $window;
+                vm.exceptionService = exceptionService;
+
+                vm.exceptions = [];
+                vm.startDate = moment().subtract(30, 'days');
+                vm.endDate = moment();
+                vm.searchParameters = {
+                    type: "",
+                    message: "",
+                    stackTrace: "",
+                    url: "",
+                    person: "",
+                    currentPage: 1,
+                    startDate: vm.startDate.format("L"),
+                    endDate: vm.endDate.format()
+                }
+                vm.totalResults = 0;
+
+                // Datepicker objects
+                vm.optionsFrom = { format: 'MM/DD/YYYY', showClear: true };
+                vm.optionsTo = { format: 'MM/DD/YYYY', showClear: true };
+                vm.update = function (startDate, endDate) {
+                    vm.optionsFrom.maxDate = endDate;
+                    vm.optionsTo.minDate = startDate;
+                };
+
+                vm.showStackTrace = _showStackTrace;
+                vm.showRequestBody = _showRequestBody;
+                vm.showApiUrl = _showApiUrl;
+                vm.search = _search;
+                vm.sanitize = _sanitize;
+
+                vm.exceptionService.getAll(_getExceptionsSuccess, _getExceptionsError);
+
+                function _getExceptionsSuccess(data) {
+                    if (data.items) {
+                        for (var i = 0; i < data.items.length; i++) {
+                            data.items[i] = _formatException(data.items[i]);
+                        }
+                        vm.$scope.$apply(function () {
+                            vm.exceptions = data.items;
+                            vm.totalResults = data.resultCount;
+                        })
+                    }
+                }
+
+                function _getExceptionsError(data) {
+                    console.log(data);
+                }
+
+                function _formatException(exception) {
+                    if (exception.stackTrace) {
+                        exception.truncatedStackTrace = exception.stackTrace.substring(0, 150) + "...";
+                        exception.fullStackTrace = false;
+                        exception.stackTrace = exception.stackTrace.replace(/ at /g, "<br> at ");
+                    }
+                    if (exception.requestBody) {
+                        if (exception.requestBody.length > 60) {
+                            exception.truncatedRequestBody = exception.requestBody.substring(0, 57) + "...";
+                            exception.fullRequestBody = false;
+                            exception.requestBody = exception.requestBody.replace(/&/g, "<br>&");
+                            exception.requestBody = exception.requestBody.replace(/\(Method:/g, "<br>(Method:");
+                        } else {
+                            exception.fullRequestBody = true;
+                        }
+                    }
+                    if (exception.apiUrl) {
+                        if (exception.apiUrl.length > 60) {
+                            exception.truncatedApiUrl = exception.apiUrl.substring(0, 57) + "...";
+                            exception.fullApiUrl = false;
+                            exception.apiUrl = exception.apiUrl.replace(/&/g, "<br>&");
+                        } else {
+                            exception.fullApiUrl = true;
+                        }
+                    }
+                    exception = _formatDateTime(exception);
+                    return exception;
+                }
+
+                function _formatDateTime(exception) {
+                    var dateString = exception.logDate.split("T")[0];
+                    var timeString = exception.logDate.split("T")[1];
+                    var dateArray = dateString.split("-");
+                    var timeArray = timeString.split(":");
+                    timeArray.push(timeArray[2].split(".")[1] / 1000);
+                    timeArray[2] = timeArray[2].split(".")[0];
+                    var localtime = new Date(Date.UTC(dateArray[0], dateArray[1] - 1, dateArray[2], timeArray[0] - 1, timeArray[1], timeArray[2], timeArray[3]));
+                    var utcString = localtime.toUTCString();
+                    exception.utcTimeString = utcString.split(" ")[4];
+                    exception.localTimeString = localtime.getHours() + ":" + timeArray[1] + ":" + timeArray[2];
+                    exception.dateString = dateArray[1] + "/" + dateArray[2] + "/" + dateArray[0];
+                    return exception;
+                }
+
+                function _showStackTrace(exception) {
+                    exception.fullStackTrace = true;
+                }
+
+                function _showRequestBody(exception) {
+                    exception.fullRequestBody = true;
+                }
+
+                function _showApiUrl(exception) {
+                    exception.fullApiUrl = true;
+                }
+
+                function _search() {
+                    vm.searchParameters.startDate = vm.startDate.format("L");
+                    vm.searchParameters.endDate = vm.endDate.format();
+                    var queryString = $.param(vm.searchParameters);
+                    console.log(queryString);
+                    vm.exceptionService.search(queryString, _searchExceptionsSuccess, _searchExceptionsError);
+                }
+
+                function _searchExceptionsSuccess(data) {
+                    vm.$window.scrollTo(0, 0);
+                    if (data.items) {
+                        for (var i = 0; i < data.items.length; i++) {
+                            data.items[i] = _formatException(data.items[i]);
+                        }
+                        vm.$scope.$apply(function () {
+                            vm.exceptions = data.items;
+                            vm.totalResults = data.resultCount;
+                        })
+                    }
+                }
+
+                function _searchExceptionsError(data) {
+                    toastr.error("Failed to get exceptions");
+                }
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+            }
+        })();
+
+
+    </script>
+
+
+}

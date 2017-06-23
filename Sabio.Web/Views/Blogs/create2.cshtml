@@ -1,0 +1,907 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+@section styles{
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Scripts/Plugins/Cropper/Cropper.css" rel="stylesheet" />
+    <style>
+        /* 3.10 Component - Nav Tabs */
+
+        .nav-tabs,
+        .nav-tabs > li > a,
+        .nav-tabs > li.active > a,
+        .nav-tabs > li.active > a:hover,
+        .nav-tabs > li.active > a:focus,
+        .nav-tabs.nav-justified > li > a,
+        .nav-tabs.nav-justified > .active > a,
+        .nav-tabs.nav-justified > .active > a:hover,
+        .nav-tabs.nav-justified > .active > a:focus {
+            border: none !important;
+            font-size: 22px;
+            margin: 5px;
+        }
+
+            .nav-tabs > li.active > a,
+            .nav-tabs > li.active > a:hover,
+            .nav-tabs > li.active > a:focus,
+            .nav-tabs.nav-justified > .active > a,
+            .nav-tabs.nav-justified > .active > a:hover,
+            .nav-tabs.nav-justified > .active > a:focus {
+                color: #ffffff;
+                background-color: #343c4b;
+                border-bottom: 1px solid #fff;
+                font-weight: 500;
+                display: block;
+                letter-spacing: 0;
+            }
+
+        .nav-tabs {
+            background: #fefafa;
+            -webkit-border-radius: 1px 1px 0 0;
+            -moz-border-radius: 1px 1px 0 0;
+            border-radius: 1px 1px 0 0;
+        }
+
+            .nav-tabs.nav-tabs-inverse {
+                background: #242a30;
+            }
+
+            .nav-tabs.nav-justified > li > a {
+                -webkit-border-radius: 3px 3px 0 0;
+                -moz-border-radius: 3px 3px 0 0;
+                border-radius: 3px 3px 0 0;
+            }
+
+            .nav-tabs.nav-tabs-inverse > li.active > a,
+            .nav-tabs.nav-tabs-inverse > li.active > a:hover,
+            .nav-tabs.nav-tabs-inverse > li.active > a:focus {
+                color: #242a30;
+                background: #fff;
+            }
+
+            .nav-tabs.nav-tabs-inverse > li > a:hover,
+            .nav-tabs.nav-tabs-inverse > li > a:focus {
+                color: #fff;
+                background: none;
+            }
+
+            .nav-tabs > li, .nav-tabs.nav-justified > li {
+                margin-bottom: 0;
+            }
+
+                .nav-tabs > li > a {
+                    margin-right: 5px;
+                    line-height: 20px;
+                }
+
+        .tab-content {
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #fff;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        .nav-tabs + .tab-content {
+            -webkit-border-radius: 0 0 3px 3px;
+            -moz-border-radius: 0 0 3px 3px;
+            border-radius: 0 0 3px 3px;
+        }
+
+
+
+        div:after ::before {
+            content: none;
+        }
+
+        .gallery {
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,.3);
+        }
+
+            .gallery > div {
+                position: relative;
+                float: left;
+                padding: 5px;
+            }
+
+                .gallery > div > img {
+                    display: block;
+                    width: 200px;
+                    transition: .1s transform;
+                    transform: translateZ(0); /* hack */
+                }
+
+        .center {
+            margin: 0 auto;
+        }
+
+        .img-wrap {
+            position: relative;
+            display: inline-block;
+            font-size: 0;
+        }
+
+            .img-wrap .close {
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                z-index: 100;
+                background-color: #FFF;
+                padding: 5px 2px 2px;
+                color: #000;
+                font-weight: bold;
+                cursor: pointer;
+                opacity: .8;
+                text-align: center;
+                margin: 0 auto;
+                font-size: 22px;
+                line-height: 10px;
+                border-radius: 50%;
+            }
+
+            .img-wrap:hover .close {
+                opacity: 1;
+            }
+
+        err-msg {
+            font: red;
+            font-weight: 700;
+        }
+    </style>
+}
+<!-- begin #page-title -->
+<div id="page-title" class="page-title has-bg">
+    <div class="bg-cover"><img src="/content/images/blog/cover.jpg" alt="" /></div>
+    <div class="container">
+        <h1>Official Deploy Blog</h1>
+        @*<p>Blog Page Title Goes Here</p>*@
+        @*<div ng-switch on="vm.blogList">
+            <span ng-switch-when="true">Recent Blog Posts</span>
+            <span ng-switch-when="false">Single Blog Post </span>
+        </div>*@
+    </div>
+</div>
+
+<!-- end #page-title -->
+<div id="content" class="content" data-ng-controller='blogController as vm'>
+    <!-- begin container -->
+    <div class="container">
+        <!-- begin row -->
+        <div class="row">
+            <!-- begin post-list -->
+            <div class="post-list post-grid post-grid-3" ng-hide="vm.showForm">
+                <div class="post-content">
+
+                    <!-- begin post-info -->
+                    <div class="post-info">
+                        <h4 class="post-title">
+                            <a>Add Your own Blog Post</a>
+                        </h4>
+
+                        <div class="post">
+                            <p>You can post your own blog. If you'd like to guest post on our website, please read our data usage policy and terems page before submitting blog post.   </p>
+                        </div>
+                        <div class="btn read-btn-container">
+                            <a class="btn btn-success " ng-click="vm.add()"><i class="fa fa-plus m-r-5"></i>Click Here to Add Your Blog</a>
+
+                        </div>
+                    </div>
+                    <!-- end post-info -->
+                </div>
+
+
+
+                <div class="post-li" ng-repeat='item in vm.items | filter: search'>
+                    <!-- begin post-content -->
+                    <div class="post-content">
+                        <!-- begin post-image -->
+                        <div class="post-image">
+                            <a ng-click="vm.select(item)"><img class="img-responsive" ng-src='https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{item.photos[0].blogPhotoKey}}'></a>
+                        </div>
+                        <!-- end post-image -->
+                        <!-- begin post-info -->
+                        <div class="post-info">
+                            <h4 class="post-title">
+                                <a href="#">{{item.title}}</a>
+                            </h4>
+                            <div class="post-by">
+                                Posted By <a ng-click="vm.select(item)">{{item.firstName}} {{item.lastName}}</a> <span class="divider">|</span><span class="dateCreated"> 21 Oct 2015</span>
+                            </div>
+                            <div class="post-desc" ng-bind-html="vm.sanitize(item.body)">
+                                {{item.body }}
+                            </div>
+                            <div class="btn read-btn-container">
+                                <a ng-click="vm.edit(item)" class="btn btn-primary "><i class="fa fa-edit m-r-5"></i>Edit</a>
+                                <a ng-really-message="Are you sure?" ng-really-click="vm.delete(item)" class="delete btn btn-danger "><i class="fa fa-trash-o m-r-5"></i>Delete</a>
+                                <a href="/blogs" class="btn btn-success "><i class="fa fa-edit m-r-5"></i>View Mode</a>
+                            </div>
+                        </div>
+                        <!-- end post-info -->
+                    </div>
+                    <!-- end post-content -->
+
+                </div>
+                <div class="row">
+                    <div class="col-md-9 text-center">
+                        <ul uib-pagination ng-model="vm.currentPage" total-items="vm.totalItems" boundary-link="true" ng-change="vm.pageChanged() " items-per-page="vm.itemsPerPage"></ul>
+                    </div>
+                </div>
+               
+
+            </div>
+            <!-- end #content -->
+
+            <div class="editpage" ng-show="vm.showForm" ng-cloak>
+                <!-- begin row -->
+                <div class="row">
+                    <!-- begin col-6 -->
+                    <div class="col-md-12">
+                        <div class="">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#tab-1" data-toggle="tab">Edit Blog</a></li>
+                                <li class=""><a href="#tab-3" data-toggle="tab">Upload Photo</a></li>
+                                <li class=""><a href="#tab-2" data-toggle="tab">Blog Photos</a></li>
+
+                                <li class="" ng-click="vm.showComment()"><a href="#tab-4" data-toggle="tab">Blog Comments</a></li>
+                            </ul>
+                        </div>
+                        <div class="tab-content">
+                            <div class="tab-pane fade active in" id="tab-1">
+
+                                <form name="editForm" class="form-horizontal" ng-submit="vm.submitForm(editForm.$valid)" novalidate>
+                                    <div class="form-group">
+                                        <label> Blog Title</label>
+                                        <input type="text" class="form-control" ng-model="vm.item.title" name="title" ng-minlength="3" ng-maxlength="100" ng-class="{'form-validate' : editForm.title.$invalid && submitted }" required />
+                                        <p ng-show="editForm.title.$invalid && submitted" class="error-msg">This Field is required.</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="blogCategory">Category</label>
+                                        <select type="text" name="blogCategory" class="form-control" ng-model="vm.item.blogCategory" ng-class="{'form-validate' : editForm.blogCategory.$invalid && submitted }" required>
+                                            <option value="">Please Select</option>
+                                            <option value="General">General</option>
+                                            <option value="Experience Sharing">Experience Sharing</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        @*<p ng-show="editForm.blogCategory.$invalid && submitted" class="error-msg"> Please select at least one Category.</p>
+                                        *@
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="privacy">Privacy</label>
+                                        <div name="blogPrivacy" class="form-control no-border" ng-class="{'form-validate' : editForm.privacy.$invalid && submitted }" required>
+                                            <p>
+                                                <input type="radio" name="private" ng-checked="vm.item.private=false" />Private
+                                                <input type="radio" name="private" ng-checked="vm.item.private=true" />Public
+                                            </p>
+                                            @*<b ng-show="blogForm.blogPrivacy.$invalid $$ submitted" class="error-msg"> Please select at least one Category.</b>*@
+
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="blogTag"> Select Keywords</label>
+                                        <select name="blogtagIds[]" ng-model="vm.item.tags" class="form-control" multiple>
+                                            <option ng-repeat="tag in vm.tags" ng-value="{{tag.id}}">
+                                                {{tag.keyword}}
+                                            </option>
+                                        </select>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="ckEditor">Blog Post</label>
+                                        <textarea class="ckeditor" ng-model="vm.item.body" id="ckeditor" name="ckeditor" ng-minlength="5" data-ng-bind-html="vm.sanitize(vm.item.body)" ng-class="{'form-validate' : editForm.body.$invalid && submitted }" ng-required="string"></textarea>
+                                        <p ng-show="editForm.body.$invalid && submitted" class="error-msg">This field is required.</p>
+
+                                    </div>
+
+
+                                    <button type="button" class="btn btn-primary btn-sm" href="#tab-3" data-toggle="tab" ng-click="submitted=true; vm.submitForm(editForm.$valid)">Save</button>
+                                    <button type="button" class="btn btn-default btn-sm" ng-click="vm.cancel()">Cancel</button>
+
+                                </form>
+                                <p ng-show="submitted">Click <a href="#tab-3" data-toggle="tab">here </a>to upload photos for your new blog</p>
+
+
+                            </div>
+                            <div class="tab-pane fade" id="tab-2">
+
+                                <div class="gallery">
+                                    <div ng-repeat="photo in vm.item.photos">
+                                        <div class="img-wrap">
+                                            <span class="close" ng-click="vm.deletePhoto(photo)">&times;</span>
+                                            <img class="img-responsive" ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{photo.blogPhotoKey}}" width="300">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="tab-3">
+                                <p>
+                                    <div id="canvas"></div>
+                                    <div class="center">
+                                        <strong>Select Image:</strong>
+                                        <br />
+                                        <input type="file" id="uploadToCanvas">
+                                        <br />
+                                        <button class="btn btn-success upload-btn" ng-click="vm.uploadToServer()">Upload Cropped Image</button>
+                                    </div>
+                                </p>
+                            </div>
+                            <div class="tab-pane fade" id="tab-4">
+
+                                <div>
+                                    <ul class="comment-list" ng-repeat="item in vm.comments" ng-include="'commentSection.html'"></ul>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- end col-6 -->
+
+                </div>
+                <!-- end row -->
+
+
+
+            </div>
+        </div>
+
+
+        <!-- end row -->
+
+
+    </div>
+</div>
+<!-- end container -->
+
+<script type="text/ng-template" id="commentSection.html">
+    <li>
+        <div class="comment-avatar">
+            <img class="comment-avatar-img" src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{item.photoKey}}" />
+        </div>
+        <!-- end comment-avatar -->
+        <!-- begin comment-container -->
+        <div class="comment-container">
+            <div class="comment-author">
+                {{item.firstName}} {{item.lastName}}
+
+
+            </div>
+            <div class="comment-content">
+                @*<p ng-switch on="item.isApproved"> Status:
+                    <span ng-switch-when="true"> Approved</span>
+                    <span ng-switch-when="false">Pending</span>
+                    </p>*@
+
+                {{item.comment}}
+                <h4>
+                    @*<span class="label label-primary" ng-class="{'disabled': item.isApproved}"  ng-click="vm.approveComment(item)" >Approve</span>*@
+
+                    <span class="label label-warning" ng-click="vm.deleteComment(item)">Delete comment</span>
+                    <span id="commentMessage" class="alert alert-success fadeOut hidden"> </span>
+                </h4>
+            </div>
+
+
+
+        </div>
+        <!-- end comment-container -->
+        <ul class="indent" ng-if="item.replies">
+            <li ng-repeat="item in item.replies" ng-include="'commentSection.html'"></li>
+        </ul>
+    </li>
+</script>
+
+@section pageInitScripts{
+    <script src="~/Assets/Admin/plugins/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ng/angular-ckeditor.min.js"></script>
+    <script src="~/Scripts/sabio/select2.full.js"></script>
+    <script src="~/Scripts/select.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("ui.select");
+    </script>
+}
+
+@section Scripts{
+
+    <script src="~/Scripts/sabio.services.blog.js"></script>
+    <script src="~/Scripts/sabio.services.file.js"></script>
+    <script src="~/Scripts/sabio.services.blogTag.js"></script>
+    <script src="~/Scripts/Plugins/Cropper/Cropper.js"></script>
+    <script src="~/Scripts/sabio.services.cropper.js"></script>
+    <script src="~/Scripts/sabio.services.blogComment.js"></script>
+    <script>
+        $('#uploadToCanvas').on('change', sabio.services.cropper.bindToCropper);
+
+    </script>
+
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                 .factory('blogService', BlogService)
+
+            .directive('ngReallyClick', [function () {
+                return {
+                    restrict: 'A',
+                    link: function (scope, element, attrs) {
+                        element.bind('click', function () {
+                            var message = attrs.ngReallyMessage;
+                            if (message && confirm(message)) {
+                                scope.$apply(attrs.ngReallyClick);
+                            }
+                        });
+                    }
+                }
+            }]);
+            BlogService.$inject = ['$baseService', '$sabio'];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function BlogService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.blog;
+
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+
+
+
+
+        })();
+
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('commentService', CommentService);
+            CommentService.$inject = ['$baseService', '$sabio'];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function CommentService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.blogComment;
+
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+
+        })();
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                 .factory('blogTagService', BlogTagService)
+
+
+            BlogTagService.$inject = ['$baseService', '$sabio'];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function BlogTagService($baseService, $sabio) {
+                var tagSvg = sabio.services.blogTag;
+
+                var newService = $baseService.merge(true, {}, tagSvg, $baseService);
+                return newService;
+            }
+
+
+
+
+        })();
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('fileService', FileService);
+            FileService.$inject = ['$baseService', '$sabio'];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function FileService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.file;
+
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+
+        })();
+
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                 .factory('cropperService', CropperService)
+
+
+            CropperService.$inject = ['$baseService', '$sabio'];    //  $sabio is a reference to sabio.page object which is created in sabio.js
+
+            function CropperService($baseService, $sabio) {
+                var tagSvg = sabio.services.cropper;
+
+                var newService = $baseService.merge(true, {}, tagSvg, $baseService);
+                return newService;
+            }
+
+
+
+
+        })();
+
+        (function () {
+
+            //angular.module(APPNAME)
+            //    .directive('fileRead', FileRead);
+
+            //function FileRead() {
+            //    return {
+            //        scope: {
+            //            fileread: "="
+            //        },
+            //        link: function (scope, element, attributes) {
+            //            element.bind("change", function (changeEvent) {
+            //                scope.$apply(function () {
+
+            //                    scope.fileread = changeEvent.target.files[0];
+            //                    // or all selected files:
+            //                    // scope.fileread = changeEvent.target.files;
+            //                });
+            //            });
+            //        }
+            //    }
+            //}
+
+        })();
+
+
+        (function () {
+            angular.module(APPNAME)
+            .controller('blogController', BlogController);
+
+            BlogController.$inject = ['$scope', '$window', '$baseController', 'blogService', '$sce', 'blogTagService', 'cropperService', 'fileService', 'commentService'];
+
+            function BlogController($scope, $window, $baseController, blogService, $sce, blogTagService, cropperService, fileService, commentService) {
+                // Administrative stuff
+                var vm = this;
+
+                vm.$scope = $scope;
+                // Simulate inheritance to add
+                // $document, $log, $route, $routeParams, $systemEventService, $alertService, $sabio services
+                // to our controller.
+                $baseController.merge(vm, $baseController);
+                vm.blogService = blogService;
+                vm.$window = $window;
+                vm.blogTagService = blogTagService;
+                vm.cropperService = cropperService;
+                vm.commentService = commentService;
+                vm.fileService = fileService;
+                vm.uploadToServer = _uploadToServer;
+                vm.deleteComment = _deleteComment;
+
+                // ViewModel
+
+                vm.items = [];
+                vm.item = null;  // copy of item being edited
+                vm.itemIndex = -1; // index of item being edited
+                vm.sanitize = _sanitize;
+                vm.edit = _edit;
+                vm.goHome = _goHome;
+                vm.recentBlogs = [];
+                vm.currentBlogId = 0;
+                vm.deleteComment = _deleteComment;
+                vm.deletePhoto = _deletePhoto;
+                vm.approveComment = _approveComment;
+
+                vm.showForm = false;
+                vm.uploadToCropper = uploadToCropper;
+
+                vm.save = _save;
+                vm.cancel = _cancel;
+                vm.submitForm = _submitForm;
+                vm.submitted = false;
+                vm.add = _add;
+                vm.showComment = _showComment;
+                vm.submitted = false;
+                vm.delete = _delete;
+                vm.selectByCategory = _selectByCategory;
+                vm.categories = ['General', 'Experience Sharing', 'Other'];
+                vm.blogTags = _blogTags;
+                vm.tags = [];
+                // comment Section
+                vm.comments = [];
+                vm.comment = null;
+                var blogId;
+
+
+
+                _render();
+                _blogTags();
+
+
+
+                function _render() {
+                    vm.blogService.getAll(_getAllSuccess, _getAllError);
+
+                }
+
+                function _showComment() {
+
+                    vm.commentService.getAllComments(vm.currentBlogId, _getCommentAllSuccess, _getCommentAllError);
+                }
+                function _goHome() {
+                    vm.$window.location.href = "/blogs/create";
+                }
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+
+                }
+                function _getCommentAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.comments = data.items;
+                    });
+                    console.log("comments", data.items);
+
+                }
+                function _getCommentAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+                }
+
+                function _getAllSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                        vm.recentBlogs = data.items;
+
+
+                    });
+                    console.log(data.items);
+                    vm.$alertService.success("Retrieved all");
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+                }
+
+                function _selectByCategory(foo) {
+                    vm.itemIndex = vm.items.indexOf(foo);
+                    vm.blogService.search("", foo, 1, 4, _getSearchSuccess, _getSearchError);
+                }
+
+                function _submitForm(isValid) {
+                    vm.submitted = true;
+                    if (isValid) {
+                        console.log("data is valid! go save it");
+                        _save();
+                    }
+                    else {
+                        console.log("form data invalid ");
+
+                    }
+
+                }
+
+                function _edit(foo) {
+                    vm.itemIndex = vm.items.indexOf(foo);
+                    vm.blogService.getById(foo.id, _getByIdSuccess, _getByIdError);
+                    vm.currentBlogId = foo.id;
+                    vm.showForm = true;
+                }
+
+                function _delete(foo) {
+                    if (foo.id) {
+                        vm.blogService.delete(foo.id, _deleteSuccess, _deleteError);
+                    }
+
+                }
+
+                function _deleteComment(foo) {
+
+                    if (foo.id) {
+                        
+                        vm.commentService.delete(foo.id, _deleteCommentSuccess, _deleteError);
+                    }
+                    var index = vm.comments.indexOf(foo);
+                    vm.comments.splice(index, 1);
+
+                }
+
+                function _deletePhoto(foo) {
+                    var index = vm.item.photos.indexOf(foo);
+                    vm.item.photos.splice(index, 1);
+
+                    if (foo.id) {
+
+                        vm.blogService.deletePhoto(foo.id, _deletePhotoSuccess, _deletePhotoError);
+                    }
+
+                }
+                function _deleteCommentSuccess(data) {
+                    console.log("Comment delete Success");
+                }
+
+                function _blogTags() {
+                    vm.blogTagService.getAll(_onBlogTagSuccess, _getAllError);
+                }
+
+                function _onBlogTagSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.tags = data.items;
+                    });
+                    console.log(data.items);
+                }
+
+                function _deletePhotoSuccess(data) {
+
+                    vm.$alertService.success("Photo Delete Successful");
+                }
+                function _deletePhotoError() {
+
+                    vm.$alertService.error("Photo Delete Failed");
+                }
+
+
+
+
+
+
+                function _add() {
+                    //CKEDITOR.instances.ckeditor.setData("")
+                    // vm.item = {};
+                    vm.showForm = true;
+                    //  vm.itemIndex = -1;
+                    vm.cropperService.options(550, 300, 'square');
+                }
+
+                function _cancel() {
+                    vm.showForm = false;
+                    _endEdit();
+                }
+
+                function _endEdit() {
+                    vm.item = null;
+                    vm.itemIndex = -1;
+                }
+
+                function _save() {
+                    vm.item.body = CKEDITOR.instances.ckeditor.getData();
+                    if (vm.item.id) {
+                        vm.blogService.putJson(vm.item.id, vm.item, _putSuccess, _putError);
+                    }
+                    else {
+                        vm.blogService.postJson(vm.item, _postSuccess, _postError);
+                    }
+                }
+
+                function _putSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        // To update UI, replace with new version
+                        vm.items[vm.itemIndex] = vm.item;
+                        _endEdit();
+                        vm.$alertService.success("Update successful");
+                        vm.$window.location.href = "create";
+
+                    });
+                }
+
+                function _putError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Update failed");
+                }
+
+                function _postSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            // To update UI, get id from data
+                            vm.item.id = data.item;
+                            vm.currentBlogId = data.item;
+                            vm.items.push(vm.item);
+                            _endEdit();
+                            vm.$alertService.success("Insert successful");
+                            vm.$window.location.href = "#tab-3";
+
+
+                        });
+                    }
+                }
+
+                function _postError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Insert failed");
+                }
+
+
+                function _getByIdSuccess(data) {
+
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                            CKEDITOR.instances.ckeditor.insertHtml(data.item.body);
+                            vm.cropperService.options(550, 300, 'square');
+                        });
+                    }
+                    vm.$alertService.success("Single Post Blog");
+                }
+                function _getSearchSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                      
+                    });
+
+                    vm.$alertService.success("Blog By Category");
+                }
+                function _getSearchError(jqXHR) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+
+                    });
+
+                    vm.$alertService.error(jqXHR.responseText, "GetById failed");
+                }
+
+                function _deleteSuccess(data) {
+                    vm.$alertService.success("Delete Successful");
+                    //vm.$scope.$apply(function () {
+                    //    vm.items = data.items;
+                    //});
+                    // vm.$window.location.href = '/create';
+                    vm.blogService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetById failed");
+                }
+                function _deleteError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetById failed");
+                }
+                function uploadToCropper() {
+                    vm.cropperService.bindToCropper();
+                }
+                function _uploadToServer() {
+                    $uploadCrop.croppie('result', {
+                        type: 'canvas',
+                        size: 'viewport'
+                    }).then(function (resp) {
+                        var blob = dataURItoBlob(resp);
+                        console.log(blob);
+
+                        var fd = new FormData(document.forms[0]);
+                        fd.append("image", blob, document.forms[0].fileName);
+                        vm.fileService.uploadPhoto(fd, _imageUploadSuccess, _imageUploadError);
+                    });
+                }
+                function _imageUploadSuccess(data) {
+                    // vm.$alertService.success("Image Uploaded Successfully");
+                    console.log("Photokey", data.item);
+                    $window.location.href = "/blogs/create";
+                    var photoData = {
+                        blogId: vm.currentBlogId,
+                        blogPhotoKey: data.item
+                    }
+
+                    vm.fileService.updateBlogPhoto(photoData, _BlogPhotoUploadSuccess, _BlogPhotoUploadError);
+                }
+                function _BlogPhotoUploadSuccess(data) {
+                    vm.$alertService.success("Image Uploaded Successfully");
+                    console.log(data);
+                    $window.location.href = "/blogs/create"
+
+                }
+                function _BlogPhotoUploadError() {
+                    vm.$alertService.error("Image Upload Failed");
+                }
+                function _imageUploadError() {
+                    vm.$alertService.error("Image Upload Failed");
+                }
+
+                function _approveComment(foo) {
+                    vm.commentService.approve(foo.id, _approveSuccess, _getByIdError);
+                }
+                function _approveSuccess(data) {
+                    console.log("comment status change success", data);
+                    vm.$alertService.success("Comment Approved");
+                }
+            }
+
+        })();
+
+
+
+    </script>
+
+}

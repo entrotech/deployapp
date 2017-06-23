@@ -1,0 +1,159 @@
+﻿
+
+@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section styles {
+    <style>
+        .item {
+            margin: 25px;
+        }
+    </style>
+
+}
+
+<!--<div id="projectList" class="list-group"></div>-->
+
+<div id="content" class="">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li><a href="/projects/create">Create</a></li>
+        <li class="active"><a href="javascript:;">Projects</a></li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Projects<small></small></h1>
+    <!-- end page-header -->
+    <!-- begin row -->
+    <div class="row">
+        <!-- begin col-12 -->
+        <div class="col-md-12">
+            <div class="result-container">
+                <div class="input-group m-b-20">
+                    <input type="text" class="form-control input-white" placeholder="Enter keywords here..." />
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-inverse"><i class="fa fa-search"></i> Search</button>
+                    </div>
+                </div>
+                <div class="dropdown pull-left">
+                    <a href="javascript:;" class="btn btn-white btn-white-without-border dropdown-toggle" data-toggle="dropdown">
+                        Filters by <span class="caret m-l-5"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="javascript:;">Posted Date</a></li>
+                        <li><a href="javascript:;">View Count</a></li>
+                        <li><a href="javascript:;">Total View</a></li>
+                        <li class="divider"></li>
+                        <li><a href="javascript:;">Location</a></li>
+                    </ul>
+                </div>
+                <ul class="pagination pagination-without-border pull-right m-t-0">
+                    <li class="disabled"><a href="javascript:;">«</a></li>
+                    <li class="active"><a href="javascript:;">1</a></li>
+                    <li><a href="javascript:;">2</a></li>
+                    <li><a href="javascript:;">3</a></li>
+                    <li><a href="javascript:;">4</a></li>
+                    <li><a href="javascript:;">5</a></li>
+                    <li><a href="javascript:;">»</a></li>
+                </ul>
+                <ul class="result-list" id="projectList"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+
+
+    <script src="~/Scripts/sabio.services.project.js"></script>
+    <script type="text/javascript">
+
+        sabio.page.startUp = function () {
+
+            $("#projectList").on("click", ".editBtn", sabio.page.handlers.editBtn)
+            sabio.page.loadTemplate();
+
+            sabio.services.project.getAll(sabio.page.handlers.onSuccess, sabio.page.OnGetError);
+        }
+
+        sabio.page.handlers.onSuccess = function (data) {
+            $.each(data.items, function (k, row) {
+                var template = sabio.page.loadTemplate();
+                var deadline = row.deadline;
+
+                if (deadline !== "0001-01-01T00:00:00") {
+
+                    deadline = deadline.split('T')[0];
+                    $(".deadline", template).text(deadline);
+
+                }
+
+                $(".projectName", template).text(row.projectName);
+                $(".description", template).html(row.description);
+                $(".budget", template).text("$" + row.budget);
+
+                $(".companyId", template).text(row.companyId);
+
+
+                $(".id", template).text(row.id);
+                $('.editBtn', template).attr('data-id', row.id);
+
+                $("#projectList").append(template);
+
+            })
+        }
+
+        sabio.page.handlers.editBtn = function () {
+            var id = $(this).data('id')
+            document.location = "/projects/" + id + "/edit/"
+        }
+
+        sabio.page.onError = function () {
+            console.log("Something went wrong...");
+        }
+
+        sabio.page.loadTemplate = function () {
+            return $($("#template").html());
+
+        }
+
+    </script>
+
+    <script type="text/html" id="template">
+        <li>
+            <div class="result-info col-md-12">
+                <span class="hidden id"></span>
+                <span class="hidden companyId"></span>
+                <h4 class="title projectName"><a href="javascript:;">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</a></h4>
+                <p class="location">Deadline: <span class="deadline">N/A</span></p>
+                <p class="desc description">
+                    Nunc et ornare ligula. Aenean commodo lectus turpis, eu laoreet risus lobortis quis. Suspendisse vehicula mollis magna vel aliquet. Donec ac tempor neque, convallis euismod mauris. Integer dictum dictum ipsum quis viverra.
+                </p>
+            </div>
+            <div class="result-price">
+
+                <a href="javascript:;" class="btn btn-inverse btn-block editBtn">Edit</a>
+            </div>
+
+        </li>
+    </script>
+
+    <!-- <script type="text/html" id="template">
+
+         <div class="item list-group">
+
+             <span class="hidden id"></span>
+             <div><strong>Project Name: </strong><span class="projectName"></span></div>
+             <div><strong>Description: </strong><span class="description"></span></div>
+             <div><strong>Budget: </strong><span class="budget">N/A</span></div>
+             <div><strong>Deadline: </strong><span class="deadline">N/A</span></div>
+             <div><strong>Company ID:  </strong><span class="companyId"></span></div>
+
+             <button type="button" class="btn btn-default editBtn pull-right">Edit</button>
+         </div>
+
+     </script> -->
+
+}

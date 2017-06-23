@@ -1,0 +1,430 @@
+﻿@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@section Styles {
+    <link href="~/Assets/Admin/plugins/simple-line-icons/css/simple-line-icons.css" rel="stylesheet" />
+
+    <style>
+        .title {
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .proposal-item {
+            margin-left:15px;
+            padding-bottom: 20px;
+            padding-top: 20px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .accept {
+            border-style: solid;
+            border-color: #43AF6A;
+            border-width: 15px;
+        }
+
+        .deny {
+            border-style: solid;
+            border-color: #ff6666;
+            border-width: 15px;
+        }
+
+        .reset {
+            margin-bottom: 3px;
+        }
+
+        .statusSelect {
+            width: 125px;
+        }
+
+        .edit-container {
+            margin-left: 15px;
+        }
+    </style>
+}
+<h1 class="page-header">Proposals</h1>
+<!-- BEGIN search-results -->
+<div ng-controller='proposalController as proposalVm' class="row">
+    <div id="search-results" class="section-container">
+        <!-- BEGIN search-item-container -->
+        <div class="search-item-container col-md-6">
+            <div class="search-sidebar">
+                <div class="sort">
+                    <label for="statusSelect"> Sort By Proposal Status: </label><br>
+                    <select name="statusSelect" class="statusSelect" ng-model="proposalVm.selectedItem" ng-change="proposalVm.getStatusOption()">
+                        <option value="0" selected="selected">All</option>
+                        <option value="Accepted">Accepted</option>
+                        <option value="Denied">Denied</option>
+                        <option value="Pending">Pending</option>
+                        <option value="New">New</option>
+                    </select>
+                    <input type="button" class="btn btn-danger btn-xs reset pull-right m-b-5" value="Reset Fields" ng-click="proposalVm.render()" />
+                </div>
+                <form method="POST" name="filter_form">
+                    <div class="form-group">
+                        <input type="text" ng-model="proposalVm.searchText" class="form-control input-sm" ng-keyup="proposalVm.search(searchText)" id="textbox" placeholder="Search Proposals" />
+                    </div>
+                </form>
+                <span>Total {{proposalVm.filteredItems.length}} result(s).</span>
+            </div>
+            <div class="row">
+                <!-- BEGIN item-row -->
+                <div class="row">
+                    <!-- BEGIN item -->
+                    <div class="row">
+                        <!-- begin panel -->
+                        <div ng-repeat="item in proposalVm.pagedItems"
+                             class="proposal-item panel panel-inverse"
+                             ng-class="{ 'accept': item.status.id === 1, 'deny': item.status.id === 2 }" ng-model="search.$"
+                             ng-click="proposalVm.select(item)">
+                            <p class="form-group">
+                                <label>ID:</label> <a ng-click="proposalVm.select(item)">
+                                    {{item.id}}
+                                </a>
+                                <label>First Name:</label>
+                                <a ng-click="proposalVm.select(item)">{{item.firstName}} </a>
+                                <label>Last Name:</label>
+                                <a ng-click="proposalVm.select(item)">{{item.lastName}}</a>
+                            </p>
+                            <p class="form-group">
+                                <label>Phone:</label>
+                                <a ng-click="proposalVm.select(item)">{{item.phoneNumber| tel}}</a>
+                                <label>Email</label>
+                                <a ng-click="proposalVm.select(item)">{{item.email}}</a>
+                            </p>
+                            <p class="form-group">
+                                <label>Budget</label>
+                                <a ng-click="proposalVm.select(item)">{{item.budget}}</a>
+                                <label>Deadline</label>
+                                <a ng-click="proposalVm.select(item)">{{item.deadline}}</a>
+                            </p>
+                            <p class="form-group">
+                                <label>Project Type:</label>
+                                <a ng-click="proposalVm.select(item)">{{item.projectType}}</a>
+                            </p>
+                            <p class="form-group">
+                                <label>Description:</label>
+                                <a ng-click="proposalVm.select(item)">{{item.description}}</a>
+                            </p>
+                            <p class="form-group">
+                                <label>Notes:</label>
+                                <a ng-click="proposalVm.select(item)">{{item.notes}}</a>
+                            </p>
+                            <p class="form-group">
+                                <label>Status:</label>
+                                <a ng-model="item.status.id" ng-click="proposalVm.select(item.status.id)">{{item.status.name}}</a>
+                            </p>
+                            <div class="result-info m-b-10 text-right">
+                                <input type="button" data-ng-click="proposalVm.saveAccept(item)" class="btn btn-sm btn-success" value="Accept"
+                                       ng-hide="(item.status.id ===1||item.status.id ===2) ? true : false">
+                                <input type="button" data-ng-click="proposalVm.saveDeny(item)" class="btn btn-sm btn-danger" value="Deny"
+                                       ng-hide="(item.status.id ===1||item.status.id ===2) ? true : false">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END item -->
+
+        <div class="col-md-4 edit-container" ng-show="proposalVm.item">
+            <div class="row">
+                <div class="panel panel-inverse" data-sortable-id="form-stuff-1">
+                    <div class="panel-heading">
+                        <span class="h4">Edit Proposal</span>
+                    </div>
+                    <div class="panel-body">
+                        <form name="editForm">
+                            <div class="form-group hidden">
+                                <label>Id: </label><input type="text" class="form-control" ng-model="proposalVm.item.id">
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : userForm.firstName.$invalid && !userForm.firstName.$pristine }">
+                                <label>First Name:</label>
+                                <input type="text" class="form-control" ng-model="proposalVm.item.firstName" />
+                                <p ng-show="userForm.firstName.$invalid && !userForm.firstName.$pristine" class="help-block">Your First Name is required.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : userForm.lastName.$invalid && !userForm.lastName.$pristine }">
+                                <label>Last Name</label>
+                                <input type="text" class="form-control" ng-model="proposalVm.item.lastName" />
+                                <p ng-show="userForm.lastName.$invalid && !userForm.lastName.$pristine" class="help-block">Your Last Name is required.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : userForm.phone.$invalid && !userForm.phone.$pristine }">
+                                <label>Phone:</label>
+                                <input type="text" class="form-control" ng-model="proposalVm.item.phoneNumber" />
+                                <p ng-show="userForm.phone.$invalid && !userForm.phone.$pristine" class="help-block">Your phone is required.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : userForm.email.$invalid && !userForm.email.$pristine }">
+                                <label>Email</label>
+                                <input type="text" class="form-control" ng-model="proposalVm.item.email" />
+                                <p ng-show="userForm.email.$invalid && !userForm.email.$pristine" class="help-block">Your email is required.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : userForm.budget.$invalid && !userForm.budget.$pristine }">
+                                <label>Budget</label>
+                                <input type="text" class="form-control" ng-model="proposalVm.item.budget" />
+                                <p ng-show="userForm.budget.$invalid && !userForm.budget.$pristine" class="help-block">Your budget is required.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : userForm.deadline.$invalid && !userForm.deadline.$pristine }">
+                                <label>Deadline</label>
+                                <input type="text" class="form-control" ng-model="proposalVm.item.deadline" />
+                                <p ng-show="userForm.deadline.$invalid && !userForm.deadline.$pristine" class="help-block">Your deadline is required.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : userForm.projectType.$invalid && !userForm.projectType.$pristine }">
+                                <label>Project Type:</label>
+                                <input type="text" class="form-control" ng-model="proposalVm.item.projectType" />
+                                <p ng-show="userForm.projectType.$invalid && !userForm.projectType.$pristine" class="help-block">Your projectType is required.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : userForm.description.$invalid && !userForm.description.$pristine }">
+                                <label>Description:</label>
+                                <input type="text" class="form-control" ng-model="proposalVm.item.description" />
+                                <p ng-show="userForm.description.$invalid && !userForm.description.$pristine" class="help-block">Your description is required.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : userForm.notes.$invalid && !userForm.notes.$pristine }">
+                                <label>Notes:</label>
+                                <input type="text" class="form-control" ng-model="proposalVm.item.notes" />
+                                <p ng-show="userForm.notes.$invalid && !userForm.notes.$pristine" class="help-block">Your notes is required.</p>
+                            </div>
+                            <div ng-hide="proposalVm.statusOption ==='Accepted'">
+                                <label>Status:</label>
+                                <div class="form-group">
+                                    <select name="statusSelect" class="statusSelect"
+                                            ng-model="proposalVm.statusOption">
+                                        <option value="Accepted">Accepted</option>
+                                        <option value="Denied">Denied</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="New">New</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" 
+                                    ng-click="proposalVm.save(item)">Save</button>
+                            <button type="button" class="btn btn-default btn-sm" ng-click="proposalVm.cancel()">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 text-center">
+        <ul uib-pagination ng-model="proposalVm.currentPage"
+            total-items="proposalVm.totalItems" boundary-link="true"
+            ng-change="proposalVm.pageChanged()" items-per-page="proposalVm.itemsPerPage"
+            max-size="5"></ul>
+    </div>
+</div>
+
+@section pageInitScripts{
+}
+
+@section scripts {
+    <script src="~/Scripts/sabio.services.proposal.js"></script>
+    <script src="~/Scripts/app/services/proposal.js"></script>
+    <script src="~/Scripts/app/filters/tel.js"></script>
+    <script>
+
+        (function () {
+            angular.module(APPNAME)
+            .controller('proposalController', ProposalController);
+            ProposalController.$inject = ['$scope', '$window', '$baseController', 'proposalService'];
+
+            function ProposalController($scope, $window, $baseController, proposalService) {
+                // Administrative stuff
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.proposalService = proposalService;
+                vm.$window = $window;
+                // ViewModel
+                vm.goHome = _goHome;
+                vm.items = [];
+                vm.item = null;  // copy of item being edited
+                vm.itemIndex = -1; // index of item being edited
+                vm.select = _select;
+                vm.search = _search;
+                vm.save = _save;
+                vm.saveAccept = _saveAccept;
+                vm.saveDeny = _saveDeny;
+                vm.sortReverse = false;
+                vm.cancel = _cancel;
+                vm.results = [];
+                vm.currentPage = 1;
+                vm.itemsPerPage = 4;
+                vm.totalItems = 0;
+                vm.pageChanged = _pageChanged;
+                vm.pagedItems = [];
+                vm.filteredItems = [];
+                vm.addNewProposal = _addNewProposal;
+                vm.expand = _expand;
+                vm.selectedItem = null; //dropdown item
+                vm.getStatusOption = _getStatusOption;
+                vm.statusOption = '';
+                vm.render = _render;
+
+                //"The Fold"
+                _render();
+
+                function _render() {
+                    vm.proposalService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _goHome() {
+                    vm.$window.location.href = '/';
+                }
+
+                //Pagination
+                function _pageChanged() {
+                    var begin = ((vm.currentPage - 1) * vm.itemsPerPage);
+                    var end = begin + vm.itemsPerPage;
+                    vm.pagedItems = vm.filteredItems.slice(begin, end);
+                }
+
+                //Search
+                function _search() {
+                    if (vm.searchText && vm.searchText.length > 0) {
+                        vm.filteredItems = vm.items.filter(_searchFilter);
+                    }
+                    else {
+                        vm.filteredItems = vm.items;
+                    }
+                    vm.totalItems = vm.filteredItems.length;
+                    _pageChanged();
+                }
+
+                function _searchFilter(element, index, array) {
+                    return element.firstName.toLowerCase().indexOf(vm.searchText.toLowerCase()) > -1
+                    || element.lastName.toLowerCase().indexOf(vm.searchText.toLowerCase()) > -1
+                    || element.description.toLowerCase().indexOf(vm.searchText.toLowerCase()) > -1
+                    || element.projectType.toLowerCase().indexOf(vm.searchText.toLowerCase()) > -1
+                    || element.status.name.toLowerCase().indexOf(vm.searchText.toLowerCase()) > -1;
+
+                }
+                //SELECT OPTION
+                function _getStatusOption() {
+                    if (vm.selectedItem != 0) {
+                        var statusName = vm.selectedItem;
+                        vm.proposalService.search(statusName, _searchSuccess, _searchAllError);
+                    } else {
+                        _render();
+                    }
+                }
+                function _searchSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                        _search();
+                    });
+                  
+                }
+
+                function _searchAllError(jqXHR) {
+                    console.log(jqXHR.responseText);
+                }
+
+                function _getAllSuccess(data) {
+                    vm.selectedItem = null;
+                    vm.searchText = '';
+                    vm.item = null;
+                    vm.$scope.$apply(function () {
+                        vm.items = data.items;
+                        _search();
+                    });
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+                }
+
+                function _select(data) {
+                    vm.itemIndex = vm.items.indexOf(data);
+                    vm.proposalService.getById(data.id, _getByIdSuccess, _getByIdError)
+                }
+
+                function _getByIdSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                            vm.statusOption = data.item.status.name;
+                        });
+                    }
+                    window.scroll(0, 0);
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetById failed");
+                }
+
+                function _cancel() {
+                    _endEdit();
+                }
+
+                function _endEdit() {
+                    vm.item = null;
+                    vm.itemIndex = -1;
+                }
+                function _addNewProposal() {
+                    vm.$window.location.href = '/proposals/admin/create/';
+                }
+                function _save(item) {
+                
+                        switch (vm.statusOption) {
+                            case "Accepted":
+                                vm.$alertService.error("An accepted Proposal cannot be edited");
+                                break;
+                            case "Denied":
+                                vm.item.status.id = 2;
+                                vm.proposalService.putJSON(vm.item.id, vm.item, _putSuccess, _putError);
+                                break;
+                            case "Pending":
+                                vm.item.status.id = 3;
+                                vm.proposalService.putJSON(vm.item.id, vm.item, _putSuccess, _putError);
+                                break;
+                            case "New":
+                                vm.item.status.id = 4;
+                                vm.proposalService.putJSON(vm.item.id, vm.item, _putSuccess, _putError);
+                                break;
+                            default:
+                                vm.proposalService.putJSON(vm.item.id, vm.item, _putSuccess, _putError);
+                               
+                        }
+                   
+                }
+
+                //Update Status to Accepted
+                function _saveAccept(data) {
+                    vm.itemIndex = vm.items.indexOf(data);
+                    data.status.id = 1;
+                    vm.proposalService.putJSON(data.id, data, _putSuccess, _putError);
+                }
+                //Update Status to Denied
+                function _saveDeny(data) {
+                    vm.itemIndex = vm.items.indexOf(data);
+                    data.status.id = 2;
+                    vm.proposalService.putJSON(data.id, data, _putSuccess, _putError);
+                }
+                function _putSuccess(data) {
+                    console.log(data);
+                    if (data.item) {
+                        vm.$window.location.href = ('/projects/' + data.item + '/edit/');
+                    } else {
+                        _render();
+
+                        vm.$alertService.success("Update successful");
+                    }
+                }
+                function _putError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Update failed");
+                }
+                function _expand(item) {
+                    angular.forEach(items, function (i) {
+                        if (i === item) {
+                            i.showfull = !i.showfull;
+                        } else {
+                            i.showfull = false;
+                        }
+                    });
+                };
+            }
+        }
+            )();
+    </script>
+}

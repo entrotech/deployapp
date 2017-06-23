@@ -1,0 +1,144 @@
+﻿<style>
+    .timecard table {
+        border: 1px solid #ccc;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+        .timecard table tr {
+            border: 1px solid #ddd;
+            padding: 5px;
+        }
+
+        .timecard table th, table td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .timecard table th {
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+    .timecard .table-condensed {
+        background-color: #fff;
+    }
+</style>
+
+<div class="timecard border-top-1" data-ng-if="!tVm.item">
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title">Timecards</h3>
+            <div class="input-group">
+                <div class="result-container row">
+                    <div class="col-md-4 m-b-20">
+                        <label>Sort By Person:</label>
+                        <select class="form-control" data-ng-model="person" data-ng-change="tVm.filter(person, status)" data-ng-options="person.person.id as person.person.fullName for person in tVm.model.item.staff">
+                            <option value="">All</option>
+                            <option>{{item.person.fullName}}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 m-b-20">
+                        <label>Sort By Status:</label>
+                        <select class="form-control" data-ng-model="status" data-ng-change="tVm.filter(person, status)" data-ng-options="status.timecardStatusId as status.status for status in tVm.items | unique: 'status' ">
+                            <option value="">All</option>
+                            <option>{{item.status}}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="pull-right">
+                            <label>Add a new entry</label>
+                            <button type="button" data-ng-click="tVm.add()">
+                                <i class="fa-plus-circle fa"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><a href="" ng-click="tVm.sort('fullName')">Name</a></th>
+                                <th><a href="" ng-click="tVm.sort('startDateTimeUtc')">Start Date</a></th>
+                                <th><a href="" ng-click="tVm.sort('endDateTimeUtc')">End Date</a></th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                                <th><a href="" ng-click="tVm.sort('hoursWorked')">Hours Worked</a></th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in tVm.filteredItems">
+                                <td>{{item.fullName}}</td>
+                                <td>{{item.startDateTimeUtc | date:'dd MMM yyyy'}}</td>
+                                <td>{{item.endDateTimeUtc | date:'dd MMM yyyy'}}</td>
+                                <td>{{item.startDateTimeUtc | date:'hh:mm a'}}</td>
+                                <td>{{item.endDateTimeUtc | date:'hh:mm a'}}</td>
+                                <td>{{item.hoursWorked}}</td>
+                                <td>{{item.status}}</td>
+                                <td>
+                                    <button uib-tooltip="Edit Entry" type="button" data-ng-click="tVm.select(item)" data-ng-show="item.timecardStatusId == 1 || item.timecardStatusId == 2">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button uib-tooltip="Delete Entry" type="button" data-ng-click="tVm.delete(item)" data-ng-show="item.timecardStatusId == 1 || item.timecardStatusId == 2">
+                                        <i class="fa fa-trash-o"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-md-12 text-center">
+                        <ul uib-pagination ng-model="tVm.currentPage" total-items="tVm.totalItems" boundary-link="true" ng-change="tVm.pageChanged() " items-per-page="tVm.itemsPerPage"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-12">
+    <!-- begin panel -->
+    <div class="panel" data-sortable-id="form-stuff-1" data-ng-if="tVm.item">
+        <div class="panel-body">
+            <form id="timecardEntryForm">
+                <div data-ng-hide="tVm.item.personId">
+                    <h4>Select Person for timecard entry</h4>
+                    <select class="form-control" data-ng-model="person" data-ng-options="person.person.id as person.person.fullName for person in tVm.model.item.staff"></select>
+                </div>
+                <div data-ng-show="tVm.item.personId">
+                    <h4>Select Timecard Status</h4>
+                    <select class="form-control" data-ng-model="status">
+                        <option value="1">Entered</option>
+                        <option value="2">Approved</option>
+                    </select>
+                </div>
+                <h4>Enter date and time started working</h4>
+                <div class="form-group">
+                    <div class="input-group" datetimepicker
+                         on-change="tVm.update(tVm.item.startDateTimeUtc, tVm.item.endDateTimeUtc)"
+                         data-ng-model="tVm.item.startDateTimeUtc" options="tVm.optionsFrom">
+                        <input class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+                <h4>Enter date and time ended working</h4>
+                <div class="form-group">
+                    <div class="input-group" datetimepicker
+                         on-change="tVm.update(tVm.item.startDateTimeUtc, tVm.item.endDateTimeUtc)"
+                         data-ng-model="tVm.item.endDateTimeUtc" options="tVm.optionsTo">
+                        <input class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" data-ng-click="tVm.save(person, status)">Save</button>
+                <button type="button" class="btn btn-default" data-ng-click="tVm.cancel()">Cancel</button>
+            </form>
+        </div>
+    </div>
+</div>

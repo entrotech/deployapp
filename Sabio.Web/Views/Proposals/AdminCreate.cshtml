@@ -1,0 +1,205 @@
+﻿@{
+    ViewBag.Title = "Manage";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+@section styles {
+
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+
+    <style>
+        .fullPartContainer {
+            padding-left: 10px;
+        }
+
+        .product {
+            background: #fff;
+            border: 1px solid #c5ced4;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            padding: 30px 30px 30px 30px;
+        }
+    </style>
+}
+<!-- BEGIN #product -->
+<div id="product" class="section-container p-t-20">
+    <!-- BEGIN container -->
+    <div class="container">
+        <!-- BEGIN breadcrumb -->
+        <ul class="breadcrumb m-b-10 f-s-12">
+            <li><a href="/home/index">Home</a></li>
+            <li><a href="/proposals/ngindex">Proposals</a></li>
+            <li class="active">Create</li>
+        </ul>
+        <!-- END breadcrumb -->
+        <!-- BEGIN product -->
+    </div>
+</div>
+<h1 class="page-header">Proposals <small></small></h1>
+<!-- end page-header -->
+<!-- begin form content -->
+<div class="row">
+    <!-- begin col-6 -->
+    <div class="col-md-8">
+        <!-- begin panel -->
+        <div class="panel panel-inverse" data-sortable-id="form-stuff-1">
+            <div class="panel-heading">
+                <div class="panel-heading-btn">
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                </div>
+                <h4 class="panel-title">Enter Your Proposal</h4>
+            </div>
+            <div class="panel-body">
+                <form id="userForm" ng-controller='proposalController as proposalVm' novalidate>
+
+                    <div class="item-row">
+                        <!-- BEGIN item -->
+
+                        <div class="form-group" ng-class="{'has-error' : userForm.firstName.$invalid && !userForm.firstName.$pristine }">
+                            <label>First Name:</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.firstName" />
+                            <p ng-show="userForm.firstName.$invalid && !userForm.firstName.$pristine" class="help-block">Your First Name is required.</p>
+                        </div>
+                        <div class="form-group" ng-class="{'has-error' : userForm.lastName.$invalid && !userForm.lastName.$pristine }">
+                            <label>Last Name</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.lastName" />
+                            <p ng-show="userForm.lastName.$invalid && !userForm.lastName.$pristine" class="help-block">Your Last Name is required.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Company</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.company" />
+                        </div>
+                        <div class="form-group" ng-class="{'has-error' : userForm.phone.$invalid && !userForm.phone.$pristine }">
+                            <label>Phone:</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.phoneNumber" />
+                            <p ng-show="userForm.phone.$invalid && !userForm.phone.$pristine" class="help-block">Your phone is required.</p>
+                        </div>
+                        <div class="form-group" ng-class="{'has-error' : userForm.email.$invalid && !userForm.email.$pristine }">
+                            <label>Email</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.email" />
+                            <p ng-show="userForm.email.$invalid && !userForm.email.$pristine" class="help-block">Your email is required.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Budget</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.budget" />
+                        </div>
+                        <div class="form-group">
+                            <label>Deadline</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.deadline" />
+                        </div>
+                        <div class="form-group" ng-class="{'has-error' : userForm.projectType.$invalid && !userForm.projectType.$pristine }">
+                            <label>Project Type:</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.projectType" />
+                            <p ng-show="userForm.projectType.$invalid && !userForm.projectType.$pristine" class="help-block">Your projectType is required.</p>
+                        </div>
+                        <div class="form-group" ng-class="{'has-error' : userForm.description.$invalid && !userForm.description.$pristine }">
+                            <label>Description:</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.description" />
+                            <p ng-show="userForm.description.$invalid && !userForm.description.$pristine" class="help-block">Your description is required.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Notes:</label>
+                            <input type="text" class="form-control" ng-model="proposalVm.item.notes" />
+                        </div>
+                        <button type="button" data-ng-click="proposalVm.save(item)" class="btn btn-primary submit" ng-disabled="userForm.$invalid">Save</button>
+                        <button type="button" class="btn btn-default cancel">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section pageInitScripts{
+    @*
+
+    *@
+}
+
+@section scripts {
+    <script src="~/Scripts/sabio.services.proposal.js"></script>
+    <script>
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                 .factory('proposalService', ProposalService);
+
+            ProposalService.$inject = ['$baseService', '$sabio'];
+
+            function ProposalService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.proposal;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+            .controller('proposalController', ProposalController);
+
+            ProposalController.$inject = ['$scope', '$window', '$baseController', 'proposalService'];
+
+            function ProposalController($scope, $window, $baseController, proposalService) {
+
+                var vm = this;
+                vm.$scope = $scope;
+
+                $baseController.merge(vm, $baseController);
+                vm.proposalService = proposalService;
+                vm.$window = $window;
+                // ViewModel
+                vm.goHome = _goHome;
+                vm.items = [];
+                vm.item = null;
+                vm.itemIndex = -1;
+                vm.save = _save;
+                vm.cancel = _cancel;
+                vm.add = _add;
+                vm.submitForm = _submitForm;
+
+                function _goHome() {
+                    vm.$window.location.href = '/';
+                }
+
+                // create a new empty item
+                function _add() {
+                    vm.item = {};
+                    vm.itemIndex = -1;
+                }
+
+                function _cancel() {
+                    _endEdit();
+                }
+
+                function _endEdit() {
+                    vm.item = null;
+                    vm.itemIndex = -1;
+                }
+
+                function _save(item) {
+                    vm.proposalService.postJSON(vm.item, _postSuccess, _postError);
+                }
+
+                function _postSuccess(data) {
+                    vm.$alertService.success("Insert successful");
+                    vm.$window.location.href = '/proposals/ngindex/';
+                }
+
+                function _postError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Insert failed");
+                }
+                function _submitForm(isValid) {
+                    if (isValid) {
+                        console.log("Data is valid!");
+                    } else {
+                        console.log("Form submitted with invalid data")
+                    }
+                };
+            }
+        }
+              ());
+    </script>
+}

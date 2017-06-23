@@ -1,0 +1,404 @@
+﻿@model Sabio.Web.Models.ViewModels.BaseViewModel
+@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+@section styles {
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <style>
+        #searchBarName {
+            background-color: #fff;
+            border: 1px solid;
+            border-radius: 1px;
+            /*cursor: crosshair;*/
+            font: 20px arial, sans-serif;
+            border-color: #66AFE9;
+            /*float: left;*/
+            text-align: center;
+        }
+
+        #searchBarAddress {
+            background-color: #fff;
+            border: 1px solid;
+            border-radius: 1px;
+            /*cursor: crosshair;*/
+            font: 20px arial, sans-serif;
+            border-color: #66AFE9;
+            text-align: center;
+        }
+
+
+
+        .panel-heading {
+        }
+
+        .personList {
+            top: 50px;
+            position: relative;
+        }
+
+        .name {
+            font-size: large;
+        }
+
+        .photo {
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+        }
+
+        #title {
+            text-align: center;
+            font-size: 400%;
+        }
+
+        .profile-right {
+            transform: translate(200px, -2000px);
+            font-size: medium;
+            /*margin-top: 30px;
+            font-size: medium;
+            position: fixed;
+            margin-left: 450px;*/
+        }
+
+        #checkBox {
+            text-align: center;
+        }
+
+        btnCancel {
+            position: absolute;
+            cursor: crosshair;
+            color: white;
+            font: weight 900;
+            font-size: 1.2rem;
+            border: none;
+            padding: 1em 3em;
+            margin: 2em auto;
+            display: block;
+            transition: background .5s ease-in, transform .5s .25s ease-in-out;
+        }
+
+            btnCancel:hover {
+                background: #c61140;
+                transform: scale(1.2);
+            }
+
+        /*#checkBoxes label {
+            display: block;
+            float: left;
+            padding-right: 10px;
+            white-space: nowrap;
+        }*/
+
+        #checkBoxes {
+            text-align:center;
+        }
+
+        #profiles {
+            background: #fff;
+            border: 1px solid #c5ced4;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            padding: 30px 30px 30px 30px;
+            margin-bottom: 15px;
+        }
+
+        .btnSearch {
+            text-align: center;
+        }
+    </style>
+
+}
+<ol class="breadcrumb pull-right">
+    <li><a href="/">Home</a></li>
+    <li class="active">Members List</li>
+</ol>
+<h1 class="page-header">Search Members</h1>
+@*<fieldset id="title">
+    <legend>
+        <strong>Person Profile</strong>
+    </legend>
+</fieldset>*@
+<div class="inverse" data-ng-app="SabioApp">
+    <div ng-controller="personController as vmP" class="row">
+
+        @*---- Search ----- *@
+
+        <div class="col-md-8">
+            <div class="sidebar-search">
+                <input type="text" class="form-control input-white" id="searchBarName" placeholder="Search by name or email" ng-model="vmP.searchString" @*ng-keyup="vmP.search(searchString)"*@/>
+            </div>
+            <br />
+            @* ---Search by address--- *@
+            <div id="search">
+                <input type="text" class="form-control input-white" id="searchBarAddress" placeholder="Search by address" google-place ng-model="vmP.placeChanged" aria-label="search" />
+            </div>
+            <br />
+            <fieldset id="checkBoxes">
+                <legend>Are you a/an ?</legend>
+                <form>
+                    <div class="checkBoxes">
+                        <label for="veterans"><input type="checkbox" id="veteran" ng-click="vmP.isVeteran" />&nbsp;<span>Veterans</span></label>
+                        <label for="employers"><input type="checkbox" id="employers" ng-click="vmP.isEmployer" />&nbsp;<span>Employers</span></label>
+                        <label for="vtFamilies"><input type="checkbox" id="vtFamilies" ng-click="vmP.isFamilyMember" />&nbsp;<span>Family Member</span></label>
+                        <br />
+                    </div>
+                    <br />
+                    <div>
+                        <label for="singleSelect">Location </label>
+                        <select name="singleSelect" id="singleSelect">
+                            <option value="">---Please select---</option>
+                            @*<option><a href="javascript:;"class="radius" ng-click="vmP.changeFilter('distance', 8046.72)">Within 5 miles</option>*@
+                            <option value="{{data.option1}}">Within 10 miles</option>
+                            <option value="{{data.option1}}">Within 15 miles</option>
+                            <option value="{{data.option1}}">Within 20 miles</option>
+                            <option value="{{data.option1}}">Within 50 miles</option>
+                            <option value="{{data.option1}}">Within 100 miles</option>
+                        </select>
+                        <br>
+
+                    </div>
+                    <br />
+                    <div class="btnSearch">
+                        <button type="button" class="btnSearch btn-inverse" ng-click="vmP.search(searchString)">
+                            <i class="fa fa-search">Search</i>
+                            Search
+                        </button>
+                    </div>
+                </form>
+                <br />
+            </fieldset>
+            <div class="panel-body" id="profiles">
+                <ul ng-class-even="pull-left">
+                    <li class="data-list personList" ng-repeat="item in vmP.items | filter:filterByCategory" data-ng-click="vmP.selectOne(item)">
+                        @*<div class="sort-list">Today</div>*@
+                        <div class="panel panel-body">
+                            <a ng-href="/person/{{item.id}}">
+                                <span class="label label-inverse f-s-10">Veteran</span>
+                                <div class="name">
+                                    {{item.firstName}}{{item.middleName}}{{item.lastName}}<br />{{item.email}}
+                                </div>
+                            </a>
+                        </div>
+                        <span><img ng-src={{item.profilePicture}} class="photo"></span>
+                    </li>
+                </ul>
+                <br />
+                @*---------- Pagination ------- *@
+            </div>
+            <div>
+                <ul uib-pagination ng-model="vmP.currentPage" total-items="vmP.totalItems" boundary-link="true" ng-change="vmP.search()" items-per-page="vmP.itemsPerPage"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section pageInitScripts{
+
+}
+
+
+@section scripts {
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/jquery.tmpl.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    <script src="~/Scripts/sabio.ui.toastr.js"></script>
+    <script src="~/Scripts/app/filters/tel.js"></script>
+    <script src="~/Assets/Admin/js/map-google.demo.min.js"></script>
+    <script src="~/Scripts/app/directives/Google API autocomplete.js"></script>
+    <script src="~/Scripts/sabio.services.globalEvent.js"></script>
+    <script type="text/javascript">
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('personService', PersonService);
+
+            PersonService.$inject = ['$baseService', '$sabio'];
+
+            function PersonService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.person;//bind the ajax service
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+            .factory('globalEventService', GlobalEventService);
+            GlobalEventService.$inject = ['$baseService', '$sabio'];
+
+            function GlobalEventService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.globalEvent;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+        (function () {
+            angular.module(APPNAME)
+                .controller('personController', PersonController);
+
+
+
+            PersonController.$inject = ['$scope', '$window', '$baseController', 'personService', 'globalEventService'];
+
+            function PersonController($scope, $window, $baseController, personService, globalEventService) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.personService = personService;
+                vm.$window = $window;
+                vm.globalEventService = globalEventService;
+
+                vm.items = [];
+                vm.item = null;
+                vm.itemIndex = -1;
+
+
+                vm.totalItems = null;
+                vm.delete = _delete;
+                vm.selectOne = _selectOne;
+                vm.cancel = _cancel;
+                vm.search = _search;
+                vm.itemsPerPage = 5;
+                vm.currentPage = 1;
+                vm.isVeteran = [];
+                vm.isEmployer = [];
+                vm.isFamilyMember = [];
+
+               
+
+
+
+
+
+                //_render();
+
+                //function _render() {
+                //    //    vm.personService.getall(_getAllSuccess, _getAllError);
+                //}
+
+                //google api autocomplete
+                vm.$scope.$on('place_changed', function (e, place) {
+                    //_search();
+                });
+
+
+
+                function _search() {
+                    vm.personService.search(vm.searchString, vm.itemsPerPage, vm.currentPage, _onSearchSuccess, _onSearchError, vm.isVeteran, vm.isEmployer, vm.isFamilyMember)                
+                }
+                function _onSearchSuccess(data) {
+                    console.log(data.items);
+                    vm.items = [];
+                    vm.$scope.$apply(function () {
+                        data.items
+                        vm.items = data.items;
+                        vm.totalItems = data.resultCount;
+                        //_selectOne();
+
+                    });
+                }
+                function _onSearchError(jqXHR) {
+                    console.log(jqXHR);
+                    vm.$alertService.error(jqXHR.responseText, "search failed")
+                }
+
+                function _selectOne(one) {
+                    console.log(one)
+                    vm.itemIndex = vm.items.indexOf(one);
+                    vm.item = one;
+                    //$window.location.href = '/person/0/edit';
+                    _search();
+                }
+
+                function _cancel() {
+                    _endEdit();
+                }
+
+                function _endEdit() {
+                    vm.item = null;
+                    vm.itemIndex = -1;
+
+                }
+
+                //function _getAllSuccess(data) {
+
+                //    vm.$scope.$apply(function () {
+                //        vm.items = data.items;
+
+                //        //vm.filteredItems = vm.items.slice(0, vm.itemsPerPage);
+                //    });
+                //    //_pageChanged();
+                //}
+
+                //function _getAllError(jqXHR) {
+                //    vm.$alertService.error(jqXHR.responseText, "GetAll failed");
+                //}
+
+                function _getByIdSuccess(data) {
+                    if (data.item) {
+                        vm.$scope.$apply(function () {
+                            vm.item = data.item;
+                        });
+                    }
+                    vm.$alertService.success("Retrieved item for editing from database");
+                }
+
+                function _getByIdError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "GetById failed");
+                }
+
+                function _delete(foo) {
+                    vm.personService.delete(foo, _deleteSuccess, _deleteError);
+                    console.log(foo);
+
+                }
+
+                function _deleteSuccess(foo) {
+                    vm.$scope.$apply(function () {
+                        vm.items.splice(vm.itemIndex, 1);
+                        vm.$alertService.success("Delete successful");
+                        _endEdit();
+                        _render();
+                    });
+                }
+
+                function _deleteError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Delete failed");
+                }
+
+                //    function _addMapMarker() {
+                //        var googleAddress = "";
+                //        if (vm.person.streetAddress) {
+                //            address = vm.person.streetAddress + "" + vm.person.location;
+                //            googleAddress = address.replace(/\s+/g, "+");
+                //        }
+                //        else {
+                //            vm.onlyCity = true;
+                //            googleAddress = vm.person.location.replace(/\s+/g, "+");
+                //        }
+                //        vm.globalEventService.getLatLng(googleAddress, _addMapMarkerSuccess, _addMapMarkerError);
+                //    }
+
+                //    function _addMapMarkerSuccess(data, status, xhr) {
+                //        if (data.status !== "ZERO_RESULTS") {
+                //            var lat = data.results[0].geometry.location.lat;
+                //            var lng = data.results[0].geometry.location.lng;
+                //            var latLng = new google.maps.LatLng(lat, lng);
+                //        }
+                //        function _addMapMarkerError(data) {
+                //            toastr.error("Failed to load map marker")
+                //        }
+
+
+                //    }
+            }
+
+        })();
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI&libraries=places"></script>
+}

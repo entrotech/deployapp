@@ -1,0 +1,654 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    ViewBag.Title = "create";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+@section styles {
+    <style>
+        .jobPosting {
+            border-style: solid;
+            border-width: 1px;
+            padding-left: 20px;
+        }
+
+        #newPosting {
+            margin-top: 10px;
+        }
+
+        .result-info {
+            border-right: 1px dashed #ddd;
+        }
+
+        .days-ago {
+            float: right;
+            display: inline-block;
+        }
+
+        .float-left {
+            float: left;
+        }
+
+        .result-price {
+            position: relative;
+        }
+
+        .edit-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            height: 30%;
+            width: 50%;
+            margin: -8% 0 0 -20%;
+        }
+
+        #submitEmailSearch {
+            padding: 5px 10px 5px 10px;
+        }
+
+        #addPeople {
+            margin-top: 10px;
+        }
+
+        .form-content {
+            margin-top: 20px;
+        }
+
+        .personButton {
+            padding: 0 4px 0 4px;
+            margin: 0 10px 5px 0;
+        }
+
+        .activePerson {
+            display: inline;
+        }
+
+        .item .row {
+            padding: 0 15px 0 30px;
+        }
+
+        .float-right {
+            float: right;
+        }
+
+        .title {
+            text-align: left;
+            margin-left: 30px;
+        }
+
+        .search-item-container .item-row .item {
+            width: 100%;
+        }
+
+        .days-ago {
+            float: right;
+            margin: 15px 15px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .result-list .title {
+            margin: 8px 0px 20px 20px;
+            font-size: 20px;
+            line-height: 24px;
+            display: inline-block;
+        }
+
+            .result-list .title a {
+                color: #333;
+            }
+
+        .result-list .location {
+            color: #999;
+        }
+
+        .result-list .desc {
+            margin-bottom: 20px;
+            max-height: 32px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 16px;
+        }
+
+        .float-left {
+            float: left;
+        }
+
+        .item {
+            background: #fff;
+        }
+    </style>
+}
+
+<div ng-controller="companyController as coVm">
+    <div class="row">
+        <div class="col-md-offset-4 col-xs-4 form-content">
+            <md-button class="btn btn-xs btn-default m-b-10 pull-right" ng-click="coVm.back()">
+                <md-tooltip>Back</md-tooltip>
+            </md-button>
+            <h1>Company</h1>
+            <form id="companyAddForm" name="companyAddForm" ng-submit="coVm.save(companyAddForm.$valid)">
+                <div class="form-group" ng-class="{'has-error' : companyAddForm.companyName.$invalid && !companyAddForm.companyName.$pristine }">
+                    <label for="companyName">Company Name</label>
+                    <input type="text" class="form-control" name="companyName" placeholder="Company Name" id="companyName" required ng-model="coVm.item.name" />
+                    <p ng-show="companyAddForm.companyName.$invalid && !companyAddForm.companyName.$pristine" class="help-block">Company name is required.</p>
+                </div>
+                <div class="form-group" ng-class="{'has-error' : companyAddForm.companyPhoneNumber.$invalid && !companyAddForm.companyPhoneNumber.$pristine }">
+                    <label for="phone">Company Phone Number</label>
+                    <input type="text" class="form-control" name="companyPhoneNumber" placeholder="Company Phone Name" id="companyPhoneNumber" required ng-model="coVm.item.phoneNumber" />
+                    <p ng-show="companyAddForm.companyPhoneNumber.$invalid && !companyAddForm.companyPhoneNumber.$pristine" class="help-block">Phone number is required.</p>
+                </div>
+                <div class="form-group" ng-class="{'has-error' : companyAddForm.companyEmail.$invalid && !companyAddForm.companyEmail.$pristine }">
+                    <label for="email">Company Email</label>
+                    <input type="text" class="form-control" name="companyEmail" placeholder="Company Email" id="companyEmail" required ng-model="coVm.item.email" />
+                    <p ng-show="companyAddForm.companyEmail.$invalid && !companyAddForm.companyEmail.$pristine" class="help-block">Email is required.</p>
+                </div>
+                <div class="form-group" ng-class="{'has-error' : companyAddForm.address1.$invalid && !companyAddForm.address1.$pristine }">
+                    <label for="address1">Street Address 1</label>
+                    <input type="text" class="form-control" name="address1" placeholder="Address" id="address1" required ng-model="coVm.item.address1" />
+                    <p ng-show="companyAddForm.address1.$invalid && !companyAddForm.address1.$pristine" class="help-block">Address is required.</p>
+                </div>
+                <div class="form-group">
+                    <label for="address2">Apt/Suite</label>
+                    <input type="text" class="form-control" name="address2" placeholder="Apt/Suite" id="address2" ng-model="coVm.item.address2" />
+                </div>
+                <div class="form-group" ng-class="{'has-error' : companyAddForm.city.$invalid && !companyAddForm.city.$pristine }">
+                    <label for="city">City</label>
+                    <input type="text" class="form-control" name="city" placeholder="City" id="city" required ng-model="coVm.item.city" />
+                    <p ng-show="companyAddForm.city.$invalid && !companyAddForm.city.$pristine" class="help-block">City is required.</p>
+                </div>
+                <div class="form-group" ng-class="{'has-error' : companyAddForm.countryId.$invalid && !companyAddForm.countryId.$pristine }">
+                    <label for="countryId">Country</label>
+                    <div>
+                        <select name="countryId" id="country" ng-model="coVm.selectedCountry" ng-options="country.name for country in coVm.countries track by country.id" required ng-change="coVm.countryChange()"></select>
+                        <p ng-show="companyAddForm.countryId.$invalid && !companyAddForm.countryId.$pristine" class="help-block">Country is required.</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="stateProvinceId">State</label>
+                    <div>
+                        <select name="stateProvinceId" id="stateProvince" ng-model="coVm.selectedStateProvince" ng-options="stateProvince.name for stateProvince in coVm.stateProvinces track by stateProvince.id"></select>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{'has-error' : companyAddForm.postalCode.$invalid && !companyAddForm.postalCode.$pristine }">
+                    <label for="postalCode">Postal Code</label>
+                    <input type="text" class="form-control" placeholder="Postal Code" name="postalCode" id="postalCode" required ng-model="coVm.item.postalCode" />
+                    <p ng-show="companyAddForm.postalCode.$invalid && !companyAddForm.postalCode.$pristine" class="help-block">Postal code is required.</p>
+                </div>
+                <div class="form-group" ng-class="{'has-error' : companyAddForm.inactive.$invalid && !companyAddForm.inactive.$pristine }">
+                    <label for="inactive">Inactive: </label>
+                    <select class="form-control" id="inactive" name="inactive" required ng-model="coVm.item.inactive">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+
+                    </select>
+                    <p ng-show="companyAddForm.inactive.$invalid && !companyAddForm.inactive.$pristine" class="help-block">Status is required.</p>
+                </div>
+                <div class="form-group" ng-class="{'has-error' : userForm.name.$invalid && !userForm.name.$pristine }">
+                    <label for="isDeploy">This is an entity within Deploy</label>
+                    <select class="form-control" id="isDeploy" name="isDeploy" required ng-model="coVm.item.isDeploy">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" id="submit" ng-disabled="companyAddForm.$invalid">Save</button>
+                <md-button class="btn btn-xs btn-default" ng-click="coVm.back()">
+                    <md-tooltip>Back</md-tooltip>
+                </md-button>
+
+            </form>
+            <p class="alert alert-success hidden fade"></p>
+
+        </div>
+        <div class="col-md-offset-4 col-xs-4" id="addPeople" ng-show="coVm.id">
+            <hr />
+            <div class="col-md-6">
+                <div><label>Add User to Company</label></div>
+                <input type="text" placeholder="Search for people" id="emailSearch" ng-model="coVm.personSearchString" />
+                <button type="button" class="btn btn-primary" id="submitEmailSearch" ng-click="coVm.searchPeople()"><i class="fa fa-search"></i></button>
+                <div id="searchedPeopleList">
+                    <div class="person" ng-repeat="person in coVm.searchedPeople">
+                        <button type="button" class="btn btn-success personButton" ng-click="coVm.addPerson(person)"><i class="fa fa-plus-circle"></i></button>
+                        <p class="activePerson">{{person.firstName}} {{person.lastName}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" id="activePeopleList">
+                <h5>Current Active Users</h5>
+                <div class="activePeopleContainer">
+                    <div class="person" ng-repeat="person in coVm.item.people">
+                        <button type="button" class="btn btn-danger personButton" ng-click="coVm.deletePerson(person)"><i class="fa fa-minus-circle"></i></button>
+                        <p class="activePerson">{{person.firstName}} {{person.lastName}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-offset-2 col-md-8 positions" ng-show="coVm.id">
+            <hr />
+            <h3><strong>Open Positions</strong></h3>
+            <div class="search-item-container result-list" id="jobPostingContainer">
+                <div class="item-row" data-ng-repeat="posting in coVm.item.jobPostings">
+                    <div class="item">
+                        <div class="positionName">
+                            <h4 class="title"><a ng-href="/jobpostings/{{posting.id}}/edit">{{posting.positionName}}</a></h4>
+                            <span class="days-ago">
+                                <small>Posted {{posting.daysAgo}}</small>
+                            </span>
+                        </div>
+                        <div class="result-info col-s-5 col-xs-6">
+                            <div class="float-left">
+                                <p class="desc">{{posting.streetAddress}}</p>
+                                <p class="desc">{{posting.location}}</p>
+                                <p class="desc" ng-show="posting.jobTagsString">Tags: {{posting.jobTagsString}}</p>
+                            </div>
+                        </div>
+                        <div class="result-info2 col-s-3 col-xs-6">
+                            <div class="float-left">
+                                <p class="desc">{{posting.compensationString}}</p>
+                                <p class="desc">{{posting.experienceLevel}}</p>
+                                <p class="desc">{{posting.duration}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-offset-2 col-md-8 positions" ng-show="coVm.id">
+            <hr />
+            <button type="button" class="btn btn-primary" id="addNewPosting" ng-click="coVm.addPosting()">Add Posting</button>
+            <hr />
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/sabio.services.company.js"></script>
+    <script src="~/Scripts/sabio.services.geography.js"></script>
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/sabio.services.companyperson.js"></script>
+
+
+    <script>
+
+        sabio.page.id = @Model.Item;
+        @*@if ( Model.Item > 0 ) {
+
+        } else {
+            sabio.page.id = null;
+        }*@
+
+        sabio.page.personId = @Model.Id;
+
+        (function () {
+            angular.module(APPNAME)
+                .factory('companyService', CompanyService);
+
+            CompanyService.$inject = ['$baseService', '$sabio'];
+
+            function CompanyService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.company;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .factory('geographyService', GeographyService);
+
+            GeographyService.$inject = ['$baseService', '$sabio'];
+
+            function GeographyService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.geography;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .factory('personService', PersonService);
+
+            PersonService.$inject = ['$baseService', '$sabio'];
+
+            function PersonService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.person;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .factory('companyPersonService', CompanyPersonService);
+
+            CompanyPersonService.$inject = ['$baseService', '$sabio'];
+
+            function CompanyPersonService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.companyperson;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('companyController', CompanyController);
+
+            CompanyController.$inject = ['$baseController', '$scope', '$window', '$sabio', 'companyService', 'geographyService', 'personService', 'companyPersonService'];
+
+            function CompanyController($baseController, $scope, $window, $sabio, companyService, geographyService, personService, companyPersonService) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$window = $window;
+                $baseController.merge(vm, $baseController);
+                vm.companyService = companyService;
+                vm.geographyService = geographyService;
+                vm.personService = personService;
+                vm.companyPersonService = companyPersonService;
+
+                vm.id = null;
+                vm.personId = $sabio.personId;
+                vm.item = {};
+                vm.personIndex = -1;
+                vm.countries = [];
+                vm.selectedCountry = null;
+                vm.stateProvinces = [];
+                vm.selectedStateProvince = null;
+                vm.personSearchString = "";
+                vm.searchedPeople = [];
+                vm.personToAdd = null;
+                vm.personToAddIndex = -1;
+
+                vm.save = _save;
+                vm.back = _back;
+                vm.countryChange = _countryChange;
+                vm.searchPeople = _searchPeople;
+                vm.addPerson = _addPerson;
+                vm.deletePerson = _deletePerson;
+                vm.addPosting = _addPosting;
+
+                _getCountries();
+
+                // Get By Id functions
+                if ($sabio.id) {
+                    vm.id = $sabio.id;
+                    vm.companyService.selectById(vm.id, _selectByIdSuccess, _selectByIdError)
+                }
+
+                function _back() {
+                    location.replace('index');
+                }
+
+                function _selectByIdSuccess(data) {
+                    data.item.isDeploy = data.item.isDeploy.toString();
+                    data.item.inactive = data.item.inactive.toString();
+                    vm.$scope.$apply(function () {
+                        vm.selectedCountry = data.item.country;
+                        _countryChange();
+                        vm.selectedStateProvince = data.item.stateProvince;
+                    })
+                    if (data.item.jobPostings) {
+                        data.item.jobPostings = _formatJobPostings(data.item.jobPostings);
+                    }
+                    vm.$scope.$apply(function () {
+                        vm.item = data.item;
+                    })
+                }
+
+                function _selectByIdError() {
+                    toastr.error("Failed to load company");
+                }
+
+                // POST and PUT functions
+                function _save(isValid) {
+                    if (isValid) {
+                        vm.item.personId = vm.personId;
+                        if (vm.selectedCountry) {
+                            vm.item.countryId = vm.selectedCountry.id;
+                        }
+                        if (vm.selectedStateProvince) {
+                            vm.item.stateProvinceId = vm.selectedStateProvince.id;
+                        }
+                        if (vm.id) {
+                            vm.companyService.update($sabio.id, vm.item, _updateSuccess, _updateError);
+                        } else {
+                            vm.companyService.insert(vm.item, _insertSuccess, _insertError);
+                        }
+                    }
+                }
+
+                function _updateSuccess() {
+                    toastr.success("Company saved")
+                }
+
+                function _updateError() {
+                    toastr.error("Company update failed")
+                }
+
+                function _insertSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.id = data.item;
+                    })
+                    console.log(vm.id);
+                    toastr.success("Company saved")
+                }
+
+                function _insertError() {
+                    toastr.error("Company save failed")
+                }
+
+                // People functions
+                function _searchPeople() {
+                    vm.personService.search(vm.personSearchString, 1000, 1, _personSearchSuccess, _personSearchError);
+                }
+
+                function _personSearchSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.searchedPeople = data.items;
+                    })
+                }
+
+                function _personSearchError(data) {
+                    toastr.error("Person search failed");
+                }
+
+                function _addPerson(prsn) {
+                    vm.personToAdd = prsn;
+                    vm.personToAddIndex = vm.searchedPeople.indexOf(prsn);
+
+                    vm.companyPersonService.add(vm.id, prsn.id, _onAddPersonSuccess, _onAddPersonError);
+                }
+
+                function _onAddPersonSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        vm.item.people.push(vm.personToAdd);
+                        vm.personToAdd = null;
+                        vm.searchedPeople.splice(vm.personToAddIndex, 1);
+                        vm.personToAddIndex = -1;
+                    })
+                }
+
+                function _onAddPersonError(data) {
+                    toastr.error("Failed to add person");
+                }
+
+                function _deletePerson(prsn) {
+                    vm.personIndex = vm.item.people.indexOf(prsn);
+
+                    vm.companyPersonService.delete(vm.id, prsn.id, _onDeletePersonSuccess, _onDeletePersonError);
+                }
+
+                function _onDeletePersonSuccess() {
+                    vm.$scope.$apply(function () {
+                        vm.item.people.splice(vm.personIndex, 1);
+                        toastr.success("Person deleted");
+                        vm.personIndex = -1;
+                    })
+                }
+
+                function _onDeletePersonError() {
+                    toastr.error("Failed to delete person");
+                }
+
+                // Geography functions
+                function _getCountries() {
+                    vm.geographyService.getAllCountries(_getCountriesSuccess, _getCountriesError);
+                }
+
+                function _getCountriesSuccess(data) {
+                    vm.countries = data.items;
+                }
+
+                function _getCountriesError(data) {
+                    toastr.error("Failed to get countries");
+                }
+
+                function _countryChange() {
+                    vm.geographyService.getStateProvincesByCountryId(vm.selectedCountry.id, _getStateProvincesSuccess, _getStateProvincesError);
+                }
+
+                function _getStateProvincesSuccess(data) {
+                    vm.stateProvinces = data.items;
+                }
+
+                function _getStateProvincesError(data) {
+                    toastr.error("Failed to get states/provinces");
+                }
+
+                // Job Postings functions
+                function _formatJobPostings(jobPostings) {
+                    for (i = 0; i < jobPostings.length; i++) {
+                        // Attach job tags
+                        if (jobPostings[i].jobTags) {
+                            var jobTagsArray = [];
+                            for (j = 0; j < jobPostings[i].jobTags.length; j++) {
+                                jobTagsArray.push(jobPostings[i].jobTags[j].keyword);
+                            }
+                            var jobTagsString = jobTagsArray.join(", ");
+                            jobPostings[i].jobTagsString = jobTagsString;
+                        }
+                        // Attach days ago
+                        var t = jobPostings[i].dateCreated.split(/[- : T]/);
+                        var d = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5]));
+                        var today = new Date();
+                        var daysAgo = parseInt((today - d) / 86400000);
+                        if (daysAgo == 1) {
+                            daysAgo = daysAgo + " day ago";
+                        } else {
+                            daysAgo = daysAgo + " days ago";
+                        }
+                        jobPostings[i].daysAgo = daysAgo;
+                        // Build location
+                        var locationArray = [];
+                        if (jobPostings[i].city) {
+                            locationArray.push(jobPostings[i].city);
+                        }
+                        if (jobPostings[i].stateProvinceName) {
+                            locationArray.push(jobPostings[i].stateProvinceName);
+                        }
+                        if (jobPostings[i].countryName) {
+                            locationArray.push(jobPostings[i].countryName);
+                        }
+                        var locationString = locationArray.join(", ");
+                        jobPostings[i].location = locationString;
+                        // Build compensation, experience and duration
+                        if (jobPostings[i].compensation) {
+                            jobPostings[i].compensationString = _compensationStringBuilder(jobPostings[i].compensation, jobPostings[i].compensationRateId);
+                        }
+                        if (jobPostings[i].experienceLevelId) {
+                            jobPostings[i].experienceLevel = _convertExperienceLevelId(jobPostings[i].experienceLevelId);
+                        }
+                        if (jobPostings[i].fullPartId || jobPostings[i].contractPermanentId) {
+                            jobPostings[i].duration = _durationStringBuilder(jobPostings[i].fullPartId, jobPostings[i].contractPermanentId);
+                        }
+                    }
+                    return jobPostings;
+                }
+
+                function _convertExperienceLevelId(id) {
+                    var string = "";
+                    switch (id) {
+                        case 1:
+                            string = "Entry level";
+                            break;
+                        case 2:
+                            string = "Mid-level";
+                            break;
+                        case 3:
+                            string = "Senior level";
+                            break;
+                        default:
+                            break;
+                    }
+                    return string;
+                }
+
+                function _compensationStringBuilder(amt, rate) {
+                    var formattedAmt = amt.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+                    var formattedRate = "";
+                    if (rate) {
+                        switch (rate) {
+                            case 1:
+                                formattedRate = " per hour";
+                                break;
+                            case 2:
+                                formattedRate = " per day";
+                                formattedAmt = formattedAmt.slice(0, -3);
+                                break;
+                            case 3:
+                                formattedRate = " per year";
+                                formattedAmt = formattedAmt.slice(0, -3);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    return "$" + formattedAmt + formattedRate;
+                }
+
+                function _durationStringBuilder(fullPartId, contractPermanentId) {
+                    var stringArray = [];
+                    if (fullPartId) {
+                        switch (fullPartId) {
+                            case 1:
+                                stringArray.push("Part-time");
+                                break;
+                            case 2:
+                                stringArray.push("Full-time");
+                                break;
+                            case 3:
+                                stringArray.push("Part-time to full-time");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    if (contractPermanentId) {
+                        switch (contractPermanentId) {
+                            case 1:
+                                stringArray.push("Contract");
+                                break;
+                            case 2:
+                                stringArray.push("Permanent");
+                                break;
+                            case 3:
+                                stringArray.push("Contract-to-hire");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    var string = stringArray.join(", ");
+                    return string;
+                }
+
+                function _addPosting() {
+                    window.location.href = "/jobpostings/create";
+                }
+            }
+        })();
+
+    </script>
+}
+

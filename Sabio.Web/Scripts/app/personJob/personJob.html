@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h4 class="userPanelTitle">Job Applications</h4>
+    <!-- begin tab-pane -->
+    <div class="panel panel-default" ng-hide="jaVm.jobs">
+        <div class="panel-heading">
+            <h5 class="panel-title">Apply For Jobs!</h5>
+        </div>
+        <div class="panel-collapse collapse in">
+            <div class="panel-body">
+                <p>
+                    You haven't applied to any jobs yet. Click <a href="/jobpostings">here</a> to apply!
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default panel-body jobs" ng-show="jaVm.filteredJobs && jaVm.jobs">
+        <ul uib-pagination ng-model="jaVm.currentPage" total-items="jaVm.totalJobs" boundary-link="true" ng-change="jaVm.pageChanged() " items-per-page="jaVm.jobsPerPage"></ul>
+
+        <div class="job data-list block-view row" data-ng-repeat="job in jaVm.filteredJobs" ng-click="jaVm.toJob(job.jobPosting.id)">
+            <div class="col-sm-10 col-xs-12">
+                <p class="pull-left"><strong>{{job.jobPosting.positionName}}</strong>, {{job.jobPosting.companyName}}</p>
+            </div>
+            <div class="col-sm-2 hidden-xs">
+                <p class="pull-right">{{job.status}}</p>
+            </div>
+            <div class="col-sm-6 col-xs-12">
+                <p class="pull-left"><small>Applied on: {{job.dateCreated | date: 'short'}}</small></p>
+            </div>
+            <div class="col-sm-6 hidden-xs">
+                <p class="pull-right"><small>Updated: {{job.dateCreated === job.dateModified ? 'N/A' : job.dateModified | date: 'short'}}</small></p>
+            </div>
+        </div>
+    </div>
+    <!--<div class="user-link" ng-show="jaVm.Jobs">
+        <a href="/jobpostings">View More Jobs<i class="fa fa-angle-double-right m-l-5"></i></a>
+    </div>-->
+    <!-- end tab-pane -->
+</body>
+</html>

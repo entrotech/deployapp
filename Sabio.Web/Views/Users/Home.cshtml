@@ -1,0 +1,181 @@
+﻿
+@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+@section Styles {
+    <link href="~/Assets/Admin/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
+    <style>
+        /* event categories */
+        .event {
+            height: 10px;
+            width: 20px;
+            display: inline-block;
+            box-shadow: 2px 2px 1px rgba(0,0,0,0.2);
+            margin-right: .3em;
+        }
+        .user-calendar {
+            margin-top: 20px;
+        }
+
+            .user-calendar h2 {
+                font-weight: 500;
+                color: #242a30;
+                margin-top: 0;
+                margin-bottom: 15px;
+                line-height: 1.25;
+                font-size: 18px;
+            }
+
+            .user-calendar > .fc-scroller div {
+                overflow-x: hidden !important;
+                overflow-y: hidden !important;
+            }
+
+        div.data-list.block-view:hover {
+            background-color: #f8f9fa;
+        }
+
+        div.user-link{
+            margin-top: 20px;
+        }
+        .btn-xs{
+            padding-top: 3px;
+            padding-bottom: 3px;
+            /*padding-left: 10px;
+            padding-right: 10px;*/
+            margin-bottom: 5px;
+        }
+                /*#content {
+            padding-left: 0;
+            padding-right: 0;
+        }*/
+        .content{
+            padding-top: 40px;
+        }
+        .page-header>h1{
+            font-size: 36px;
+            font-family: 'Open Sans', "Helvetica Neue",Helvetica,Arial,sans-serif;
+            color: #707478;
+            font-weight: 500;
+        }
+
+    </style>
+}
+
+<div ng-controller='userHomeController as uhVm' style="background-color:white">
+    <div id="user" class="content">
+        <!-- begin container -->
+        <div class="container">
+            <div class="page-header">
+                <h1 class="text-center">Welcome, {{uhVm.item.firstName}}</h1>
+            </div>
+            <div class="panel-group wrapper">
+                <!-- begin row -->
+                <div class="row user-panel">
+                    <!-- begin col-6 -->
+                    <div class="col-md-6">
+                        <person-job person="uhVm.item"></person-job>
+                    </div>
+                    <!-- end col-6 -->
+                    <!-- begin col-6 -->
+                    <div class="col-md-6">
+                        <div class="user-calendar" ui-calendar="uhVm.calOptions" ng-model="uhVm.calendarItems">
+                        </div>
+                        @*<div class="user-link">
+                            <a href="/calendar">View Your Calendar<i class="fa fa-angle-double-right m-l-5"></i></a>
+                        </div>*@
+                    </div>
+                    <!-- end col-6 -->
+                </div>
+                <div class="row user-panel">
+                    <!-- begin col-6 -->
+                    <div class="col-md-6">
+                        <person-project person="uhVm.item"></person-project>
+                    </div>
+                    <!-- end col-6 -->
+                    <!-- begin col-6 -->
+                    <div class="col-md-6">
+                        <h4 class="userPanelTitle">Squads</h4>
+                        <div class="panel-group m-b-0" ng-hide="uhVm.item.squads">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h5 class="panel-title">Join Squads!</h5>
+                                </div>
+                                <div class="panel-collapse collapse in">
+                                    <div class="panel-body">
+                                        <p>
+                                            You are not a part of any squads at this moment. Click <a href="/squads">here</a> to apply!
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- begin panel-group -->
+                        <div class="panel-group m-b-0" id="accordion2">
+                            <!-- begin panel -->
+                            <div class="panel" data-ng-repeat="sq in uhVm.item.squads" ng-class="{'panel-primary':sq.isLeader, 'panel-default': !sq.isLeader}">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion2" href="#{{sq.id}}">{{sq.name}}</a>
+                                    </h4>
+                                </div>
+                                <div id="{{sq.id}}" class="panel-collapse collapse" ng-class="{'in': sq.isLeader && $first}">
+                                    <div class="panel-body">
+                                        <div class="project-panel row">
+                                            <div class="col-xs-12">
+                                                <p>Role: <strong>{{sq.isLeader ? 'Leader' : 'Member'}}</strong></p>
+                                                <a href="/squads/{{sq.id}}/homeng1" class="button btn btn-xs btn-primary pull-right">Squad Home</a>
+                                                <a data-ng-if="sq.isLeader" href="/squads/{{sq.id}}/manage" class="button btn btn-xs btn-warning pull-left">Edit Squad</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="user-link">
+                            <a href="/squads">View More Squads<i class="fa fa-angle-double-right m-l-5"></i></a>
+                        </div>*@
+                        <!-- end panel-group -->
+                    </div>
+                    <!-- end col-6 -->
+                </div>
+            </div>
+        </div>
+        <!-- end container -->
+    </div>
+    <!-- end #home -->
+</div>
+
+
+@section pageInitScripts{
+    @*<script src="~/Assets/Admin/plugins/fullcalendar/lib/moment.min.js"></script>*@
+    <script src="~/Assets/Admin/plugins/fullcalendar/fullcalendar.min.js"></script>
+    <script src="~/Scripts/angular-ui/angular-ui-calendar.js"></script>
+    <script src="~/Scripts/bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("ui.calendar", "ui.bootstrap.tpls")
+    </script>
+}
+
+
+@section Scripts{
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/app/services/person.js"></script>
+    <script src="~/Scripts/sabio.services.user.js"></script>
+    <script src="~/Scripts/app/services/user.js"></script>
+    <script src="~/Scripts/sabio.services.timecardEntry.js"></script>
+    <script src="~/Scripts/app/services/TimecardEntry.js"></script>
+    <script src="~/Scripts/sabio.services.jobapplication.js"></script>
+    <script src="~/Scripts/app/services/jobApplication.js"></script>
+    <script src="~/Scripts/sabio.services.squadEvent.js"></script>
+    <script src="~/Scripts/app/services/squadEvent.js"></script>
+    <script src="~/Scripts/sabio.services.globalEvent.js"></script>
+    <script src="~/Scripts/app/services/globalEvent.js"></script>
+    <script src="~/Scripts/app/personProject/personProjectComponent.js"></script>
+    <script src="~/Scripts/app/personProject/personProjectController.js"></script>
+    <script src="~/Scripts/app/personJob/personJobComponent.js"></script>
+    <script src="~/Scripts/app/personJob/personJobController.js"></script>
+    <script src="~/Scripts/app/userHome/userHomeController.js"></script>
+}

@@ -1,0 +1,525 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+<style>
+    #map {
+        height: 550px;
+        width: 100%;
+        margin-bottom: .5%;
+    }
+
+    .rounded {
+        margin-top: 3%;
+        border-radius: 10px;
+    }
+</style>
+@section Styles {
+    <link href="/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" /> <!-- SWEET ALERT -->
+    <link href="~/Assets/Admin/plugins/bootstrap-eonasdan-datetimepicker/build/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+
+
+}
+
+<!-- begin breadcrumb -->
+<ol class="breadcrumb pull-right">
+    <li><a href="/">Home</a></li>
+    <li><a href="/opportunities/create">Languages</a></li>
+    <li class="active">Add Opportunities</li>
+</ol>
+<!-- end breadcrumb -->
+<!-- begin page-header -->
+<h1 class="page-header">Opportunities</h1>
+<!-- end page-header -->
+<!-- begin form content -->
+<div class="row">
+    <!-- begin col-6 -->
+    <div class="col-md-8">
+        <!-- begin panel -->
+        <div class="panel panel-inverse" data-sortable-id="form-stuff-1">
+            <div class="panel-heading">
+                <div class="panel-heading-btn">
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                    <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                </div>
+                <h4 class="panel-title">Add Opportunity</h4>
+            </div>
+            <div class="panel-body">
+                <form id="opportunityForm">
+
+                    <div class="form-group">
+                        <label for="name">Name / Title</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+
+
+                    @*  DATE START AND DATE END  *@
+                    <div class="form-group">
+                        <label class="control-label">Date(s)</label>
+                        <div class="">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <input type="text" class="form-control" id="datetimepicker6" name="DateTimeStart" placeholder="Start Date" />
+                                </div>
+                                <div class="col-xs-6">
+                                    <input type="text" class="form-control" id="datetimepicker7" name="DateTimeEnd" placeholder="End Date" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea type="text" class="form-control" id="description" name="description" rows="5"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactPersonFirstName">Contact Person First Name</label>
+                        <input type="text" class="form-control" id="contactPersonFirstName" name="contactPersonFirstName">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactPersonLastName">Contact Person Last Name</label>
+                        <input type="text" class="form-control" id="contactPersonLastName" name="contactPersonLastName">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" id="phone" name="phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address1">Address 1</label>
+                        <input type="text" class="form-control" id="address1" name="address1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address2">Address 2</label>
+                        <input type="text" class="form-control" id="address2" name=".">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" name="city">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stateProvinceId">State / Province</label>
+                        <select class="form-control" id="stateProvince" name="stateProvinceId"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postalCode">Zip Code</label>
+                        <input type="text" class="form-control" id="postalCode" name="postalCode">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="countryId">Country</label>
+                        <select class="form-control" id="countryId" name="countryId"></select>
+                    </div>
+
+                    <button type="button" class="btn btn-primary submit">Submit</button>
+
+                    <a href="/opportunities/create" class="btn btn-default ">Cancel</a>
+                    <button type="button" class="btn btn-danger delete hidden" data-toggle="modal" data-target="#myModal">Delete</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end form content -->
+<!-- MAP -->
+<div class="row">
+    <div class="col-md-8">
+        <div id="map" class="rounded">
+   
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script src="/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/sabio.services.geography.js"></script>
+    <script src="~/Scripts/sabio.services.opportunity.js"></script>
+
+    <script src="~/Assets/Admin/plugins/bootstrap3-editable/inputs-ext/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-daterangepicker/moment.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-eonasdan-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI"></script>
+
+    <script type="text/javascript">
+
+        sabio.page.activeId = @Model.Item;
+
+        sabio.page.startUp = function(){
+            console.log("this is my startup");
+            sabio.page.calendar();
+            sabio.services.geography.getAllCountries(
+                sabio.page.handlers.getCountriesSuccess
+                , sabio.page.handlers.getCountriesError); // Geography 1.
+            sabio.page.handlers.getStateProvinces();
+            sabio.page.getOpportunityId();  
+            sabio.page.initializeValidation();
+            $(".submit").on("click", sabio.page.handlers.submitForm); // 1.
+            $(".update").on("click", sabio.page.handlers.put);
+            $(".delete").on("click", sabio.page.handlers.delete);
+
+            $("#countryId").on("change", sabio.page.handlers.getStateProvinces);
+
+            //$(".submit").on("click", sabio.page.handlers.captureAddress);
+        }
+
+        sabio.page.calendar = function(){
+            console.log("This is my calander function");
+
+            $('#datetimepicker6').datetimepicker({defaultDate: "1/1/2001"});
+            $('#datetimepicker7').datetimepicker({
+                useCurrent: false //Important! See issue #1075
+                , defaultDate: "1/1/2001"
+            });
+            $("#datetimepicker6").on("dp.change", function (e) {
+                $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+            
+            });
+            $("#datetimepicker7").on("dp.change", function (e) {
+                $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+            });
+        }
+
+        // 2. SUBMIT FORM 
+        sabio.page.handlers.submitForm = function () {
+            if ($("#opportunityForm").valid()){
+                sabio.page.submitValidForm($("#opportunityForm").serialize());
+            }
+        };
+
+        // 3. FORM VALIDATION 
+        sabio.page.initializeValidation = function() {  // added
+            console.log("This is my initialize validation function.")
+            $.validator.setDefaults({
+                debug: true
+            });
+
+            $("#opportunityForm").validate({
+
+                highlight: function(element) {
+                    $(element).addClass("form-validate");
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass("form-validate");
+                },
+                errorPlacement: function(label, element){
+                    element.parent().append(label);
+                },
+                errorClass: "error-msg",
+                errorElement: "span",
+
+                // rules are linked to html via the "name" attribute values.
+                rules: {
+                    "name": {
+                        required: true,
+                        maxlength: 50
+                    },
+                    "description": {
+                        required: true,
+                        maxlength: 500
+                    },
+                    "contactPersonFirstName": {
+                        required: true,
+                        maxlength: 50
+                    },
+                    "contactPersonLastName": {
+                        required: true,
+                        maxlength: 50
+                    },
+                    "email": {
+                        required: true,
+                        email: true
+                    },
+                    "stateProvinceId": {
+                        required: true,
+                    },
+                    "countryId": {
+                        required: true,
+                    },
+                    "DateTimeStart":{
+                        required: true
+                    },
+                }
+            })
+
+        }
+
+        // GET BY ID - ajax
+        sabio.page.getOpportunityId = function() {
+            if (sabio.page.activeId != 0) {
+                sabio.services.opportunity.getById(
+                    sabio.page.activeId
+                    , sabio.page.getOpportunityIdSuccess
+                    , sabio.page.getOpportunityIdFailed);
+                console.log("this is my get by id function");
+                sabio.page.toEdit();
+            }
+        }
+
+        // GET BY ID - POPULATE FORM 
+        sabio.page.getOpportunityIdSuccess = function (data) {
+            console.log("this is my GET OPP Success function");
+
+            console.log(data);
+            $("#name").val(data.item.name)
+            $("#description").val(data.item.description)
+            $("#contactPersonFirstName").val(data.item.contactPersonFirstName);
+            $("#contactPersonLastName").val(data.item.contactPersonLastName);
+            $("#email").val(data.item.email);
+            $("#phone").val(data.item.phone);
+            $("#address1").val(data.item.address1);
+            $("#address2").val(data.item.address2);
+            $("#city").val(data.item.city);
+            $("#postalCode").val(data.item.postalCode);
+            $("#countryId").val(data.item.country.id);
+            sabio.page.handlers.getStateProvinces();
+            $("#stateProvince").val(data.item.stateProvince.id);
+            $("#datetimepicker6").val((moment(data.item.dateTimeStart).format('MM/DD/YYYY h:mm A zz')));
+            $("#datetimepicker7").val((moment(data.item.dateTimeStart).format('MM/DD/YYYY h:mm A zz')));
+
+            // $("#inactive").val(data.item.inactive ? "true" : "false");  // may be useful as a template.
+            sabio.page.handlers.initMap(); 
+            sabio.page.handlers.addMapMarker(); 
+        }
+
+        sabio.page.getOpportunityIdFailed = function() {
+            console.log("Get Opp ID failed!");
+        }
+
+        // 3. POST & PUT (validated) - ajax (2)
+        sabio.page.submitValidForm = function() {
+            if(sabio.page.activeId == 0){
+                var myData = $("#opportunityForm").serialize();
+                sabio.services.opportunity.post(myData, sabio.page.postSuccessful, sabio.page.postFailed);
+                console.log("this is my submit opp function");
+
+            }
+
+            else {
+                var myData = $("#opportunityForm").serialize() + "&id=" + sabio.page.activeId;
+                sabio.services.opportunity.put(sabio.page.activeId, myData, sabio.page.putSuccessful, sabio.page.putFailed);
+                console.log("this is my put update opp function");
+
+            }
+        };
+
+        sabio.page.postSuccessful = function(data) {
+            toastr.success("Opportunity Posted!");
+            console.log("POST succeeded!");
+            console.log(data);
+            sabio.page.activeId = data.item
+            sabio.page.toEdit();
+
+            sabio.page.handlers.initMap(); 
+            sabio.page.handlers.addMapMarker(); 
+        }
+
+        sabio.page.postFailed = function(data) {
+            toastr.error("Opportunity failed to post!");
+            console.log("POST failed!");
+            console.log(data);
+        }
+
+        sabio.page.putSuccessful = function(data) {
+            toastr.success("Opportunity Updated!");
+            console.log("PUT succeeded!");
+            console.log(data);
+            sabio.page.handlers.initMap(); 
+            sabio.page.handlers.addMapMarker(); 
+        }
+
+        sabio.page.putFailed = function(data) {
+            toastr.error("Opportunity failed to update!");
+            console.log("PUT failed!");
+            console.log(data);
+        }
+
+        sabio.page.toEdit = function()  {
+            $("h4").text("Edit entry");
+            $(".submit").text("Save changes").removeClass("btn-primary").addClass("btn-warning");
+            $(".delete").removeClass("hidden");
+            //document.location = "/opportunities/" + id + "/edit";
+
+        };
+
+        // DELETE - ajax
+        sabio.page.handlers.delete = function(){
+            console.log("This is my delete function.");
+            sabio.services.opportunity.delete(sabio.page.activeId, sabio.page.deleteSuccess, sabio.page.deleteError);
+        }
+
+        sabio.page.deleteSuccess = function(data){
+            toastr.success("Opportunity deleted!");
+            console.log("Delete Success!");
+            console.log(data);
+            //document.location = "/opportunities/create";
+        }
+
+        sabio.page.deleteError = function(data){
+            toastr.error("Opportunity failed to delete!");
+            console.log("Delete Error.");
+            console.log(data);
+        }
+
+        // GEOGRAPHY FUNCTIONS
+        sabio.page.countryId = 0;
+
+        sabio.page.handlers.getCountriesSuccess = function (data) {  // 2.
+            sabio.page.loadCountries(data.items); // 3.
+        }
+
+        sabio.page.handlers.getCountriesError = function (data) { // 2.b if failed.
+            alert("Failed to get countries");
+            console.log(data);
+        }
+
+        sabio.page.loadCountries = function (countryArray) {
+            var $countries = $("#countryId");
+            for (i = 0; i < countryArray.length; i++) {
+                $countries.append($("<option />").val(countryArray[i].id).text(countryArray[i].name));
+            };
+            $("#countryId").val(247);
+        }
+
+        sabio.page.handlers.getStateProvinces = function () {
+            sabio.page.countryId = $("#countryId").val();
+
+            sabio.services.geography.getStateProvincesByCountryId(
+                sabio.page.countryId,
+                sabio.page.handlers.getStateProvincesSuccess,
+                sabio.page.handlers.getStateProvincesError);
+        }
+
+        sabio.page.handlers.getStateProvincesSuccess = function (data) {
+            sabio.page.loadStateProvinces(data.items);
+        }
+
+        sabio.page.handlers.getStateProvincesError = function (data) {
+            alert("Failed to get states/provinces");
+            console.log(data);
+        }
+
+        sabio.page.loadStateProvinces = function (stateProvinceArray) {
+            $("#stateProvince").empty();
+            var $stateProvince = $("#stateProvince");
+            for (i = 0; i < stateProvinceArray.length; i++) {
+                $stateProvince.append($("<option />").val(stateProvinceArray[i].id).text(stateProvinceArray[i].name));
+            };
+        }
+
+
+
+        // Google Maps Start
+        sabio.page.handlers.initMap = function () {
+            console.log("This is my initMap function.")
+
+            sabio.page.map = new google.maps.Map($("#map")[0], {
+                center: { lat: 33.9885, lng: -118.3869007 },
+                zoom: 10
+            });
+
+        }
+
+        // event handlers
+        sabio.page.handlers.captureAddress = function () {
+            console.log("this is captureAddress function.");
+            var formData = {
+                address: $("#address1").val(),
+                city: $("#city").val(),
+                //state: $("#stateProvince").val(),
+                zip: $("#postalCode").val()
+            };
+            var address = formData.address + " "
+                + formData.city
+                + " "
+                //+ formData.stateProvince
+                //+ " "
+                + formData.zip
+            ;
+
+            var googleAddress = address.replace(/\s+/g, "+");
+            console.log(googleAddress);
+
+            return googleAddress;
+        };
+
+        sabio.page.handlers.addMapMarker = function (){
+            if ($("#opportunityForm").valid()) {
+                var googleAddress = sabio.page.handlers.captureAddress();
+
+                sabio.services.opportunity.getLatLng(
+                googleAddress
+                , sabio.page.handlers.addMapMarkerSuccess
+                , sabio.page.handlers.addMapMarkerError
+                );
+            }
+            else {
+                return;
+            }
+        }
+
+        sabio.page.handlers.addMapMarkerSuccess = function (data, status, xhr) {
+            if (data.status !== "ZERO_RESULTS") {
+                var lat = data.results[0].geometry.location.lat;
+                var lng = data.results[0].geometry.location.lng;
+                var latLng = new google.maps.LatLng(lat, lng);
+                var infowindow = new google.maps.InfoWindow({
+                    content: $("#description").val()
+
+                });
+
+                var marker = new google.maps.Marker({
+                    position: latLng,
+                    map: sabio.page.map,
+                    //title: $("#name").val(), // What's this do?
+                    animation: google.maps.Animation.DROP
+                });
+
+                marker.addListener('click', function () {
+                    infowindow.open(sabio.page.map, marker);
+                });
+  
+                $("#map").removeClass("hidden");
+                google.maps.event.trigger(sabio.page.map, "resize");
+
+                $("html, body").animate({
+                    scrollTop: $("#map").offset().top
+                }, 800);
+
+                sabio.page.map.panTo(latLng);
+
+                console.log(data);
+            }
+            else {
+                toastr.error("Failed to create event!");
+            }
+        };
+
+        sabio.page.handlers.addMapMarkerError = function (jqXHR, textStatus, errorThrown) {
+            toastr.error("Failed to create event!");
+        };
+
+    </script>
+
+}

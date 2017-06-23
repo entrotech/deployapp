@@ -1,0 +1,510 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+@{
+    ViewBag.Title = "JobPostings";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+@section styles {
+
+    <link href="~/Content/select2.css" rel="stylesheet" />
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+
+    <style>
+        #viewAll {
+            margin-bottom: 5px;
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-bottom: .5%;
+        }
+
+        .rounded {
+            border-radius: 5px;
+        }
+
+        .product {
+            background: #fff;
+            border: 1px solid #c5ced4;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            padding: 30px 30px 30px 30px;
+            margin-bottom: 15px;
+        }
+        .applied {
+            float: right;
+            text-align: center;
+            width: 15%;
+            background-color: lightgreen;
+            padding-top: 13px;
+            border-radius: 5px;
+            border-color: darkgreen;
+            border-style: solid;
+            border-width: 2px;
+        }
+        .appliedText {
+            color: darkgreen;
+        }
+        .inline {
+            display: inline-block;
+        }
+    </style>
+}
+
+<!-- BEGIN #product -->
+<div id="product" class="section-container p-t-20" ng-controller="jobPostingController as jpVm">
+    <!-- BEGIN container -->
+    <div class="container">
+        <!-- BEGIN breadcrumb -->
+        <ul class="breadcrumb m-b-10 f-s-12">
+            <li><a href="/home/index">Home</a></li>
+            <li><a href="/jobpostings/index">Job Search</a></li>
+            <li class="active positionName">{{jpVm.jobPosting.positionName}}</li>
+        </ul>
+        <!-- END breadcrumb -->
+        <!-- BEGIN product -->
+        <div class="product">
+            <div class="inline">
+                <h3 class="positionName">{{jpVm.jobPosting.positionName}}</h3>
+
+                <h4 id="companyName"><a ng-href="/companies/{{jpVm.jobPosting.companyId}}">{{jpVm.jobPosting.companyName}}</a></h4>
+
+                <p id="experienceLevel" ng-show="jpVm.jobPosting.experienceLevel">{{jpVm.jobPosting.experienceLevel}}</p>
+            </div>
+            <div class="applied" ng-show="jpVm.applied"><h4 class="appliedText">Applied! <i class="fa fa-check-circle"></i></h4></div>
+            <hr />
+            <h5 class="location" ng-show="jpVm.jobPosting.location">Location</h5>
+            <div>
+                <p class="streetAddress" id="streetAddress" ng-show="jpVm.jobPosting.streetAddress">{{jpVm.jobPosting.streetAddress}}</p>
+            </div>
+            <p class="location" id="location" ng-show="jpVm.jobPosting.location">{{jpVm.jobPosting.location}}</p>
+
+            <h5 class="compensation" ng-show="jpVm.jobPosting.compensation">Compensation</h5>
+            <p class="compensation" id="compensation" ng-show="jpVm.jobPosting.compensation">{{jpVm.jobPosting.compensation}}</p>
+
+            <h5 class="duration" ng-show="jpVm.jobPosting.duration">Duration</h5>
+            <p class="duration" id="duration" ng-show="jpVm.jobPosting.duration">{{jpVm.jobPosting.duration}}</p>
+
+            <h5 class="description" ng-show="jpVm.jobPosting.description">Description of Company</h5>
+            <p class="description" id="description" ng-show="jpVm.jobPosting.description" ng-bind-html="jpVm.sanitize(jpVm.jobPosting.description)"></p>
+
+            <h5 class="responsibilities" ng-show="jpVm.jobPosting.responsibilities">Position Responsibilities</h5>
+            <p class="responsibilities" id="responsibilities" ng-show="jpVm.jobPosting.responsibilities" ng-bind-html="jpVm.sanitize(jpVm.jobPosting.responsibilities)"></p>
+
+            <h5 class="requirements" ng-show="jpVm.jobPosting.requirements">Required Skills and Experience</h5>
+            <p class="requirements" id="requirements" ng-show="jpVm.jobPosting.requirements" ng-bind-html="jpVm.sanitize(jpVm.jobPosting.requirements)"></p>
+
+            <h5 class="contactInformation" ng-show="jpVm.jobPosting.contactInformation">Contact Information</h5>
+            <p class="contactInformation" id="contactInformation" ng-show="jpVm.jobPosting.contactInformation" ng-bind-html="jpVm.sanitize(jpVm.jobPosting.contactInformation)"></p>
+
+            <hr />
+            <div>
+                <p class="jobTags" ng-show="jpVm.jobPosting.jobTagString">Tags: <span id="jobTags">{{jpVm.jobPosting.jobTagString}}</span></p>
+            </div>
+            <div>
+                <p class="datePosted">Date Posted: <span id="date">{{jpVm.jobPosting.date}}</span></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="map" class="rounded" ng-show="jpVm.map">
+
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="product col-md-8" ng-show="jpVm.applyMode">
+            <h4>Apply to {{jpVm.jobPosting.positionName}}</h4>
+            <h5>Your resume and contact information will be sent to {{jpVm.jobPosting.companyName}}.</h5>
+            <p>Cover Letter (optional):</p>
+            <textarea type="text" class="ckeditor" id="ckeditor" ng-model="jpVm.coverLetter" rows="5"></textarea>
+        </div>
+        <div class="col-md-8">
+            <button type="button" class="btn btn-primary" ng-click="jpVm.apply()" ng-hide="jpVm.applied">{{jpVm.applyButtonText}}</button>
+            <button type="button" class="btn btn-default" ng-click="jpVm.cancel()" ng-show="jpVm.applyMode">Cancel</button>
+        </div>
+    </div>
+
+</div>
+
+@section pageInitScripts {
+    <script src="~/Assets/Admin/plugins/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ng/angular-ckeditor.min.js"></script>
+    <script src="~/Scripts/ng/angular-sanitize.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("ngSanitize");
+    </script>
+}
+
+@section scripts {
+    <script src="~/Scripts/sabio.services.jobPosting.js"></script>
+    <script src="~/Scripts/sabio.services.globalEvent.js"></script>
+    <script src="~/Scripts/sabio.services.jobapplication.js"></script>
+    <script type="text/javascript">
+
+        sabio.page.id = @Model.Item;
+        sabio.page.personId = @Model.Id;
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('jobPostingService', JobPostingService);
+
+            JobPostingService.$inject = ['$baseService', '$sabio'];
+
+            function JobPostingService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.jobPosting;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('globalEventService', GlobalEventService);
+
+            GlobalEventService.$inject = ['$baseService', '$sabio'];
+
+            function GlobalEventService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.globalEvent;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            "use strict";
+            angular.module(APPNAME)
+                .factory('jobApplicationService', JobApplicationService);
+
+            JobApplicationService.$inject = ['$baseService', '$sabio'];
+
+            function JobApplicationService($baseService, $sabio) {
+                var aSabioServiceObject = sabio.services.jobApplication;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            angular.module(APPNAME)
+                .controller('jobPostingController', JobPostingController);
+
+            JobPostingController.$inject = ['$baseController', '$scope', '$window', '$sabio', 'jobPostingService', 'globalEventService', 'jobApplicationService', '$sce', '$sanitize'];
+
+            function JobPostingController($baseController, $scope, $window, $sabio, jobPostingService, globalEventService, jobApplicationService, $sce, $sanitize) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$window = $window;
+                $baseController.merge(vm, $baseController);
+                vm.jobPostingService = jobPostingService;
+                vm.globalEventService = globalEventService;
+                vm.jobApplicationService = jobApplicationService;
+
+                vm.id = $sabio.id;
+                vm.personId = $sabio.personId;
+                vm.applyData = {};
+                vm.jobPosting = null;
+                vm.onlyCity = false;
+                vm.map = null;
+                vm.applyMode = false;
+                vm.applyButtonText = "Apply";
+                vm.applied = false;
+
+                vm.sanitize = _sanitize;
+                vm.apply = _apply;
+                vm.cancel = _cancel;
+                vm.sanitize = _sanitize;
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+
+                // Get by ID functions
+                vm.jobPostingService.getById(vm.id, _getByIdSuccess, _getByIdError);
+
+                function _getByIdSuccess(data) {
+                    if (data.item) {
+                        vm.jobPosting = data.item;
+                        vm.jobPosting.date = _dateStringBuilder(data.item.dateCreated);
+                        if (data.item.city || data.item.stateProvinceName || data.item.countryName) {
+                            vm.jobPosting.location = _locationStringBuilder(data.item.city, data.item.stateProvinceName, data.item.countryName);
+                        }
+                        if (data.item.experienceLevelId) {
+                            vm.jobPosting.experienceLevel = _experienceLevelStringBuilder(data.item.experienceLevelId);
+                        }
+                        if (data.item.compensation) {
+                            vm.jobPosting.compensation = _compensationStringBuilder(data.item.compensation, data.item.compensationRateId);
+                        }
+                        if (data.item.fullPartId || data.item.contractPermanentId) {
+                            vm.jobPosting.duration = _durationStringBuilder(data.item.fullPartId, data.item.contractPermanentId);
+                        }
+                        if (data.item.jobTags) {
+                            vm.jobTagsString = _jobTagsStringBuilder(data.item.jobTags);
+                        }
+                        if (data.item.city) {
+                            _initMap();
+                        }
+                        _checkIfApplied();
+                    }
+                }
+
+                function _getByIdError(data) {
+                    toastr.error("Failed to get job posting");
+                }
+
+                // String builder functions
+                function _dateStringBuilder(date) {
+                    var t = date.split(/[- : T]/);
+                    var d = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5]));
+                    var dateString = d.getMonth() + "/" + d.getDate() + "/" + d.getFullYear();
+                    return dateString;
+                }
+
+                function _locationStringBuilder(city, stateProvince, country) {
+                    var locationArray = [];
+                    if (city) {
+                        locationArray.push(city);
+                    }
+                    if (stateProvince) {
+                        locationArray.push(stateProvince);
+                    }
+                    if (country) {
+                        locationArray.push(country);
+                    }
+                    var locationString = locationArray.join(", ");
+                    return locationString;
+                }
+
+                function _experienceLevelStringBuilder(id) {
+                    var string = "";
+                    switch (id) {
+                        case 1:
+                            string = "Entry level";
+                            break;
+                        case 2:
+                            string = "Mid-level";
+                            break;
+                        case 3:
+                            string = "Senior level";
+                            break;
+                        default:
+                            break;
+                    }
+                    return string;
+                }
+
+                function _compensationStringBuilder(amt, rate) {
+                    var formattedAmt = amt.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+                    var formattedRate = "";
+                    if (rate) {
+                        switch (rate) {
+                            case 1:
+                                formattedRate = " per hour";
+                                break;
+                            case 2:
+                                formattedRate = " per day";
+                                formattedAmt = formattedAmt.slice(0, -3);
+                                break;
+                            case 3:
+                                formattedRate = " per year";
+                                formattedAmt = formattedAmt.slice(0, -3);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    return "$" + formattedAmt + formattedRate;
+                }
+
+                function _durationStringBuilder(fullPartId, contractPermanentId) {
+                    var stringArray = [];
+                    if (fullPartId) {
+                        switch (fullPartId) {
+                            case 1:
+                                stringArray.push("Part-time");
+                                break;
+                            case 2:
+                                stringArray.push("Full-time");
+                                break;
+                            case 3:
+                                stringArray.push("Part-time to full-time");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    if (contractPermanentId) {
+                        switch (contractPermanentId) {
+                            case 1:
+                                stringArray.push("Contract");
+                                break;
+                            case 2:
+                                stringArray.push("Permanent");
+                                break;
+                            case 3:
+                                stringArray.push("Contract-to-hire");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    var string = stringArray.join(", ");
+                    return string;
+                }
+
+                function _jobTagsStringBuilder(jobTags) {
+                    var jobTagsArray = [];
+                    for (i = 0; i < jobTags.length; i++) {
+                        jobTagsArray.push(jobTags[i].keyword);
+                    }
+                    var jobTagsString = jobTagsArray.join(", ");
+                    return jobTagsString;
+                }
+
+                // Map functions
+                function _initMap() {
+                    _addMapMarker();
+
+                    $(window).resize(function () {
+                        vm.map.setCenter(center);
+                    });
+                }
+
+                function _addMapMarker() {
+                    var googleAddress = "";
+                    if (vm.jobPosting.streetAddress) {
+                        address = vm.jobPosting.streetAddress + " " + vm.jobPosting.location;
+                        googleAddress = address.replace(/\s+/g, "+");
+                    } else {
+                        vm.onlyCity = true;
+                        googleAddress = vm.jobPosting.location.replace(/\s+/g, "+");
+                    }
+
+                    vm.globalEventService.getLatLng(
+                        googleAddress,
+                        _addMapMarkerSuccess,
+                        _addMapMarkerError
+                    );
+                }
+
+                function _addMapMarkerSuccess(data, status, xhr) {
+
+                    if (data.status !== "ZERO_RESULTS") {
+                        vm.$scope.$apply(function () {
+                            var lat = data.results[0].geometry.location.lat;
+                            var lng = data.results[0].geometry.location.lng;
+                            var latLng = new google.maps.LatLng(lat, lng);
+
+                            vm.map = new google.maps.Map($("#map")[0], {
+                                center: latLng,
+                                zoom: 12
+                            });
+
+                            var infowindow = new google.maps.InfoWindow({
+                                content: vm.jobPosting.streetAddress
+                            });
+
+                            if (vm.onlyCity) {
+                                var myCity = new google.maps.Circle({
+                                    center: latLng,
+                                    radius: 5000,
+                                    strokeColor: "#0000FF",
+                                    strokeOpacity: 0.8,
+                                    strokeWeight: 2,
+                                    fillColor: "#0000FF",
+                                    fillOpacity: 0.4
+                                });
+                                myCity.setMap(vm.map);
+                            } else {
+                                var marker = new google.maps.Marker({
+                                    position: latLng,
+                                    map: vm.map,
+                                    title: vm.jobPosting.streetAddress,
+                                    animation: google.maps.Animation.DROP
+                                });
+                            }
+                            google.maps.event.trigger(vm.map, "resize");
+
+                            vm.map.panTo(latLng);
+                        })
+                    }
+                    else {
+                        toastr.error("Failed to load map");
+                    }
+                }
+
+                function _addMapMarkerError(data) {
+                    toastr.error("Failed to load map marker")
+                }
+
+                // Apply functions
+                function _apply() {
+                    if (vm.personId > 0) {
+                        if (vm.applyMode) {
+                            vm.coverLetter = $sanitize(CKEDITOR.instances.ckeditor.getData());
+                            vm.applyData = {
+                                personId: vm.personId,
+                                jobPostingId: vm.id,
+                                coverLetter: vm.coverLetter
+                            };
+                            vm.jobApplicationService.post(vm.applyData, _applySuccess, _applyError);
+                        } else {
+                            vm.applyMode = true;
+                            vm.applyButtonText = "Send Application";
+                        }
+                    } else {
+                        window.location.href = "/users/login?ReturnUrl=%2Fjobpostings%2F" + vm.id;
+                    }
+                }
+
+                function _applySuccess(data) {
+                    toastr.success("Application sent!");
+                    _loadAppliedMode();
+                }
+
+                function _applyError(data) {
+                    toastr.error("Application failed to send");
+                }
+
+                function _cancel() {
+                    vm.applyMode = false;
+                    vm.applyButtonText = "Apply";
+                }
+
+                function _checkIfApplied() {
+                    vm.jobApplicationService.getByPersonId(vm.personId, _getByPersonIdSuccess, _getByPersonIdError);
+                }
+
+                function _getByPersonIdSuccess(data) {
+                    var jobPostingIds = [];
+                    if (data.items) {
+                        for (var i = 0; i < data.items.length; i++) {
+                            jobPostingIds.push(data.items[i].jobPostingId);
+                        }
+                        var jobPostingIndex = jobPostingIds.indexOf(vm.id);
+                        if (jobPostingIndex >= 0) {
+                            _loadAppliedMode();
+                        }
+                    }
+                }
+
+                function _getByPersonIdError(data) {
+                    toastr.error("Failed to get application info");
+                }
+
+                function _loadAppliedMode() {
+                    vm.$scope.$apply(function () {
+                        vm.applyMode = false;
+                        vm.applied = true;
+                        $window.scrollTo(0, 0);
+                    })
+                }
+            }
+        })();
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEXjYvK3d8Dasdyz2HN3gy81FJk6XvlYI"></script>
+}

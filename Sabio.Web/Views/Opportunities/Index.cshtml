@@ -1,0 +1,231 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<style>
+    #languageIndex {
+        border-style: initial;
+        padding: 15px;
+    }
+
+    #editFloat {
+        float: right;
+    }
+</style>
+
+
+<div class="row">
+
+    <div id="opportunitiesIndex">
+        <!-- language loads up here  -->
+        <div id="content" class="content">
+            <div>
+                <!-- removed class "container" from this line: made box to narrow. -->
+                <div class="row row-space-20">
+                    <!-- removed "row row-space-20" from class -->
+                    <div class="col-lg-12">
+                        <!-- remvoed id "gridPost": doesn't seem to do anything. -->
+                        <div class="post-list" id="opportunitiesIndex">
+                            <!-- removed "post-grid-4" from class: too constricting. -->
+                            <!-- content goes here. -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@*  <div class="row">
+        <div class="col-lg-12">
+             <div class="post-list" id="opportunitiesIndex"> <!-- removed "result-list" from class: no appearant effect.-->
+
+
+            </div>
+        </div>
+    </div>*@
+
+
+
+
+
+@section scripts {
+    <script src="~/Scripts/sabio.services.opportunity.js"></script>
+    <script src="~/Assets/Admin/plugins/bootstrap-daterangepicker/moment.js"></script>
+
+    <script type="text/javascript">
+
+        sabio.page.startUp = function () {
+            //sabio.page.itemsPerPage = 4;
+            sabio.page.getOpportunities();
+            console.log("This is my starUp function.");
+            $("body").on("click", ".edit", sabio.page.handlers.edit);
+            // $("body").on("click", ".delete", sabio.page.handlers.delete);
+            $("#btn-search").on("click", sabio.page.handlers.search);
+
+        }
+
+        sabio.page.getOpportunities = function () {
+            console.log("get all the opportunities!");
+            sabio.services.opportunity.getAll(sabio.page.getOpportunitySuccess, sabio.page.getOpportunityFailed);
+        }
+
+        sabio.page.getOpportunitySuccess = function (data) {
+            //$("#opportunitiesIndex").empty();
+            console.log("GET is Successful!");
+
+            //for (var i = 0; i < data.items.length; i++) {
+            //    console.log(data.items[i]);
+            //    sabio.page.totalPage = (data.items[1].noOfRows / sabio.page.itemsPerPage);
+
+            //    var $opportunity = $($("#template").html());
+            //    if (i % 2 == 0) {
+            //        $opportunity.addClass("pull-left");
+            //    }
+            //    else {
+            //        $opportunity.addClass("pull-right");
+            //    }
+            //}
+
+            $.each(data.item, function (key, data) {
+                var template = sabio.page.loadTemplate();
+                $(".id", template).text(data.id);
+                $(".name", template).text(data.name)
+                $(".description", template).text(data.description)
+                $(".contactPersonFirstName", template).text(data.contactPersonFirstName);
+                $(".contactPersonLastName", template).text(data.contactPersonLastName);
+                $(".email", template).text(data.email);
+                $(".phone", template).text(data.phone);
+                $(".address1", template).text(data.address1);
+                $(".address2", template).text(data.address2);
+                $(".city", template).text(data.city);
+                $(".stateProvinceId", template).text(data.stateProvince.name);
+                $(".postalCode", template).text(data.postalCode);
+                $(".countryId", template).text(data.country.code);
+                $(".dateTimeStart", template).text((moment(data.dateTimeStart).format('MM/DD/YYYY h:mm A')));
+                $(".dateTimeEnd", template).text((moment(data.dateTimeEnd).format('MM/DD/YYYY h:mm A')));
+
+                // $(".inactive", template).text(row.inactive ? "Inactive" : "Active");  // may be useful as a template.
+
+                $("#opportunitiesIndex").append(template);
+            })
+        }
+
+        /*
+        sabio.page.getOpportunitySuccess = function (data) {
+            console.log("GET is Successful!");
+            $.each(data.item, function (key, data) {
+                var template = sabio.page.loadTemplate();
+                $(".id", template).text(data.id);
+                $(".name", template).text(data.name)
+                $(".description", template).text(data.description)
+                $(".contactPersonFirstName", template).text(data.contactPersonFirstName);
+                $(".contactPersonLastName", template).text(data.contactPersonLastName);
+                $(".email", template).text(data.email);
+                $(".phone", template).text(data.phone);
+                $(".address1", template).text(data.address1);
+                $(".address2", template).text(data.address2);
+                $(".city", template).text(data.city);
+                $(".stateProvinceId", template).text(data.stateProvince.name);
+                $(".postalCode", template).text(data.postalCode);
+                $(".countryId", template).text(data.country.code);
+                $(".dateTimeStart", template).text((moment(data.dateTimeStart).format('MM/DD/YYYY h:mm A')));
+                $(".dateTimeEnd", template).text((moment(data.dateTimeEnd).format('MM/DD/YYYY h:mm A')));
+
+                // $(".inactive", template).text(row.inactive ? "Inactive" : "Active");  // may be useful as a template.
+
+                $("#opportunitiesIndex").append(template);
+            })
+        }*/
+
+        sabio.page.getOpportunityFailed = function (data) {
+            console.log("Not Successful.");
+            console.log(data);
+
+        }
+
+
+        sabio.page.loadTemplate = function () {
+            return $($("#template").html());
+        }
+
+        sabio.page.handlers.edit = function (e) {
+            e.preventDefault();
+            console.log("edit function");
+            var id = $(this).closest(".item").find(".id").text();
+            document.location = "/opportunities/" + id + "/edit";
+        }
+
+
+    </script>
+
+    <script type="text/html" id="template">
+
+        <div class="post-li">
+            <div class="post-content result-info">
+                <div class="post-info">
+                    <div class="id hidden">id</div>
+                    <h4 class="name">NAME</h4>
+                    <div><span class="dateTimeStart">Start</span> <i>to</i> <span class="dateTimeEnd">End</span></div>
+                    <h5 class="description">description</h5>
+                    <div class="email">email</div>
+                    <div class="phone hidden">phone</div>
+                    <div class="address1 hidden">address1</div>
+                    <div class="address2 hidden">address2</div>
+                    <div>
+                        <span class="city">city</span>, <span class="stateProvinceId">stateProvinceId</span>
+                    </div>
+                    <div class="countryId">countryId</div>
+                    <div class="postalCode hidden">postalCode</div>
+                    <div class="read-btn-container">
+                        <!-- removed id "editFloat"-->
+                        <button class="btn btn-success edit">Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </script>
+
+    <!-- ORIGINAL TEMPLATE START --
+
+            <script type="text/html" id="template">
+
+        <div class="search-item-container col-md-4" style="background: #fff">
+            <div class="item ">
+        <li>
+            <div class="result-info list">
+
+                <div class="id hidden">id</div>
+                <h4 class="name">name</h4>
+                <div><span class="dateTimeStart">Start</span> <i>to</i> <span class="dateTimeEnd">End</span></div>
+                @*<div>Start Date: <span class="dateTimeStart">Start</span></div>
+                    <div>End Date: <span class="dateTimeEnd">End</span></div>*@
+                <h5 class="description">description</h5>
+                <div>
+                    <span class="contactPersonFirstName">contactPersonFirstName</span> <span class="contactPersonLastName">contactPersonLastName</span>
+                </div>
+                <div class="email">email</div>
+                <div class="phone hidden">phone</div>
+                <div class="address1 hidden">address1</div>
+                <div class="address2 hidden">address2</div>
+                <div>
+                    <span class="city">city</span>, <span class="stateProvinceId">stateProvinceId</span>
+                </div>
+                <div class="countryId">countryId</div>
+                <div class="postalCode hidden">postalCode</div>
+
+                <button class="btn btn-success edit " id="editFloat">Edit</button>
+                @*k  <button class="btn btn-success delete " id="editDelete">Delete</button>*@
+
+            </div>
+        </div>
+
+    </script>
+
+     -- ORIGINAL TEMPLATE END  -->
+}

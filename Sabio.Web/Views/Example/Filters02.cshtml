@@ -1,0 +1,68 @@
+﻿
+@{
+    ViewBag.Title = "Filters01";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+
+<h2>Creating custom filters</h2>
+
+<div ng-app="myReverseFilterApp" ng-controller="MyController as myVm">
+    <input ng-model="myVm.greeting" type="text"><br>
+    No filter: {{myVm.greeting}}<br>
+    Reverse: {{myVm.greeting | reverse}}<br>
+    Reverse + uppercase: {{myVm.greeting|reverse:true}}<br>
+    Reverse, filtered in controller: {{myVm.filteredGreeting}}<br>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/angular.js"></script>
+
+    <script>
+
+        (function () {
+            "use strict";
+            angular.module('myReverseFilterApp', []);
+        })();
+
+        (function () {
+            "use strict";
+            angular.module('myReverseFilterApp')
+                .filter('reverse', ReverseFilter);
+
+            function ReverseFilter() {
+                return function (input, uppercase) {
+                    input = input || '';
+                    var out = '';
+                    for (var i = 0; i < input.length; i++) {
+                        out = input.charAt(i) + out;
+                    }
+                    // conditional based on optional argument
+                    if (uppercase) {
+                        out = out.toUpperCase();
+                    }
+                    return out;
+                };
+            }
+        })();
+
+        (function () {
+            "use strict";
+            angular.module('myReverseFilterApp')
+                .controller('MyController', MyController);
+            
+            MyController.$inject = ['$scope', 'reverseFilter'];
+
+            function MyController($scope, reverseFilter) {
+                var vm = this;
+                vm.reverseFilter = reverseFilter;
+
+                vm.greeting = 'hello';
+                vm.filteredGreeting = vm.reverseFilter(vm.greeting);
+
+            }
+
+        })();
+
+    </script>
+}
+

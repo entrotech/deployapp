@@ -1,0 +1,209 @@
+﻿@{
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+@{
+    <style>
+        #date-sort {
+            margin-left: 10px;
+        }
+
+        span.category {
+            margin-left: 5px;
+        }
+
+        .search-field, .filter-sort-wrapper {
+            margin-bottom: 10px !important;
+        }
+
+        .filter-sort-wrapper {
+            margin-left: 1px;
+        }
+    </style>
+}
+
+<div ng-controller="announcementController as annVm">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li><a href="/Announcements/Create">Create</a></li>
+        <li class="active">Manage</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Announcements</h1>
+    <!-- end page-header -->
+    <!-- begin row -->
+    <div class="row">
+        <!-- begin col-12 -->
+        <div class="col-md-12">
+            <div class="result-container">
+                <div class="input-group m-b-20 col-md-12 search-field">
+                    <input type="text" class="form-control input-white"
+                           placeholder="Enter keywords" ng-model="annVm.search">
+                </div>
+                <div class="row filter-sort-wrapper">
+                    <div class="dropdown pull-left">
+                        <a href="javascript:;" class="btn btn-white btn-white-without-border dropdown-toggle" data-toggle="dropdown">
+                            Category <span class="caret m-l-5"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a id="view-general" href="javascript:;" ng-click="annVm.categoryFilter('General')">General</a>
+                            </li>
+                            <li>
+                                <a id="view-squad" href="javascript:;" ng-click="annVm.categoryFilter('Squad')">Squad</a>
+                            </li>
+                            <li>
+                                <a id="view-mentorship" href="javascript:;" ng-click="annVm.categoryFilter('Mentorship')">Mentorship</a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a id="view-all" href="javascript:;" ng-click="annVm.resetFilter()">All</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="dropdown pull-left" id="date-sort">
+                        <a ng-click="annVm.sortArrow = !annVm.sortArrow; annVm.sort(annVm.items.dateCreated);" href="javascript:;"
+                           class="btn btn-white btn-white-without-border dropdown-toggle" data-toggle="dropdown">
+                            Date
+                            <span ng-show="!annVm.sortArrow" class="fa fa-caret-down"></span>
+                            <span ng-show="annVm.sortArrow" class="fa fa-caret-up"></span>
+                        </a>
+                    </div>
+                </div>
+                <div id="announcements-container">
+                    <!-- begin panel -->
+                    <div dir-paginate="item in annVm.items | orderBy: annVm.sortKey: annVm.reverse | filter: {announcementCategory: {name: annVm.category}} | filter: annVm.search | itemsPerPage:5"
+                         class="announcement panel panel-inverse" data-sortable-id="ui-media-object-4">
+                        <div class="panel-heading">
+                            <div class="panel-heading-btn">
+                                <span class="label label-info person">
+                                    {{item.personFirstName}} {{item.personLastName}}
+                                </span>
+                                <span class="label label-danger category">
+                                    {{item.announcementCategory.name}}
+                                </span>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning"
+                                   data-click="panel-collapse">
+                                    <i class="fa fa-minus"></i>
+                                </a>
+                            </div>
+                            <h4 class="panel-title title">
+                                <a href="javascript:;">
+                                    {{item.title}}
+                                </a>
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="media media-sm">
+                                <div class="media-body">
+                                    <p class="small">
+                                        {{item.dateCreated | date : "MMMM d, y"}}
+                                    </p>
+                                    <p class="body desc">
+                                        {{item.body}}
+                                    </p>
+                                    <p>
+                                        <a ng-click="annVm.edit(item)" href="javascript:;"
+                                           class="edit-announcement btn btn-sm btn-info m-r-5">
+                                            Edit <i class="fa fa-edit m-r-5"></i>
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end panel -->
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <dir-pagination-controls max-size="5"
+                                                 direction-links="true"
+                                                 boundary-links="true">
+                        </dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end col-12 -->
+    </div>
+    <!-- end row -->
+</div>
+
+@section pageInitScripts{
+    <script src="~/Scripts/dirPagination.js"></script>
+    <script>
+        sabio.moduleOptions.extraModuleDependencies.push("angularUtils.directives.dirPagination")
+    </script>
+}
+
+@section Scripts {
+    <script src="~/Scripts/sabio.services.announcement.js"></script>
+    <script src="~/Scripts/app/services/announcement.js"></script>
+    <script>
+        (function () {
+            angular.module(APPNAME)
+                .controller("announcementController", AnnouncementController);
+
+            AnnouncementController.$inject = ["$scope", "$window", "$baseController", "announcementService"];
+
+            function AnnouncementController($scope, $window, $baseController, announcementService) {
+                var vm = this;
+                vm.$scope = $scope;
+                $baseController.merge(vm, $baseController);
+                vm.announcementService = announcementService;
+                vm.$window = $window;
+
+                // view model
+                vm.sortArrow = false;
+                vm.items = [];
+                vm.search = "";
+                vm.sortKey = "";
+                vm.category = "";
+                vm.reverse = false;
+                vm.edit = _edit;
+                vm.sort = _sort;
+                vm.categoryFilter = _categoryFilter;
+                vm.resetFilter = _resetFilter;
+
+                _render();
+
+                function _sort(keyname) {
+                    vm.sortKey = keyname;
+                    vm.reverse = !vm.reverse;
+                }
+
+                function _categoryFilter(category) {
+                    vm.category = category;
+                }
+
+                function _resetFilter() {
+                    vm.category = "";
+                }
+
+                function _render() {
+                    vm.announcementService.getAll(_getAllSuccess, _getAllError);
+                }
+
+                function _getAllSuccess(data) {
+                    if (data.items.length >= 1) {
+                        vm.$scope.$apply(function () {
+                            vm.items = data.items;
+                        });
+                    }
+                    else {
+                        vm.$alertService.success("No announcements exist!");
+                    }
+                }
+
+                function _getAllError(jqXHR) {
+                    vm.$alertService.error(jqXHR.responseText, "Failed to load announcements!");
+                }
+
+                function _edit(item) {
+                    vm.$window.location.href = "/announcements/" + item.id + "/edit";
+                }
+            }
+        })();
+    </script>
+}
