@@ -12,4 +12,4 @@ To create a new database for this application, create a database with the name o
 
 Then modify the ConnectionStrings.config to reflect the corresponding connection string for your serer and database.
 
-
+The API keys and other settings for SendGrid, Google Maps API, Twilio, Amazon AWS S3 file storage, etc. are stored in the PrivateSettings.config file and should be changed to reflect the Operation Code accounts.
