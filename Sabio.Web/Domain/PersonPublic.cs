@@ -21,6 +21,7 @@ namespace Sabio.Web.Domain
         public string Country { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string PhotoUrl { get; set; }
+        public string Description { get; set; }
 
 
     }

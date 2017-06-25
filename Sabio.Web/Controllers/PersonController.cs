@@ -37,10 +37,12 @@ namespace Sabio.Web.Controllers
 
 
         [AllowAnonymous]
-        [Route("indexbase")]
-        public ActionResult IndexBase()
+        [Route("{id:int}/PublicPerson")]
+        public ActionResult PublicPerson(int id)
         {
-            return View();
+            ItemViewModel<int> model = new ItemViewModel<int>();
+            model.Item = id;
+            return View(model);
         }
     }
 }

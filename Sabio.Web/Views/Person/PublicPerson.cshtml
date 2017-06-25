@@ -1,0 +1,202 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<int>
+
+@{
+    ViewBag.Title = "PublicPerson";
+    Layout = "~/Views/Shared/_BlogLayout.cshtml";
+}
+
+@section styles{
+    <style>
+        .grid-wrapper {
+            display: grid;
+            grid-gap: 10px;
+            grid-template-columns: 33% 33% 34%;
+            background-color: #fff;
+            color: #444;
+        }
+
+        .public-profile-grid {
+            background-color: #444;
+            color: #000;
+            border-radius: 5px;
+            padding: 20px;
+            font-size: 150%;
+            height: auto;
+        }
+
+        .profile-photo {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .basic-info {
+            grid-column: 2 / 4;
+            grid-row: 1;
+        }
+
+        .about-me {
+            grid-column: 1/4;
+            grid-row: 2;
+        }
+
+        /*photo resize styles*/
+        div > img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .portrait {
+            height: auto;
+            width: auto;
+        }
+
+        .landscape {
+            height: 30px;
+            width: 80px;
+        }
+
+        .square {
+            height: 75px;
+            width: 75px;
+        }
+    </style>
+    <link href="~/Assets/Admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+}
+
+<div class="content" ng-controller="publicPersonProfileController as pppc">
+    <div class="container">
+
+        <div class="grid-wrapper">
+
+            <div class="public-profile-grid profile-photo container-fluid">
+                <div>
+                    <img class="thumbnail" ng-src="{{pppc.person.photoUrl}}" />
+                </div>
+            </div>
+
+            <div class="public-profile-grid basic-info">
+                <div class="panel panel-inverse">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <h4>Public information:</h4>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-6">
+                            <h4><strong ng-bind="pppc.person.fullName"></strong></h4>
+                            <h5 ng-bind="pppc.person.email"></h5>
+                            <div class="form-group">
+                                <label for="dateOfBirth">Date of birth:</label>
+                                <h6 ng-if="pppc.person.dateOfBirth != ''" ng-bind="pppc.person.dateOfBirth"></h6>
+                            </div>
+                            <div class="form-group">
+                                <label for="address" ng-if="pppc.person.address1 != ''">Address:</label>
+                                <h6 ng-if="pppc.person.address1 != ''" ng-bind="pppc.person.address"></h6>
+                            </div>
+                        </div>
+                        <div class="col-6">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="public-profile-grid about-me">
+                <div class="panel panel-inverse">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <h4>About me:</h4>
+                        </div>
+                    </div>
+                    <div ng-bind-html="pppc.sanitize(pppc.person.description)" class="panel-body">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.js"></script>
+    <script src="~/Scripts/sabio.ui.sweetalert.js"></script>
+    <script src="~/Scripts/sabio.services.person.js"></script>
+    <script src="~/Scripts/app/services/person.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-sanitize.js"></script>
+    <script src="~/Assets/Admin/plugins/fullcalendar/lib/moment.min.js"></script>
+
+    <script>
+
+        // Person Service
+        (function () {
+            'use strict';
+
+            angular.module(APPNAME)
+                .factory('personService', PersonService);
+
+            PersonService.$inject = ["$sabio", "$baseService"];
+
+            function PersonService($sabio, $baseService) {
+                var aSabioServiceObject = sabio.services.person;
+                var newService = $baseService.merge(true, {}, aSabioServiceObject, $baseService);
+                return newService;
+            }
+        })();
+
+        (function () {
+            'use strict';
+
+            angular.module(APPNAME)
+                .controller('publicPersonProfileController', PublicPersonProfileController);
+
+            PublicPersonProfileController.$inject = ["$scope", "$window", "personService", "$baseController", "$sce"];
+
+            function PublicPersonProfileController($scope, $window, personService, $baseController, $sce) {
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$window = $window;
+                vm.sanitize = _sanitize;
+
+                $baseController.merge(vm, $baseController);
+
+                vm.personService = personService;
+                vm.person = {};
+                vm.person.id = sabio.page.model.item;
+                vm.loadPerson = _loadPerson;
+
+                _loadPerson();
+
+                //THE FOLD //
+                function _loadPerson() {
+                    vm.personService.getByIdPublic(vm.person.id, _onGetPersonSuccess, _onGetPersonError);
+                }
+
+                function _onGetPersonSuccess(data) {
+                    vm.$scope.$apply(function () {
+                        if (data.item.dateOfBirth == "1900-01-01T00:00:00") {
+                            data.item.dateOfBirth = null;
+                        } else {
+                            data.item.dateOfBirth = moment(data.item.dateOfBirth).format('LL');
+                        }
+                        vm.person = data.item;
+                    });
+                    vm.person.fullName = vm.person.firstName + " " + vm.person.lastName;
+
+                    vm.$alertService.success("Public profile retrieved!");
+                }
+
+                function _onGetPersonError(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    console.log(err);
+                }
+
+                function _sanitize(html_code) {
+                    return $sce.trustAsHtml(html_code);
+                }
+            }
+        })();
+    </script>
+}

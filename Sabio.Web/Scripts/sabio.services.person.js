@@ -80,6 +80,25 @@ sabio.services.person.getById = function (id, onSuccess, onError) {
 	$.ajax(url, settings);
 }
 
+sabio.services.person.getByIdPublic = function (id, onSuccess, onError) {
+    var url = "/api/person/" + id + "/publicPerson/";
+
+    var settings = {
+        cache: false,
+        contentType: "json",
+        dataType: "json",
+        type: "GET",
+        data: id,
+        success: onSuccess,
+        error: onError,
+        xhrFields: {
+            withCredentials: true
+        }
+    };
+
+    $.ajax(url, settings);
+}
+
 sabio.services.person.postJson = function (data, onSuccess, onError) {
 	var url = "/api/person";
 	var settings = {

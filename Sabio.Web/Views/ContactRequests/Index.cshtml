@@ -9,9 +9,6 @@
     <!-- begin page-header -->
     <h1 class="page-header">Contact Us Requests <small>Manage questions, comments, qualms here...</small></h1>
     <!-- end page-header -->
-    @* **PAGINATION** *@
-
-    @* **SEARCH** *@
 
 
 
@@ -35,7 +32,9 @@
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove" data-original-title="" title="" data-init="true"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">{{ item.name }}</h4>
+                        <h4 class="panel-title">{{ item.name }} 
+                            <br />
+                        {{item.dateCreated | date}}</h4>
                     </div>
                     <div class="panel-body">
 
@@ -95,6 +94,8 @@
 
 @section scripts{
     <script src="~/Scripts/sabio.services.contactRequest.js"></script>
+    <script src="~/Scripts/moment.js"></script>
+
 
     <script>
 
@@ -135,7 +136,7 @@
                 vm.items = [];
                 vm.item = null;  // copy of item being edited
                 vm.itemIndex = -1; // index of item being edited
-                vm.totalItems = 10;
+                vm.totalItems = 8;
                 //vm.send = _send;
                 vm.select = _select;
                 vm.currentPage = 1;
@@ -203,6 +204,8 @@
                 function _onUpdateError(error) {
                     vm.$alertService.error(error);
                 }
+
+                
 
                 // SEARCH
                 function _search() {

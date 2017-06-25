@@ -6784,6 +6784,7 @@
     <Content Include="Scripts\angular-touch.js" />
     <Content Include="Scripts\angular-touch.min.js" />
     <Content Include="Scripts\angular-ui\angular-ui-calendar.js" />
+    <Content Include="Scripts\angular-ui\ngjs-color-picker.js" />
     <Content Include="Scripts\angular-ui\ui-bootstrap-tpls.js" />
     <Content Include="Scripts\angular-ui\ui-bootstrap-tpls.min.js" />
     <Content Include="Scripts\angular-ui\ui-bootstrap.js" />
@@ -6859,6 +6860,7 @@
     <Content Include="Scripts\bower_components\outlayer\item.js" />
     <Content Include="Scripts\bower_components\outlayer\outlayer.js" />
     <Content Include="Scripts\dirPagination.js" />
+    <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\Plugins\Cropper\Cropper.js" />
     <Content Include="Scripts\Plugins\Cropper\Cropper.css" />
     <Content Include="Scripts\sabio.services.cropper.js" />
@@ -8395,6 +8397,7 @@
     <Content Include="Scripts\sabio\core\services\base.service.js" />
     <Content Include="Scripts\sabio\sabio.material.js" />
     <Content Include="Scripts\sabio\sabio.module.js" />
+    <Content Include="Scripts\sabio\sabio.module.ngjs-color-picker.js" />
     <Content Include="Scripts\sabio\sabio.module.ui-bootstrap.js" />
     <Content Include="Scripts\sabio\sabio.module.xeditable.js" />
     <Content Include="Scripts\sabio.services.squadMember.js" />
@@ -8468,7 +8471,6 @@
     <Content Include="Views\Sabio\Gamma.cshtml" />
     <Content Include="Views\Sabio\Delta.cshtml" />
     <Content Include="Views\Sabio\Epsilon.cshtml" />
-    <Content Include="Views\Example\Ajax.cshtml" />
     <Content Include="Scripts\jquery.validate.min.js.map">
       <DependentUpon>jquery.validate.min.js</DependentUpon>
     </Content>
@@ -8576,7 +8578,6 @@
     <Content Include="Views\HomeStatistics\Stats.cshtml" />
     <Content Include="Views\GlobalEvents\IndexAdminNg.cshtml" />
     <Content Include="Views\Announcements\IndexBlogTheme2.cshtml" />
-    <Content Include="Views\GlobalEvents\IndexBlogTheme3.cshtml" />
     <Content Include="Views\Testimonials\PublicIndex.cshtml" />
     <Content Include="Views\SquadEvents\EventDetails2.cshtml" />
     <Content Include="Views\Projects\Dashboard_Blog.cshtml" />
@@ -8590,6 +8591,8 @@
     <Content Include="Views\Languages\NgIndex.cshtml" />
     <Content Include="Views\Opportunities\IndexNg5.cshtml" />
     <Content Include="Views\Opportunities\Admin.cshtml" />
+    <Content Include="Views\Person\PublicPerson.cshtml" />
+    <Content Include="Views\Example\Ajax.cshtml" />
     <None Include="Web.Azure.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

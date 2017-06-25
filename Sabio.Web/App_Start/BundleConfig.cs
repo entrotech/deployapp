@@ -65,19 +65,26 @@ namespace Sabio.Web
             bundles.Add(new ScriptBundle("~/bower/jquery").Include(
                       "~/Scripts/bower_components/jquery/dist/jquery.js"));
 
-            bundles.Add(new ScriptBundle("~/bower/angular").Include(
-                      "~/Scripts/bower_components/angular/angular.js",
-                      "~/Scripts/bower_components/angular-animate/angular-animate.js",
-                      "~/Scripts/bower_components/angular-bootstrap/ui-bootstrap.js",
-                      "~/Scripts/bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
-                      "~/Scripts/bower_components/angular-route/angular-route.js",
-                      "~/Scripts/bower_components/angular-toastr/dist/angular-toastr.js",
-                      "~/Scripts/bower_components/angular-toastr/dist/angular-toastr.tpls.js"));
+            // Admin theme bundles
+            bundles.Add(new StyleBundle("~/bundles/adminThemeStyles/css").Include(
+                "~/assets/admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css",
+                "~/assets/admin/plugins/bootstrap/css/bootstrap.min.css",
+                "~/assets/admin/plugins/bootstrap/css/bootstrap.min.css",
+                "~/assets/admin/css/animate.min.css",
+                "~/assets/admin/css/style.min.css",
+                "~/assets/admin/css/style-responsive.min.css",
+                "~/assets/admin/css/theme/default.css"));
 
-            //Sabio: this disables the optimizations in Bundles.
-            //this allows all files  to be rendered separately while we develop
-
-            BundleTable.EnableOptimizations = false;
+            bundles.Add(new ScriptBundle("~/bundles/adminThemeScripts").Include(
+                "~/assets/admin/plugins/jquery/jquery-1.9.1.js",
+                "~/assets/admin/plugins/jquery/jquery-migrate-1.1.0.js",
+                "~/assets/admin/plugins/jquery-ui/ui/minified/jquery-ui.js",
+                "~/assets/admin/plugins/slimscroll/jquery.slimscroll.js",
+                "~/assets/admin/plugins/jquery-cookie/jquery.cookie.js"
+                ));
+           
+            // Commented out, to let web.config control whether optimizations are used
+            //BundleTable.EnableOptimizations = false;
         }
     }
 }

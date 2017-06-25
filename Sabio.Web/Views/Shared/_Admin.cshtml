@@ -15,17 +15,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deploy - Built By Vets</title>
-    @*@Styles.Render("~/Content/css")
-        @Scripts.Render("~/bundles/modernizr")*@
+
     <!-- ================== BEGIN BASE CSS STYLE ================== -->
     <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
-    <link href="/assets/admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
-    <link href="/assets/admin/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="/assets/admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    @*<link href="/assets/admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
+    <link href="/assets/admin/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+ 
     <link href="/assets/admin/css/animate.min.css" rel="stylesheet" />
     <link href="/assets/admin/css/style.min.css" rel="stylesheet" />
     <link href="/assets/admin/css/style-responsive.min.css" rel="stylesheet" />
-    <link href="/assets/admin/css/theme/default.css" rel="stylesheet" id="theme" />
+    <link href="/assets/admin/css/theme/default.css" rel="stylesheet" id="theme" />*@
+
+    @Styles.Render("~/bundles/adminThemeStyles/css")
+
     <!-- ================== END BASE CSS STYLE ================== -->
     <link href="~/Content/deployAdmin.css" rel="stylesheet" />
     <link href="~/Content/angular-toastr.css" rel="stylesheet" />
@@ -354,30 +357,31 @@
     </div>
     <!--Begin footer-->
     <!--End footer-->
-    <!-- ================== BEGIN BASE JS ================== -->
+
     <script src="/assets/admin/plugins/jquery/jquery-1.9.1.min.js"></script>
     <script src="/assets/admin/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
     <script src="/assets/admin/plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+    <script src="/assets/admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="/assets/admin/plugins/jquery-cookie/jquery.cookie.js"></script>
+
     <script src="/assets/admin/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/assets/Admin/plugins/moment/moment.min.js"></script>
+    
     <!--[if lt IE 9]>
         <script src="/assets/admin/crossbrowserjs/html5shiv.js"></script>
         <script src="/assets/admin/crossbrowserjs/respond.min.js"></script>
         <script src="/assets/admin/crossbrowserjs/excanvas.min.js"></script>
     <![endif]-->
-    <script src="/assets/admin/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-    <script src="/assets/admin/plugins/jquery-cookie/jquery.cookie.js"></script>
-    <!-- ================== END BASE JS ================== -->
-    <!-- ================== BEGIN PAGE LEVEL JS ================== -->
+
     <script src="/assets/admin/js/apps.js"></script>
-    <!-- ================== END PAGE LEVEL JS ================== -->
+
     <script type="text/javascript">
         var APPNAME = 'SabioApp';
     </script>
+
     <script src="~/Scripts/sabio.js"></script>
 
     @Scripts.Render("~/bower/angular")
-
-    <script src="~/Assets/Admin/plugins/moment/moment.min.js"></script>
 
     @RenderSection("pageInitScripts", required: false)
 

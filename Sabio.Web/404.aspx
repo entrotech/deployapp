@@ -23,7 +23,6 @@
     <link href="/assets/admin/css/theme/default.css" rel="stylesheet" id="theme" />
     <!-- ================== END BASE CSS STYLE ================== -->
     <!-- ================== BEGIN BASE JS ================== -->
-
     <script src="/assets/admin/plugins/pace/pace.min.js"></script>
     <!-- ================== END BASE JS ================== -->
 </head>

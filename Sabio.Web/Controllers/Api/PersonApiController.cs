@@ -117,7 +117,7 @@ namespace Sabio.Web.Controllers.Api
             return Request.CreateResponse(HttpStatusCode.OK, response);
 
         }
-        [Route("{id:int}/public"), HttpGet]
+        [Route("{id:int}/publicperson"), HttpGet]
         public HttpResponseMessage PersonPublic_SelectById (int id)
         {
             ItemResponse<PersonPublic> response = new ItemResponse<PersonPublic>()

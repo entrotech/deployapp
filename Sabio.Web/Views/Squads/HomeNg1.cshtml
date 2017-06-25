@@ -7,8 +7,8 @@
 
 @section styles {
     <link href="~/Assets/Admin/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
-    <link href="~/Content/angular-material.min.css" rel="stylesheet" />
     <link href="~/Scripts/Plugins/SweetAlert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Content/angular-material.min.css" rel="stylesheet" />
     <link href="~/Assets/Admin/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
     <link href="~/Assets/Admin/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css" rel="stylesheet" />
     <link href="~/Assets/Admin/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" />
@@ -90,10 +90,10 @@
                                     <div ng-repeat="squadLeader in fcc.squad.squadLeaders" class="row">
                                         <!-- ng repeat squadleaders in fcc.squadleaders an array of squad leaders-->
                                         <div class="col-md-4">
-                                            <img class="photo-thumb-md" ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{squadLeader.person.photoKey}}" />
+                                            <a ng-href="/person/{{squadLeader.person.id}}/publicperson"><img class="photo-thumb-md" ng-src="{{squadLeader.person.profilePicture}}" /></a>
                                         </div>
                                         <div class="col-md-8">
-                                            <h3 ng-bind="squadLeader.person.fullName"></h3>
+                                            <a ng-href="/person/{{squadLeader.person.id}}/publicperson"><h3 ng-bind="squadLeader.person.fullName"></h3></a>
                                             <h6 ng-bind="squadLeader.person.email"></h6>
                                         </div>
                                     </div>
@@ -113,10 +113,10 @@
                                     <!-- ng repeat squadMember in fcc.squadMembers an array of squad members-->
 
                                     <div class="">
-                                        <div class="col-xs-3 col-md-4" ng-repeat="squadMember in fcc.squad.squadMembers">
-                                            <img class="photo-thumb-md" ng-src="https://sabio-training.s3-us-west-2.amazonaws.com/C31/{{squadMember.person.photoKey}}" /> <!--photo-->
+                                        <div class="col-sm-1 col-md-4" ng-repeat="squadMember in fcc.squad.squadMembers">
+                                            <a ng-href="/person/{{squadMember.person.id}}/publicperson"><img class="photo-thumb-md" ng-src="squadMember.person.profilePicture" /></a> <!--photo-->
                                             <div class="caption">
-                                                <h6 class="text-center" ng-bind="squadMember.person.fullName"></h6> <!-- member full name-->
+                                                <a ng-href="/person/{{squadMember.person.id}}/publicperson"><h6 class="text-center" ng-bind="squadMember.person.fullName"></h6></a> <!-- member full name-->
                                             </div>
                                         </div>
                                     </div>
@@ -246,9 +246,15 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular-sanitize.js"></script>
 
 
+    <!--Begin profile info modal template-->
+    <script type="text/ng-template" id="profile-modal-template.html">
+        <div class="modal-header">
 
+        </div>
+    </script>
+    <!--end profile modal template-->
 
-    <!--Copied modal from homeng-->
+    <!--Add Event Modal template-->
     <script type="text/ng-template" id="modal-template.html">
         <div>
             <div>
@@ -350,7 +356,28 @@
             </div>
         </div>
     </script>
-    <!-- end modal template-->
+    <!-- end event modal template-->
+
+    <!--Public Profile Modal-->
+<script type="text/ng-template" id="public-profile-modal.html">
+    <div>
+        <div>
+            <div class="modal-header">
+                <button ng-click="ppmc.modalClose()" type="button" id="modalHeaderXBtn" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">  </h4>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button ng-click="ppmc.modalClose()">Close</button>
+            </div>
+        </div>
+    </div>
+</script>
+    <!--End Public Profile Modal-->
+
+
     <script>
 
         // --------------------COPY FROM HOMENG SCRIPT -------------//
@@ -417,7 +444,31 @@
             }
         })();
 
+        //publicProfileModalController
+        (function () {
+            'use strict';
+            angular.module(APPNAME)
+                .controller('publicProfileModalController', PublicProfileModalController);
 
+            PublicProfileModalController.$inject = ["$scope", "$window", "$baseController", "$uibModalInstance", "$modalInstance", "personService", "person"];
+
+            function PublicProfileModalController ($scope, $window, $baseController, $uibModalInstance, $modalInstance, personService, person){
+                var vm = this;
+                vm.$scope = $scope;
+                vm.$window = $window;
+
+                $baseController.merge(vm, $baseController);
+
+                vm.person = person;
+                vm.personService = personService;
+                vm.modalClose = _modalClose;
+
+                //the fold
+                function _modalClose (){
+                    $uibModalInstance.close();
+                }
+            }
+        })();
 
         //modalInstanceController
         (function () {
@@ -732,7 +783,29 @@
                 };
 
 
-                /// $uibModal options
+                // Public Profile $uibModal
+                function _openModal() {
+                    var uibModalInstance = vm.$uibModal.open({
+                        animation: true,
+                        templateUrl: 'public-profile-modal.html',       //  this tells it what html template to use. it must exist in a script tag OR external file
+                        controller: 'publicProfileModalController as ppmc',    //  this controller must exist and be registered with angular for this to work
+                        size: 'md',
+                        resolve: {  //  anything passed to resolve can be injected into the modal controller as shown below
+                            person: function () {
+                                return this.person;
+                            }
+                        }
+                    });
+
+                    //  when the modal closes it returns a promise
+                    uibModalInstance.result.then(function (selectedItem) {
+                        vm.modalSelected = selectedItem;    //  if the user closed the modal by clicking Save
+                    }, function () {
+                        console.log('Modal dismissed at: ' + new Date());   //  if the user closed the modal by clicking cancel
+                    });
+                }
+
+                /// Calendar Event $uibModal options
                 function _openModal() {
                     var uibModalInstance = vm.$uibModal.open({
                         animation: true,
@@ -809,12 +882,14 @@
                                 break;
                             }
                             else {
+                                vm.currentUserPerson.squads = [];
                                 vm.currentUserPerson.squads.isMember = false;
                                 vm.currentUserPerson.squads.isLeader = false;
                             };
                         };
                     }
                     else {
+                        vm.currentUserPerson.squads = [];
                         vm.currentUserPerson.squads.isMember = false;
                         vm.currentUserPerson.squads.isLeader = false;
                     };

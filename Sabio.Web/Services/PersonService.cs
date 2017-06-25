@@ -742,6 +742,7 @@ namespace Sabio.Web.Services
                    pp.Address2 = reader.GetSafeString(ord++);
                    pp.Email = reader.GetSafeString(ord++);
                    pp.DateOfBirth = reader.GetSafeDateTime(ord++);
+                   pp.Description = reader.GetSafeString(ord++);
                });
 
             return pp;

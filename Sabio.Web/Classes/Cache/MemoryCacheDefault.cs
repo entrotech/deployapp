@@ -23,8 +23,10 @@ namespace Sabio.Web.Cache
             get
             {
                 return _instance;
+
             }
         }
+
 
         public void RemoveStartsWith(string key)
         {
