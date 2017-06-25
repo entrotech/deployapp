@@ -660,6 +660,9 @@
     <Content Include="500.aspx" />
     <Content Include="404.aspx" />
     <Content Include="404.html" />
+    <Content Include="App_Data\DeployAppCreate.sql" />
+    <Content Include="App_Data\DeployAppData.sql" />
+    <Content Include="App_Data\DeployAppSprocs.sql" />
     <Content Include="Assets\Admin\crossbrowserjs\excanvas.min.js" />
     <Content Include="Assets\Admin\crossbrowserjs\html5shiv.js" />
     <Content Include="Assets\Admin\crossbrowserjs\respond.min.js" />
@@ -8602,7 +8605,6 @@
     <Content Include="Views\Proposals\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Assets\blog\less\" />
     <Folder Include="Migrations\" />
     <Folder Include="Scripts\i18n\" />
