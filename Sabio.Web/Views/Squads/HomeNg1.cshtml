@@ -90,10 +90,14 @@
                                     <div ng-repeat="squadLeader in fcc.squad.squadLeaders" class="row">
                                         <!-- ng repeat squadleaders in fcc.squadleaders an array of squad leaders-->
                                         <div class="col-md-4">
-                                            <a ng-href="/person/{{squadLeader.person.id}}/publicperson"><img class="photo-thumb-md" ng-src="{{squadLeader.person.profilePicture}}" /></a>
+                                            <a ng-href="/person/{{squadLeader.person.id}}/publicperson">
+                                                <img class="photo-thumb-md" ng-src="{{squadLeader.person.profilePicture}}" />
+                                            </a>
                                         </div>
                                         <div class="col-md-8">
-                                            <a ng-href="/person/{{squadLeader.person.id}}/publicperson"><h3 ng-bind="squadLeader.person.fullName"></h3></a>
+                                            <a ng-href="/person/{{squadLeader.person.id}}/publicperson">
+                                                <h3 ng-bind="squadLeader.person.fullName"></h3>
+                                            </a>
                                             <h6 ng-bind="squadLeader.person.email"></h6>
                                         </div>
                                     </div>
@@ -114,9 +118,13 @@
 
                                     <div class="">
                                         <div class="col-sm-1 col-md-4" ng-repeat="squadMember in fcc.squad.squadMembers">
-                                            <a ng-href="/person/{{squadMember.person.id}}/publicperson"><img class="photo-thumb-md" ng-src="squadMember.person.profilePicture" /></a> <!--photo-->
+                                            <a ng-href="/person/{{squadMember.person.id}}/publicperson">
+                                                <img class="photo-thumb-md" ng-src="{{squadMember.person.profilePicture}}" />
+                                            </a> <!--photo-->
                                             <div class="caption">
-                                                <a ng-href="/person/{{squadMember.person.id}}/publicperson"><h6 class="text-center" ng-bind="squadMember.person.fullName"></h6></a> <!-- member full name-->
+                                                <a ng-href="/person/{{squadMember.person.id}}/publicperson">
+                                                    <h6 class="text-center" ng-bind="squadMember.person.fullName"></h6>
+                                                </a> <!-- member full name-->
                                             </div>
                                         </div>
                                     </div>
@@ -253,7 +261,6 @@
         </div>
     </script>
     <!--end profile modal template-->
-
     <!--Add Event Modal template-->
     <script type="text/ng-template" id="modal-template.html">
         <div>
@@ -357,24 +364,23 @@
         </div>
     </script>
     <!-- end event modal template-->
-
     <!--Public Profile Modal-->
-<script type="text/ng-template" id="public-profile-modal.html">
-    <div>
+    <script type="text/ng-template" id="public-profile-modal.html">
         <div>
-            <div class="modal-header">
-                <button ng-click="ppmc.modalClose()" type="button" id="modalHeaderXBtn" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title">  </h4>
-            </div>
-            <div class="modal-body">
+            <div>
+                <div class="modal-header">
+                    <button ng-click="ppmc.modalClose()" type="button" id="modalHeaderXBtn" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">  </h4>
+                </div>
+                <div class="modal-body">
 
-            </div>
-            <div class="modal-footer">
-                <button ng-click="ppmc.modalClose()">Close</button>
+                </div>
+                <div class="modal-footer">
+                    <button ng-click="ppmc.modalClose()">Close</button>
+                </div>
             </div>
         </div>
-    </div>
-</script>
+    </script>
     <!--End Public Profile Modal-->
 
 
@@ -940,7 +946,7 @@
                                 , personId: vm.currentUserPerson.id
                                 , memberStatusId: 1
                                 , isLeader: false
-                               
+
                                 , id: vm.currentUserPerson.squads.memberId
                             };
                             vm.squadMemberService.putJson (data.id, data , _onRequestAddSuccess , _onRequestAddError);
