@@ -406,7 +406,6 @@
     <Compile Include="Controllers\Api\ServiceBranchesAPIController.cs" />
     <Compile Include="Controllers\Api\SquadEventsApiController.cs" />
     <Compile Include="Controllers\Api\SquadsApiController.cs" />
-    <Compile Include="Controllers\Api\Tests\TestCenterApiController.cs" />
     <Compile Include="Controllers\Api\TimecardEntryApiController.cs" />
     <Compile Include="Controllers\AspNetUserRolesController.cs" />
     <Compile Include="Controllers\Attributes\SabioAuthorizeAttribute.cs" />
@@ -415,7 +414,6 @@
     <Compile Include="Controllers\BlogTagsController.cs" />
     <Compile Include="Controllers\EducationLevelsController.cs" />
     <Compile Include="Controllers\BlogsController.cs" />
-    <Compile Include="Controllers\ExampleController.cs" />
     <Compile Include="Controllers\FaqsController.cs" />
     <Compile Include="Controllers\GlobalEventsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -428,14 +426,12 @@
     <Compile Include="Controllers\PersonController.cs" />
     <Compile Include="Controllers\ProjectsController.cs" />
     <Compile Include="Controllers\ProposalsController.cs" />
-    <Compile Include="Controllers\SabioController.cs" />
     <Compile Include="Controllers\SkillsController.cs" />
     <Compile Include="Controllers\SquadTagsController.cs" />
     <Compile Include="Controllers\TestimonialsController.cs" />
     <Compile Include="Controllers\ServiceBranchesController.cs" />
     <Compile Include="Controllers\SquadEventsController.cs" />
     <Compile Include="Controllers\SquadsController.cs" />
-    <Compile Include="Controllers\TestsController.cs" />
     <Compile Include="Classes\PagedList.cs" />
     <Compile Include="Controllers\TimecardEntryController.cs" />
     <Compile Include="Controllers\TrelloController.cs" />
@@ -478,9 +474,6 @@
     <Compile Include="Domain\AnnouncementCategory.cs" />
     <Compile Include="Domain\SquadEvent.cs" />
     <Compile Include="Domain\Squad.cs" />
-    <Compile Include="Domain\TestPerson.cs" />
-    <Compile Include="Domain\Tests\TestBoss.cs" />
-    <Compile Include="Domain\Tests\TestEmployee.cs" />
     <Compile Include="Domain\TimecardEntry.cs" />
     <Compile Include="Domain\TrelloAuth.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
@@ -645,12 +638,7 @@
     <Compile Include="Services\JobPostingService.cs" />
     <Compile Include="Services\JobTagService.cs" />
     <Compile Include="Services\SquadService.cs" />
-    <Compile Include="Services\Tests\IEmployeeService.cs" />
     <Compile Include="Services\SquadEventService.cs" />
-    <Compile Include="Services\Tests\ITestService.cs" />
-    <Compile Include="Services\Tests\TestBossEmployeeService.cs" />
-    <Compile Include="Services\Tests\TestEmployeeService.cs" />
-    <Compile Include="Services\Tests\TestService.cs" />
     <Compile Include="Services\TimecardEntryService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
@@ -6739,9 +6727,7 @@
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <Content Include="Content\ui-bootstrap-csp.css" />
-    <Content Include="Controllers\SabioReadMe.txt" />
     <Content Include="css\jasmine.css" />
-    <Content Include="Domain\SabioReadMe.txt" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -8321,6 +8307,8 @@
     <Content Include="Scripts\bower_components\eventie\README.md" />
     <Content Include="Scripts\app\Project\ProjectTemplate.html" />
     <Content Include="Scripts\app\Timecard\TimecardTemplate.html" />
+    <None Include="Properties\PublishProfiles\opcodetest - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\opcodetest - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
@@ -8488,13 +8476,6 @@
     </Content>
     <Content Include="Scripts\sabio.ng.app.js" />
     <Content Include="Scripts\sabio.tests.services.js" />
-    <Content Include="Views\Shared\_LayoutAlternate.cshtml" />
-    <Content Include="Views\Example\Index.cshtml" />
-    <Content Include="Views\Example\Basic.cshtml" />
-    <Content Include="Views\Example\Routes.cshtml" />
-    <Content Include="Views\Example\Events.cshtml" />
-    <Content Include="Views\Example\Bootstrap.cshtml" />
-    <Content Include="Views\Example\Geography.cshtml" />
     <Content Include="Views\Shared\_Admin.cshtml" />
     <Content Include="Views\Blogs\Create.cshtml" />
     <Content Include="Views\Person\Create.cshtml" />
@@ -8525,11 +8506,6 @@
     <Content Include="Views\Users\Login.cshtml" />
     <Content Include="Views\Shared\_BlogLayout.cshtml" />
     <Content Include="Scripts\sabio.services.languageproficiency.js" />
-    <Content Include="Views\Shared\_EmptyLayout.cshtml" />
-    <Content Include="Views\Example\Ng1.cshtml" />
-    <Content Include="Views\Example\Ng2.cshtml" />
-    <Content Include="Views\Example\Ng3.cshtml" />
-    <Content Include="Views\Example\Ng4.cshtml" />
     <Content Include="Views\TimecardEntry\Index.cshtml" />
     <Content Include="Views\Blogs\AngularBlog.cshtml">
       <BrowseToURL>~/Blogs/ngBlog</BrowseToURL>
@@ -8545,20 +8521,7 @@
     <Content Include="Views\Proposals\AdminCreate.cshtml" />
     <Content Include="Views\Proposals\ngIndex.cshtml" />
     <Content Include="Scripts\sabio.services.jobapplication.js" />
-    <Content Include="Views\Example\AngularJs01.cshtml" />
-    <Content Include="Views\Example\AngularJs02.cshtml" />
-    <Content Include="Views\Example\AngularJs04.cshtml" />
-    <Content Include="Views\Example\AngularJs03.cshtml" />
-    <Content Include="Views\Example\AngularJs05.cshtml" />
-    <Content Include="Views\Example\Controller01.cshtml" />
-    <Content Include="Views\Example\Controller02.cshtml" />
-    <Content Include="Views\Example\Controller03.cshtml" />
-    <Content Include="Views\Example\Scope01.cshtml" />
-    <Content Include="Views\Example\Scope02.cshtml" />
-    <Content Include="Views\Example\Filters01.cshtml" />
-    <Content Include="Views\Example\Filters02.cshtml" />
     <Content Include="Views\GlobalEvents\GlobalEvent.cshtml" />
-    <Content Include="Views\Example\UiRouter01.cshtml" />
     <Content Include="Views\Squads\IndexNG.cshtml" />
     <Content Include="Views\Projects\ngCreate.cshtml" />
     <Content Include="Views\Projects\ngIndex.cshtml" />
@@ -8595,7 +8558,6 @@
     <Content Include="Views\Opportunities\IndexNg5.cshtml" />
     <Content Include="Views\Opportunities\Admin.cshtml" />
     <Content Include="Views\Person\PublicPerson.cshtml" />
-    <Content Include="Views\Example\Ajax.cshtml" />
     <None Include="Web.Azure.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
