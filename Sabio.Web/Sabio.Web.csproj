@@ -8662,9 +8662,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>1552</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://deploy.dev</IISUrl>
+          <IISUrl>https://deploy.test</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>https://deploy.dev</IISAppRootUrl>
+          <IISAppRootUrl>https://deploy.test</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

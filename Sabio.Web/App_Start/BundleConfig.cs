@@ -65,6 +65,15 @@ namespace Sabio.Web
             bundles.Add(new ScriptBundle("~/bower/jquery").Include(
                       "~/Scripts/bower_components/jquery/dist/jquery.js"));
 
+            bundles.Add(new ScriptBundle("~/bower/angular").Include(
+                    "~/Scripts/bower_components/angular/angular.js",
+                    "~/Scripts/bower_components/angular-animate/angular-animate.js",
+                    "~/Scripts/bower_components/angular-bootstrap/ui-bootstrap.js",
+                    "~/Scripts/bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
+                    "~/Scripts/bower_components/angular-route/angular-route.js",
+                    "~/Scripts/bower_components/angular-toastr/dist/angular-toastr.js",
+                    "~/Scripts/bower_components/angular-toastr/dist/angular-toastr.tpls.js"));
+
             // Admin theme bundles
             bundles.Add(new StyleBundle("~/bundles/adminThemeStyles/css").Include(
                 "~/assets/admin/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css",
