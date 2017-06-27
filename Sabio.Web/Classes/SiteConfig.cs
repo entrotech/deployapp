@@ -47,41 +47,6 @@ namespace Sabio.Web.Classes
             get { return GetFromConfig("BrandTagline"); }
         }
 
-        public static string BrandLogo
-        {
-            get { return GetFromConfig("BrandLogo"); }
-        }
-
-        public static string BrandThumbNail
-        {
-            get { return GetFromConfig("BrandThumbNail"); }
-        }
-
-        public static string BrandLogoFooter
-        {
-            get { return GetFromConfig("BrandLogoFooter"); }
-        }
-
-        public static string BrandBackgroundImage
-        {
-            get { return GetFromConfig("BrandBackgroundImage"); }
-        }
-
-        public static string BrandDescription
-        {
-            get { return GetFromConfig("BrandDescription"); }
-        }
-
-        public static string BrandHighRes
-        {
-            get { return GetFromConfig("BrandHighRes"); }
-        }
-
-        public static string BrandLogoEmail
-        {
-            get { return GetFromConfig("BrandLogoEmail"); }
-        }
-
         public static string AWSProfileName
         {
             get { return GetFromConfig("AWSProfileName"); }

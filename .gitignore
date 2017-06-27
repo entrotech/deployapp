@@ -3,6 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Private settings
+ConnectionStrings.config
+PrivateSettings.config
+
+
 # User-specific files
 *.suo
 *.user

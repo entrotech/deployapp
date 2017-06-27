@@ -89,41 +89,6 @@ namespace Sabio.Web.Models.ViewModels
             get { return SiteConfig.BrandTagline; }
         }
 
-        public string BrandLogo
-        {
-            get { return SiteConfig.BrandLogo; }
-        }
-
-        public string BrandThumbNail
-        {
-            get { return SiteConfig.BrandThumbNail; }
-        }
-
-        public string BrandLogoFooter
-        {
-            get { return SiteConfig.BrandLogoFooter; }
-        }
-
-        public string BrandBackgroundImage
-        {
-            get { return SiteConfig.BrandBackgroundImage; }
-        }
-
-        public string BrandDescription
-        {
-            get { return SiteConfig.BrandDescription; }
-        }
-
-        public string BrandHighRes
-        {
-            get { return SiteConfig.BrandHighRes; }
-        }
-
-        public string BrandLogoEmail
-        {
-            get { return SiteConfig.BrandLogoEmail; }
-        }
-
         public string AWSProfileName
         {
             get { return SiteConfig.AWSProfileName; }
